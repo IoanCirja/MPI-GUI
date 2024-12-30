@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FileUploadService } from './upload.service';
-import virustotal from '@api/virustotal';
 
 @Component({
   selector: 'app-upload',
@@ -13,7 +12,12 @@ export class UploadComponent {
   numProcesses: number | null = null;
   executionOutput: string = ''; 
   isLoading: boolean = false; 
-  virusTotalStatus: string = ''; 
+  allowOverSubscription: boolean = false;
+  
+  
+  nodeList: string[] = Array.from({ length: 21 }, (_, i) => `C05-${i.toString().padStart(2, '0')}`);
+  selectedNodes: boolean[] = new Array(21).fill(false); 
+  slots: number[] = new Array(21).fill(10); 
 
   constructor(private fileUploadService: FileUploadService) {}
 
@@ -23,7 +27,6 @@ export class UploadComponent {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
 
-      
       if (file.name.endsWith('.exe') || file.name.endsWith('.cpp')) {
         this.selectedFile = file;
         this.uploadMessage = `Selected file: ${file.name}`;
@@ -35,26 +38,57 @@ export class UploadComponent {
   }
 
   
+  hasSelectedNodes(): boolean {
+    return this.selectedNodes.some(selected => selected);
+  }
+
+  
+  generateHostfile(): File {
+    
+    const selectedNodesWithSlots = this.nodeList.filter((node, index) => this.selectedNodes[index])
+                                                 .map((node, index) => ({
+                                                   node,
+                                                   slots: this.slots[index]
+                                                 }));
+
+    let hostfileContent = '';
+
+    
+    selectedNodesWithSlots.forEach(({ node, slots }) => {
+      hostfileContent += `${node} slots=${slots}\n`;
+    });
+
+    console.log('Hostfile content:', hostfileContent);
+
+    
+    const blob = new Blob([hostfileContent], { type: 'text/plain' });
+  
+    
+    return new File([blob], 'hostfile', { type: 'text/plain' });
+  }
+
   uploadFile(): void {
     if (!this.selectedFile || !this.numProcesses) {
       this.uploadMessage = 'Please select a file and provide the number of processes!';
       return;
     }
 
+    const hostfile = this.generateHostfile();
     
     this.isLoading = true;
-    console.log('Uploading file with numProcesses:', this.numProcesses); 
+    console.log('Uploading file with numProcesses:', this.numProcesses);
+    console.log('Allow over subscription:', this.allowOverSubscription);
 
-    
-    this.fileUploadService.uploadFile(this.selectedFile, this.numProcesses!).subscribe({
+    this.fileUploadService.uploadFile(this.selectedFile, this.numProcesses!, this.allowOverSubscription, hostfile).subscribe({
       next: (response: any) => {
         this.uploadMessage = response.message;
         this.executionOutput = response.execution_output || 'No output from the command'; 
         this.isLoading = false; 
       },
       error: (error) => {
+        console.log("Error:", error);
         this.uploadMessage = `Failed to upload file: ${error.error.message || 'Unknown error'}`;
-        this.executionOutput = ''; 
+        this.executionOutput = error.error.detail || 'No output from the command'; 
         this.isLoading = false; 
       }
     });

@@ -66,10 +66,14 @@ class SSHService:
             print(f"Error in download_file: {e}")
             raise e
 
-    def execute_command(self, command: str, remote_path: str):
+    def execute_command(self, command: str, remote_path_exe: str, remote_path_host:str):
         try:
 
-            chmod_command = f"chmod +x {remote_path}"
+            chmod_command = f"chmod +x {remote_path_exe}"
+            stdin, stdout, stderr = self.client.exec_command(chmod_command)
+
+            chmod_command = f"chmod +x {remote_path_host}"
+
             stdin, stdout, stderr = self.client.exec_command(chmod_command)
 
             stdin, stdout, stderr = self.client.exec_command(command)
@@ -105,6 +109,49 @@ class SSHService:
             print(f"Error in delete_file: {e}")
             raise e
 
+    def send_file_to_hosts(self, local_file: str, hostfile_path: str):
+        try:
+            with open(hostfile_path, 'r') as hostfile:
+                hosts = hostfile.readlines()
+
+            for host_line in hosts:
+                host_line = host_line.strip()
+                if host_line:
+                    host = host_line.split()[0]
+
+                    fqdn = f"{host.lower()}.cs.tuiasi.ro"
+                    print(f"Sending file to host: {fqdn}")
+
+                    try:
+                        ssh_client = paramiko.SSHClient()
+                        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                        ssh_client.connect(fqdn, port=self.port, username=self.username, password=self.password)
+                        sftp_client = ssh_client.open_sftp()
+
+                        remote_path = f"/home/{self.username}/mpi-apps-ioan/{os.path.basename(local_file)}"
+                        sftp_client.put(local_file, remote_path)
+                        print(f"File uploaded to {fqdn}:{remote_path}")
+
+                        chmod_command = f"chmod +x {remote_path}"
+                        stdin, stdout, stderr = ssh_client.exec_command(chmod_command)
+                        errors = stderr.read().decode('utf-8')
+                        if errors:
+                            print(f"Error setting permissions on {fqdn}: {errors}")
+                        else:
+                            print(f"File {remote_path} set as executable on {fqdn}")
+
+                        # Close the connection
+                        sftp_client.close()
+                        ssh_client.close()
+
+                    except Exception as e:
+                        print(f"Error sending file to {fqdn}: {e}")
+                        continue
+
+            print("File successfully sent to all hosts.")
+        except Exception as e:
+            print(f"Error in send_file_to_hosts: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to send file to hosts: {str(e)}")
     def close(self):
         if self.sftp:
             self.sftp.close()

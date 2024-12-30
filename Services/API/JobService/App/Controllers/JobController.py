@@ -5,7 +5,9 @@ from fastapi import APIRouter, File, UploadFile, HTTPException, Form
 from decouple import RepositoryEnv, Config
 from JobService.App.Services.SSHService import SSHService
 import os
-
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 envPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
 env = Config(RepositoryEnv(envPath))
@@ -63,34 +65,45 @@ def scan_file_with_virustotal(file_content: bytes) -> int:
 
 
 @router.post("/upload/")
-async def upload_file(numProcesses: int = Form(...), file: UploadFile = File(...)):
+async def upload_file(numProcesses: int = Form(...), allowOverSubscription: bool = Form(...), file: UploadFile = File(...), hostfile: UploadFile = File(...)):
     try:
         if not (file.filename.endswith(".exe") or file.filename.endswith(".cpp")):
             raise HTTPException(status_code=400, detail="Only .exe or .cpp files are allowed!")
 
         content = await file.read()
+        host_content = await hostfile.read()
 
         numProcesses = int(numProcesses)
         file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
         with open(file_path, "wb") as f:
             f.write(content)
 
+        host_path = os.path.join(UPLOAD_DIRECTORY, hostfile.filename)
+        with open(host_path, "wb") as f:
+            f.write(host_content)
+
         print(f"Received num_processes: {numProcesses}")
 
         ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
         ssh_service.connect()
 
-        remote_path = f"/home/mpi.cluster/mpi-apps-ioan/{file.filename}"
-        ssh_service.upload_file(file_path, remote_path)
+        remote_path_exe = f"/home/mpi.cluster/mpi-apps-ioan/{file.filename}"
+        remote_path_host = f"/home/mpi.cluster/mpi-apps-ioan/{hostfile.filename}"
 
-        mpirun_command = f"mpirun -np {numProcesses} {remote_path}"
+        ssh_service.upload_file(file_path, remote_path_exe)
+        ssh_service.upload_file(host_path, remote_path_host)
 
-        output = ssh_service.execute_command(mpirun_command, remote_path)
+        oversubscribe_flag = "--oversubscribe" if allowOverSubscription else ""
+        mpirun_command = f"mpirun -hostfile {remote_path_host}   -np {numProcesses} {remote_path_exe} {oversubscribe_flag}"
+        logger.info(f"Executing MPI command: {mpirun_command}")
+        ssh_service.send_file_to_hosts(local_file=file_path, hostfile_path=host_path)
+
+        output = ssh_service.execute_command(mpirun_command, remote_path_exe, remote_path_host)
 
         if not output:
             output = "No output from mpirun, please check the command execution or file permissions."
 
-        ssh_service.delete_file(remote_path)
+        #ssh_service.delete_file(remote_path)
         ssh_service.close()
 
         return {"message": f"File '{file.filename}' uploaded and executed successfully!",

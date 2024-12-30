@@ -5,54 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/API.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/.editorconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/.vscode/extensions.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/.vscode/launch.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/.vscode/tasks.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/angular.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/GSS.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/Slice 2.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/arrow-right.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/blue-art.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/check.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/email.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/eye-slash.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/eye.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/password.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/person.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/public/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app-routing.module.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.spec.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/auth.module.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.spec.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/models/User.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/services/user.service.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.spec.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/main.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/src/styles.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/tsconfig.app.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../GUI/tsconfig.spec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,12 +110,23 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1735546746206</updated>
-      <workItem from="1735546747221" duration="10022000" />
+      <workItem from="1735546747221" duration="19110000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/API$main.coverage" NAME="main Coverage Results" MODIFIED="1735548057502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
