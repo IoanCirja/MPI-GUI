@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/API.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/.editorconfig" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/.vscode/extensions.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/.vscode/launch.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/.vscode/tasks.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/angular.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/GSS.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/Slice 2.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/arrow-right.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/blue-art.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/check.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/email.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/eye-slash.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/eye.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/password.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/assets/person.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/public/favicon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app-routing.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/app.config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/auth.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/models/User.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/services/user.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.spec.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/main.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/src/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/tsconfig.app.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../GUI/tsconfig.spec.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="2qvcyqnfHWWBMofhkwUXen6yKSA" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.AuthController.executor": "Run",
+    "Python.Main.executor": "Run",
+    "Python.main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/FACULTATE/Licenta/MPI-GUI/Services/API/JobService/App/Utils",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\JobService\App\Utils" />
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService" />
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService\App" />
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService\App\Utils" />
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService\App\Services" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\JobService\App" />
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService\App" />
+      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="API" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.18034.82" />
+        <option value="bundled-python-sdk-975db3bf15a3-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.18034.82" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="" />
+      <created>1735546746206</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1735546746206</updated>
+      <workItem from="1735546747221" duration="10022000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/API$main.coverage" NAME="main Coverage Results" MODIFIED="1735548057502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/API$Main.coverage" NAME="Main Coverage Results" MODIFIED="1735548313085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AuthService/App" />
+    <SUITE FILE_PATH="coverage/API$AuthController.coverage" NAME="AuthController Coverage Results" MODIFIED="1735549322351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AuthService/App/Controllers" />
+  </component>
+</project>
