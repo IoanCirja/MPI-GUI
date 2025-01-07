@@ -1,0 +1,36 @@
+<div class="job-status-container" *ngFor="let job of jobData; let i = index">
+  <div class="job-bar" (click)="toggleExpand(i)">
+    <span class="job-name">{{ job.jobName || 'Loading...' }}</span>
+    <span class="expand-icon">{{ expandedJobs.has(i) ? '↓' : '↑' }}</span>
+  </div>
+
+  
+  <div class="job-details" [class.expanded]="expandedJobs.has(i)">
+    <table class="job-details-table">
+      <tr>
+        <td><strong>Job Description:</strong></td>
+        <td>{{ job.jobDescription || 'Not available' }}</td>
+      </tr>
+      <tr>
+        <td><strong>Last Execution Time:</strong></td>
+        <td>{{ job.lastExecutionDate || 'Not available' }}</td>
+      </tr>
+      <tr>
+        <td><strong>Number of Processes:</strong></td>
+        <td>{{ job.numProcesses || 'Not available' }}</td>
+      </tr>
+      <tr>
+        <td><strong>Command:</strong></td>
+        <td>{{ job.command || 'Not available' }}</td>
+      </tr>
+      <tr>
+        <td><strong>Output:</strong></td>
+        <td>
+          <div class="output-text">
+            <pre>{{ job.output || 'No output' }}</pre>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

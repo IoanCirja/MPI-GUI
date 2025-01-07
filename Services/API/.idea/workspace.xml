@@ -6,8 +6,20 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/DTOs/AuthDTOs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Entities/AuthEntities.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Entities/User.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Repositories/AuthRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Repositories/AuthRepository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gateway/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/App/Main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploaded_files/hostfile" beforeDir="false" afterPath="$PROJECT_DIR$/uploaded_files/hostfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/auth/services/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/auth/services/user.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-poster.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-poster.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.service.ts" afterDir="false" />
@@ -28,9 +40,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="2qvcyqnfHWWBMofhkwUXen6yKSA" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -39,22 +51,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.AuthController.executor": "Run",
-    "Python.Main.executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/FACULTATE/Licenta/MPI-GUI/Services/API/JobService/App/Utils",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.AuthController.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/FACULTATE/Licenta/MPI-GUI/Services/API/JobService/App/Utils&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\JobService\App\Utils" />
@@ -110,7 +122,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1735546746206</updated>
-      <workItem from="1735546747221" duration="19110000" />
+      <workItem from="1735546747221" duration="20702000" />
+      <workItem from="1735728883549" duration="27944000" />
+      <workItem from="1736092473921" duration="6182000" />
+      <workItem from="1736283429697" duration="56000" />
     </task>
     <servers />
   </component>
@@ -130,7 +145,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/API$main.coverage" NAME="main Coverage Results" MODIFIED="1735548057502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/API$Main.coverage" NAME="Main Coverage Results" MODIFIED="1735548313085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AuthService/App" />
+    <SUITE FILE_PATH="coverage/API$Main.coverage" NAME="Main Coverage Results" MODIFIED="1735729833708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/JobService/App" />
     <SUITE FILE_PATH="coverage/API$AuthController.coverage" NAME="AuthController Coverage Results" MODIFIED="1735549322351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AuthService/App/Controllers" />
   </component>
 </project>

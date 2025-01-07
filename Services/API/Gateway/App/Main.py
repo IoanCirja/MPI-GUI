@@ -24,7 +24,7 @@ async def proxy_auth_post_service(request: Request):
 
         response = await client.request(
             method=request.method,
-            url=url,  # Ensure the URL is correct
+            url=url,
             headers=request.headers.raw,
             data=await request.body()
         )

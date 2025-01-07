@@ -63,7 +63,7 @@ body {
     align-items: center;
     border-bottom: 2px solid #ccc;
     position: relative;
-    transition: border-color 0.3s ease; /
+    transition: border-color 0.3s ease; 
 }
 
 .input-container:focus-within {

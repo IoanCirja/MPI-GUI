@@ -1,69 +1,102 @@
 <div class="upload-container">
-  <h3>Upload a File and Run MPI Command</h3>
+  <div class="card left-card">
+    <h3>Job Details</h3>
 
-  <input 
-    type="file" 
-    (change)="onFileSelected($event)" 
-    accept=".exe,.cpp" 
-    class="file-input" 
-  />
-  <div *ngIf="selectedFile">
-    <p>Selected file: {{ selectedFile.name }}</p>
-  </div>
+    <div class="input-group">
+      <label for="jobName">Job Name</label>
+      <input type="text" id="jobName" [(ngModel)]="jobName" placeholder="Enter job name" />
+    </div>
 
-  <div>
-    <label for="numProcesses">Number of Processes:</label>
-    <input 
-      type="number" 
-      id="numProcesses" 
-      [(ngModel)]="numProcesses" 
-      required 
-    />
-  </div>
+    <div class="input-group">
+      <label for="jobDescription">Job Description</label>
+      <textarea id="jobDescription" [(ngModel)]="jobDescription" placeholder="Enter job description"></textarea>
+    </div>
 
-  <div>
-    <label for="allowOverSubscription">Allow Oversubscribe</label>
-    <input 
-      type="checkbox"
-      id="allowOverSubscription"
-      [(ngModel)]="allowOverSubscription">
-  </div>
-
-  <div>
-    <h4>Select Nodes:</h4>
-    <div *ngFor="let node of nodeList; let i = index">
+    <div class="input-group">
+      <label for="fileInput">Upload Executable</label>
       <input 
-        type="checkbox" 
-        [(ngModel)]="selectedNodes[i]" 
-        [id]="'node-' + i"
+        type="file" 
+        (change)="onFileSelected($event)" 
+        accept=".exe,.cpp" 
+        id="fileInput"
+        class="file-input"
       />
-      <label for="node-{{ i }}">{{ node }}</label>
-      
-      <div *ngIf="selectedNodes[i]">
-        <label for="numSlots-{{ i }}">Number of Slots for {{ node }} (default 10):</label>
-        <input 
-          type="number" 
-          id="numSlots-{{ i }}" 
-          [(ngModel)]="slots[i]"
-          [min]="1"
-          [max]="10"
-        />
+      <div *ngIf="selectedFile">
+        <p>Selected file: {{ selectedFile.name }}</p>
       </div>
     </div>
   </div>
 
-  <button (click)="uploadFile()" [disabled]="!selectedFile || !numProcesses || !hasSelectedNodes()">
-    Upload and Run MPI Command
-  </button>
+  <div class="card right-card">
+    <h3>Process and Host Configuration</h3>
 
-  <p>{{ uploadMessage }}</p>
+    <div class="input-group">
+      <label for="numProcesses">Number of Processes:</label>
+      <input 
+        type="number" 
+        id="numProcesses" 
+        [(ngModel)]="numProcesses" 
+        required 
+      />
+    </div>
 
-  <div *ngIf="executionOutput">
-    <h4>Execution Output:</h4>
-    <pre>{{ executionOutput }}</pre>
+    <div class="input-group">
+      <label for="allowOverSubscription">Allow Oversubscribe</label>
+      <input 
+        type="checkbox"
+        id="allowOverSubscription"
+        [(ngModel)]="allowOverSubscription"
+        class="styled-checkbox"
+      />
+      <label for="allowOverSubscription" class="styled-label">Yes, allow oversubscription</label>
+    </div>
+
+    <div class="input-group">
+      <h4>Select Nodes:</h4>
+      <div *ngFor="let node of nodeList; let i = index">
+        <input 
+          type="checkbox" 
+          [(ngModel)]="selectedNodes[i]" 
+          [id]="'node-' + i"
+          class="styled-checkbox"
+        />
+        <label for="node-{{ i }}" class="styled-label">{{ node }}</label>
+
+        <div *ngIf="selectedNodes[i]" class="slots-group">
+          <label for="numSlots-{{ i }}">Number of Slots for {{ node }} (default 10):</label>
+          <input 
+            type="number" 
+            id="numSlots-{{ i }}" 
+            [(ngModel)]="slots[i]"
+            [min]="1"
+            [max]="10"
+            class="number-input"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="isLoading" class="loading-overlay">
-    <div class="spinner"></div>
+  
+  <div class="card output-card">
+    <h3>Execution Output</h3>
+    <div *ngIf="executionOutput">
+      <pre>{{ executionOutput }}</pre>
+    </div>
+    <div *ngIf="!executionOutput">
+      <p>No output available yet. Run a job to see the results.</p>
+    </div>
   </div>
+</div>
+
+
+<div class="sticky-footer">
+  <button (click)="uploadFile()" [disabled]="!selectedFile || !numProcesses || !hasSelectedNodes()">Run Job</button>
+  <button (click)="cancelJob()">Cancel</button>
+  <button (click)="clearForm()">Clear Form</button>
+  <button (click)="previewCommand()">Preview Command</button>
+</div>
+
+<div *ngIf="isLoading" class="loading-overlay">
+  <div class="spinner"></div>
 </div>

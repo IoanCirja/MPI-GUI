@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.websockets import WebSocketDisconnect
+from websocket import WebSocket
 
 from JobService.App.Controllers.JobController import router
 from JobService.App.Utils.FirebaseConnection import initializeFirebaseConnection
@@ -18,6 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(router, prefix="/api")
+
 
 
 @app.get("/")

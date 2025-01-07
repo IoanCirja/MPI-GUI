@@ -140,7 +140,7 @@ class SSHService:
                         else:
                             print(f"File {remote_path} set as executable on {fqdn}")
 
-                        # Close the connection
+                        
                         sftp_client.close()
                         ssh_client.close()
 

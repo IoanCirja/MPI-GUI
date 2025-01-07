@@ -1,63 +1,61 @@
 import hashlib
 import os
+import uuid
 import jwt
 from datetime import datetime, timedelta
-import bcrypt
-
 from decouple import RepositoryEnv, Config
 
-from AuthService.App.DTOs.AuthDTOs import LoginRequest, CreateUserRequest
+from AuthService.App.DTOs.LoginRequest import LoginRequest
+from AuthService.App.DTOs.SignUpRequest import SignUpRequest
 from AuthService.App.Repositories.AuthRepository import UserRepository
 
 envPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
 env = Config(RepositoryEnv(envPath))
 
 
-def createAccessToken(data: dict, expires_delta: timedelta = timedelta(hours=1)):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, env("SECRET_KEY"), algorithm=env("ALGORITHM"))
-    return encoded_jwt
-
-
-def verifyAccessToken(token: str):
-    try:
-        payload = jwt.decode(token, env("SECRET_KEY"), algorithms=[env("ALGORITHM"), ])
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise ValueError("Token has expired")
-    except jwt.InvalidTokenError:
-        raise ValueError("Invalid token")
-
-
 class UserService:
     @staticmethod
-    def loginUser(loginRequest: LoginRequest) -> str:
+    def loginUser(loginRequest: LoginRequest, iss:str) -> str:
         userData = UserRepository.getUserByEmail(loginRequest.email)
         if not userData:
             raise ValueError("User does not exist")
 
-        if not bcrypt.checkpw(loginRequest.password.encode('utf-8'), userData["password"].encode('utf-8')):
+        stored_hash = userData["password"]
+        salt = userData["salt"]
+
+        input_hash = hashlib.sha256((loginRequest.password + salt).encode('utf-8')).hexdigest()
+
+        if input_hash != stored_hash:
             raise ValueError("Invalid credentials")
 
-        token_data = {"sub": userData["email"], "username": userData["username"]}
-        token = createAccessToken(data=token_data)
+        token_data = {
+            "iss": iss,
+            "sub": userData["id"],
+            "exp": datetime.utcnow() + timedelta(hours=1),
+            "jti": str(uuid.uuid4()),
+            'username':userData["username"],
+            'email': userData["email"],
+        }
 
+        token = jwt.encode(token_data, key=env("SECRET_KEY"), algorithm=env("ALGORITHM"))
         return token
 
+
     @staticmethod
-    def createUser(createUserRequest: CreateUserRequest) -> dict:
+    def createUser(createUserRequest: SignUpRequest):
         if createUserRequest.password != createUserRequest.retypePassword:
             raise ValueError("Passwords do not match")
 
-        hashedPassword = bcrypt.hashpw(createUserRequest.password.encode('utf-8'), bcrypt.gensalt())
+        salt = os.urandom(16).hex()
+
+        hashedPassword = hashlib.sha256((createUserRequest.password + salt).encode('utf-8')).hexdigest()
 
         data = {
             "username": createUserRequest.username,
             "email": createUserRequest.email,
-            "password": hashedPassword.decode('utf-8')
+            "password": hashedPassword,
+            "salt": salt
         }
 
-        user_data = UserRepository.addUser(data)
-        return user_data
+        UserRepository.addUser(data)
+

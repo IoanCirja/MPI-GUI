@@ -26,11 +26,17 @@ export class LoginComponent {
         next: (response: any) => {
           const token = response.token;
           localStorage.setItem('authToken', token);
+
+          
   
           const decodedToken: any = jwtDecode(token);
-          console.log(decodedToken); 
+          const userData = {
+            email: decodedToken.email,
+            username: decodedToken.username,
+          }
+          localStorage.setItem('userData', JSON.stringify(userData));
   
-          this.router.navigate(['/auth/signup']);
+          this.router.navigate(['/jobs/upload-job']);
         },
         error: (error) => {
           console.error('Login failed:', error);

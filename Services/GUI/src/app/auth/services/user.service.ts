@@ -6,7 +6,7 @@ import { Login, SignUp } from "../models/User";
     providedIn: 'root'
   })
 export class UserService{
-    private signupUrl = 'http://localhost:8000/api/users/';
+    private signupUrl = 'http://localhost:8000/api/signup/';
     private loginUrl = 'http://localhost:8000/api/login/';
 
     constructor(private http: HttpClient){}
