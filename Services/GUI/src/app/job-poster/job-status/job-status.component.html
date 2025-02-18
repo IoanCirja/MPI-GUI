@@ -1,15 +1,23 @@
 <div class="job-status-container" *ngFor="let job of jobData; let i = index">
   <div class="job-bar" (click)="toggleExpand(i)">
-    <span class="job-name">{{ job.jobName || 'Loading...' }}</span>
+    <span class="job-name">
+      {{ job.jobName || 'Loading...' }}
+    </span>
     <span class="expand-icon">{{ expandedJobs.has(i) ? '↓' : '↑' }}</span>
   </div>
 
-  
   <div class="job-details" [class.expanded]="expandedJobs.has(i)">
     <table class="job-details-table">
       <tr>
         <td><strong>Job Description:</strong></td>
         <td>{{ job.jobDescription || 'Not available' }}</td>
+      </tr>
+      <tr>
+        <td><strong>Status:</strong></td>
+        <td>
+          <span *ngIf="job.status === 'pending'" class="loading-spinner"></span>
+          {{ job.status || 'Unknown' }}
+        </td>
       </tr>
       <tr>
         <td><strong>Last Execution Time:</strong></td>

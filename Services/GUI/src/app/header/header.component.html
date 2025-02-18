@@ -1,0 +1,34 @@
+<mat-toolbar class="header">
+
+    <span class="logo">
+      <img src="assets/logo-green.svg" alt="Learnify Logo" height="40" />
+    </span>
+
+    <span class="spacer"></span>
+    <nav class="nav-menu">
+      <a id="home" routerLink="/">Home</a>
+      <a id="Get-in-touch" routerLink="/contact-us">Get in Touch</a>
+      <a id="catalog" routerLink="/catalog">Catalog</a>
+      <a id="catalog" routerLink="/dashboard/account-settings">Dashboard</a>
+
+    </nav>
+
+    <span class="spacer"></span>
+    
+    <div *ngIf="!user"> 
+      <a class="log_in" routerLink="/login" id="loginHeader">Log In</a>
+      <a mat-raised-button color="primary" class="sign_up" routerLink="/signup">Sign Up</a>
+    </div>
+  
+    <div *ngIf="user"> 
+      <div class="user-info">
+        <img src="assets/profile.svg" alt="User Image" height="40" />
+        <div class="user-name-logout">
+          <span>{{ user.username }}</span> 
+          <button mat-button class="log_out" (click)="logout()">Log Out</button>
+        </div>
+      </div>
+    </div>
+
+  </mat-toolbar>
+  

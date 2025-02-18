@@ -1,0 +1,119 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #FCFCF9;
+    height: auto;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo img {
+    height: 80px;
+    margin-right: 10px;
+    margin-left: 20px;
+  }
+  
+  .tagline {
+    font-size: 12px;
+    margin-left: 5px;
+  }
+  
+  .nav-menu {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-menu a, .dashboard {
+    text-decoration: none;
+    font-weight: 500;
+    color: #043F2D;
+    padding: 11px 20px;
+  
+    border-radius: 7px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .nav-menu a:hover, .dashboard:hover {
+    background-color: #2A6F2C;
+    color: #FCFCF9;
+  
+  }
+  
+  .auth-buttons {
+    text-decoration: none;
+    display: flex;
+    gap: 10px;
+    font-weight: 500;
+  }
+  
+  .log_in {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    height: 40px;
+    width: 125px;
+    color: #2A6F2C;
+    border-radius: 7px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .log_in:hover {
+    background-color: #2A6F2C;
+    color: #FCFCF9;
+  }
+  
+  .sign_up {
+    background-color: #2A6F2C !important;
+    color: #FCFCF9 !important;
+    border-radius: 7px;
+    text-decoration: none;
+    height: 40px;
+    width: 125px;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .user-info img {
+    height: 60px;
+  }
+  
+  .user-name-logout {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 20px;
+  }
+  
+  .user-name-logout span {
+    margin-left: 10px;
+  }
+  
+  .log_out {
+    color: #043F2D !important;
+    border-radius: 7px;
+    text-decoration: none;
+    height: 35px;
+    width: 90px;
+    margin-top: 5px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .log_out:hover {
+    background-color: #D60707 !important;
+    color: #FCFCF9 !important;
+  }
+  
+  .dashboard {
+    text-decoration: none;
+  }
+  

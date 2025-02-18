@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FileUploadService } from '../upload/upload.service';
+import { WebSocketService } from './websocket.service';
 
 @Component({
   selector: 'app-job-status',
@@ -7,51 +8,60 @@ import { FileUploadService } from '../upload/upload.service';
   styleUrls: ['./job-status.component.css']
 })
 export class JobStatusComponent implements OnInit {
-  jobData: any[] = [];  
-  expandedJobs: Set<number> = new Set();  
+  jobData: any[] = [];
+  expandedJobs: Set<number> = new Set();
 
-  constructor(private fileUploadService: FileUploadService) {}
+  constructor(
+    private fileUploadService: FileUploadService,
+    private webSocketService: WebSocketService,
+    private cdRef: ChangeDetectorRef  
+  ) {}
 
   ngOnInit(): void {
     this.getJobStatus();
+    this.listenToWebSocketUpdates();
   }
 
-  
   getJobStatus(): void {
     this.fileUploadService.getJobStatus().subscribe({
       next: (response: any) => {
-        this.jobData = response;  
-        console.log('Fetched job data:', this.jobData);  
+        this.jobData = response;
+        console.log('Fetched job data:', this.jobData);
       },
       error: (error) => {
-        console.error("Error fetching job data:", error);
+        console.error('Error fetching job data:', error);
       }
     });
   }
 
-  
   toggleExpand(jobIndex: number): void {
     if (this.expandedJobs.has(jobIndex)) {
-      this.expandedJobs.delete(jobIndex);  
+      this.expandedJobs.delete(jobIndex);
     } else {
-      this.expandedJobs.add(jobIndex);  
+      this.expandedJobs.add(jobIndex);
     }
   }
 
+  listenToWebSocketUpdates(): void {
+    this.webSocketService.connect().subscribe((update: any) => {
+      console.log('WebSocket update:', update);
   
-  downloadFile(base64String: string, fileName: string): void {
-    const byteCharacters = atob(base64String);
-    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
-    const byteArray = new Uint8Array(byteNumbers);
-
-    const blob = new Blob([byteArray]);
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    a.click();
-
-    window.URL.revokeObjectURL(url);  
+      const updatedJobData = this.jobData.map(job => {
+        if (job.id === update.jobId) {
+          return {
+            ...job,
+            status: update.status,
+            output: update.output,
+            isLoading: update.status === 'pending' ? true : false
+          };
+        }
+        return job;
+      });
+  
+      this.jobData = updatedJobData;
+  
+      this.cdRef.detectChanges();
+    });
   }
+  
 }
