@@ -1,5 +1,0 @@
-{
-  "dependencies": {
-    "@api/virustotal": "file:.api/apis/virustotal"
-  }
-}
