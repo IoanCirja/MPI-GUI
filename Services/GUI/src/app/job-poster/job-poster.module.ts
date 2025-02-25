@@ -4,19 +4,23 @@ import { RouterModule, Routes } from '@angular/router';
 import { UploadComponent } from './upload/upload.component';
 import { FormsModule } from '@angular/forms';  
 import { JobStatusComponent } from './job-status/job-status.component';
+import { FileUploadService } from './upload/upload.service';
+import { AuthGuard } from '../auth.guard';  
 
 const routes: Routes = [
-  { path: 'upload-job', component: UploadComponent },
-  { path: 'status', component: JobStatusComponent },
+  { path: 'upload-job', component: UploadComponent, canActivate: [AuthGuard] },  
+  { path: 'status', component: JobStatusComponent, canActivate: [AuthGuard] },   
 ];
 
 @NgModule({
-  declarations: [UploadComponent, JobStatusComponent],  
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    FormsModule,  
+    FormsModule,
+    UploadComponent,
+    JobStatusComponent,
   ],
+  providers: [FileUploadService],
   exports: [RouterModule]
 })
 export class JobPosterModule { }

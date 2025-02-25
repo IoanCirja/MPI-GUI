@@ -8,6 +8,7 @@ from starlette.websockets import WebSocketDisconnect
 
 from AuthService.App.Utils.JWTUtils import *
 from JobService.App.DTOs.JobDTO import JobDTO
+from JobService.App.Entities.JobEntities import JobEntity
 from JobService.App.Services.JobService import JobService
 from JobService.App.Services.SSHService import SSHService
 import os
@@ -203,7 +204,7 @@ async def upload_file(
 
 
 
-@router.get('/jobs/', response_model=List[JobDTO])
+@router.get('/jobs/', response_model=List[JobEntity])
 async def get_job_details(
                           token: str = Depends(get_token_from_header)
                           ):

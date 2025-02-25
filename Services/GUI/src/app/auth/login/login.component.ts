@@ -1,56 +1,109 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
-import { jwtDecode } from 'jwt-decode';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  imports: [ReactiveFormsModule, CommonModule],
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  hidePassword: boolean = true; 
+  hidePassword: boolean = true;
+  errorMessages: string[] = [];
+  loginButtonDisabled: boolean = false;
 
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private userService: UserService
+  ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required]], 
-      password: ['', [Validators.required]]
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required]],
     });
+  }
+
+  ngOnInit(): void {}
+
+  ngOnDestroy(): void {
+    if (this.errorMessages.length > 0) {
+      this.clearErrorMessages();
+    }
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
       this.userService.login(this.loginForm.value).subscribe({
-        next: (response: any) => {
-          const token = response.token;
-          localStorage.setItem('authToken', token);
-
-          
-  
-          const decodedToken: any = jwtDecode(token);
-          const userData = {
-            email: decodedToken.email,
-            username: decodedToken.username,
-          }
-          localStorage.setItem('userData', JSON.stringify(userData));
-  
+        next: () => {
           this.router.navigate(['/jobs/upload-job']);
         },
         error: (error) => {
-          console.error('Login failed:', error);
-        }
+          if (error?.error?.detail) {
+            this.processErrorDetails(error.error.detail);
+          } else {
+            this.processErrorDetails('An error occurred');
+          }
+
+          this.loginButtonDisabled = true;
+          setTimeout(() => {
+            this.loginButtonDisabled = false;
+          }, 1000);
+        },
       });
     }
   }
 
- 
+  processErrorDetails(errorDetails: any) {
+    this.errorMessages = [];
+    this.loginForm.setErrors(null);
+
+    if (Array.isArray(errorDetails)) {
+      errorDetails.forEach((err: any) => {
+        const message = err.ctx && err.ctx.reason ? err.ctx.reason : err.msg;
+        this.errorMessages.push(message);
+        this.setErrorMessage(err.loc[1], message);
+      });
+    } else if (errorDetails) {
+      this.errorMessages.push(errorDetails);
+    }
+  }
+
+  setErrorMessage(field: string, message: string) {
+    const control = this.loginForm.get(field);
+    if (control) {
+      control.setErrors({ serverError: message });
+    }
+    this.autoCloseErrorPopup();
+  }
+
+  closeErrorPopup() {
+    this.clearErrorMessages();
+  }
+
+  clearErrorMessages() {
+    this.errorMessages = [];
+  }
+
+  autoCloseErrorPopup() {
+    setTimeout(() => {
+      this.clearErrorMessages();
+    }, 5000);
+  }
+
   switchToSignup() {
-    this.router.navigate(['/auth/signup']); 
+    this.router.navigate(['/auth/signup']);
   }
 
   togglePasswordVisibility() {
-    this.hidePassword = !this.hidePassword; 
+    this.hidePassword = !this.hidePassword;
   }
 }

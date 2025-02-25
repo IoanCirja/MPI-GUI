@@ -1,88 +1,173 @@
-<div class="outer-container">
-    <div class="signup-container">
-        <div class="signup-form">
-            <div class="login-prompt">
-                <span>Already have an account?</span>
-                <button (click)="switchToLogin()" class="login-button">Log In</button>
-            </div>
-
-            <h2 class="signup-title">Sign Up</h2>
-            <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-<div class="form-group">
-    <div class="input-container">
-        <img class="input-icon" src="assets/person.svg" alt="Username Icon" />
-        <input id="username" formControlName="username" type="text" class="form-input" placeholder="Username"/>
-        <img *ngIf="signupForm.get('username')?.valid && signupForm.get('username')?.touched" 
-             class="input-icon" src="assets/check.svg" alt="Check Icon" />
-    </div>
-    <div *ngIf="signupForm.get('username')?.touched && signupForm.get('username')?.value && signupForm.get('username')?.errors?.['required']" class="error-message">
-        <small>Username is required.</small>
-    </div>
+<div *ngIf="errorMessages.length > 0" class="error-popup">
+  <button class="close-btn" (click)="closeErrorPopup()">X</button>
+  <ul>
+    <li *ngFor="let error of errorMessages">{{ error }}</li>
+  </ul>
 </div>
+<div class="signup-container">
+  <div class="signup-form">
+    <div class="login-prompt">
+      <span>Already have an account?</span>
+      <button (click)="switchToLogin()" class="login-button">Log In</button>
+    </div>
 
-<div class="form-group">
-    <div class="input-container">
-        <img class="input-icon" src="assets/email.svg" alt="Email Icon" />
-        <input id="email" formControlName="email" type="email" class="form-input" placeholder="E-mail"/>
-        <img *ngIf="signupForm.get('email')?.valid && signupForm.get('email')?.touched" 
-             class="input-icon" src="assets/check.svg" alt="Check Icon" />
-    </div>
-    <div *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.value && signupForm.get('email')?.errors?.['required']" class="error-message">
-        <small>Email is required.</small>
-    </div>
-    <div *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.value && signupForm.get('email')?.errors?.['email']" class="error-message">
-        <small>Invalid email format.</small>
-    </div>
-</div>
-
-<div class="form-group">
-    <div class="input-container">
-        <img class="input-icon" src="assets/password.svg" alt="Password Icon" />
-        <input id="password" formControlName="password" [type]="hidePassword ? 'password' : 'text'" 
-               class="form-input" placeholder="Password"/>
-        <img (click)="togglePasswordVisibility()" class="input-icon" 
-             [src]="hidePassword ? 'assets/eye.svg' : 'assets/eye-slash.svg'" alt="Toggle Password Visibility" />
-    </div>
-    <div class="password-checks">
-        <small [class.valid]="passwordChecks[0]" [class.invalid]="!passwordChecks[0]">
-            Minimum 8 characters
-        </small>
-        <small [class.valid]="passwordChecks[1]" [class.invalid]="!passwordChecks[1]">
-            At least one number
-        </small>
-        <small [class.valid]="passwordChecks[2]" [class.invalid]="!passwordChecks[2]">
-            Upper and lowercase letters
-        </small>
-    </div>
-    
-</div>
-
-
-<div class="form-group">
-    <div class="input-container">
-        <img class="input-icon" src="assets/password.svg" alt="Password Icon" />
-        <input id="retypePassword" formControlName="retypePassword" [type]="hidePassword ? 'password' : 'text'" class="form-input" placeholder="Re-Type Password" />
-    </div>
-    <div *ngIf="signupForm.get('retypePassword')?.touched && signupForm.get('retypePassword')?.value && signupForm.get('retypePassword')?.errors?.['required']" class="error-message">
-        <small>Retype Password is required.</small>
-    </div>
-    <div *ngIf="!signupForm.get('retypePassword')?.errors?.['required'] && signupForm.get('retypePassword')?.touched && signupForm.get('retypePassword')!.value !== signupForm.get('password')!.value" class="error-message">
-        <small>Passwords must match.</small>
-    </div>
-</div>
-
-
-                <button type="submit" [disabled]="signupForm.invalid" class="signup-button">
-                    Sign Up
-                    <div class="arrow-icon-container">
-                        <img src="assets/arrow-right.svg" alt="Arrow Icon" class="arrow-icon" />
-                    </div>
-                </button>
-                
-            </form>
+    <h2 class="signup-title">Sign Up</h2>
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <div class="input-container">
+          <img class="input-icon" src="assets/person.svg" alt="Username Icon" />
+          <input
+            id="username"
+            formControlName="username"
+            type="text"
+            class="form-input"
+            placeholder="Username"
+          />
+          <img
+            *ngIf="
+              signupForm.get('username')?.valid &&
+              signupForm.get('username')?.touched
+            "
+            class="input-icon"
+            src="assets/check.svg"
+            alt="Check Icon"
+          />
         </div>
-    </div>
-    <div class="artwork-container">
-        <img src="assets/blue-art.svg" alt="Artwork" class="blue-art" />
-    </div>
+        <div
+          *ngIf="signupForm.get('username')?.touched && signupForm.get('username')?.value && signupForm.get('username')?.errors?.['required']"
+          class="error-message"
+        >
+          <small>Username is required.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <img class="input-icon" src="assets/email.svg" alt="Email Icon" />
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            class="form-input"
+            placeholder="Email"
+          />
+          <img
+            *ngIf="
+              signupForm.get('email')?.valid && signupForm.get('email')?.touched
+            "
+            class="input-icon"
+            src="assets/check.svg"
+            alt="Check Icon"
+          />
+        </div>
+        <div
+          *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.value && signupForm.get('email')?.errors?.['required']"
+          class="error-message"
+        >
+          <small>Email is required.</small>
+        </div>
+        <div
+          *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.value && signupForm.get('email')?.errors?.['email']"
+          class="error-message"
+        >
+          <small>Invalid email format.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <img
+            class="input-icon"
+            src="assets/password.svg"
+            alt="Password Icon"
+          />
+          <input
+            id="password"
+            formControlName="password"
+            [type]="hidePassword ? 'password' : 'text'"
+            class="form-input"
+            placeholder="Password"
+          />
+          <img
+            (click)="togglePasswordVisibility()"
+            class="input-icon"
+            [src]="hidePassword ? 'assets/eye.svg' : 'assets/eye-slash.svg'"
+            alt="Toggle Password Visibility"
+          />
+        </div>
+        <div class="password-checks">
+          <small
+            [class.valid]="passwordChecks[0]"
+            [class.invalid]="!passwordChecks[0]"
+          >
+            Minimum 8 characters
+          </small>
+          <small
+            [class.valid]="passwordChecks[1]"
+            [class.invalid]="!passwordChecks[1]"
+          >
+            At least one number
+          </small>
+          <small
+            [class.valid]="passwordChecks[2]"
+            [class.invalid]="!passwordChecks[2]"
+          >
+            Upper and lowercase letters
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-container">
+          <img
+            class="input-icon"
+            src="assets/password.svg"
+            alt="Password Icon"
+          />
+          <input
+            id="retypePassword"
+            formControlName="retypePassword"
+            [type]="hidePassword ? 'password' : 'text'"
+            class="form-input"
+            placeholder="Re-Type Password"
+          />
+        </div>
+        <div
+          *ngIf="signupForm.get('retypePassword')?.touched && signupForm.get('retypePassword')?.value && signupForm.get('retypePassword')?.errors?.['required']"
+          class="error-message"
+        >
+          <small>Retype Password is required.</small>
+        </div>
+        <div
+          *ngIf="!signupForm.get('retypePassword')?.errors?.['required'] && signupForm.get('retypePassword')?.touched && signupForm.get('retypePassword')!.value !== signupForm.get('password')!.value"
+          class="error-message"
+        >
+          <small>Passwords must match.</small>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="signupForm.invalid"
+        class="signup-button"
+      >
+        Sign Up
+        <div class="arrow-icon-container">
+          <img
+            src="assets/arrow-right.svg"
+            alt="Arrow Icon"
+            class="arrow-icon"
+          />
+        </div>
+      </button>
+    </form>
+  </div>
+  <div class="artwork-container">
+    <img src="assets/logo.svg" alt="Logo" class="logo" />
+    <p class="lorem-text">
+      Access computational resources. <br />
+      Create MPI job configurations. <br />
+      Easily monitor the results.
+    </p>
+  </div>
 </div>

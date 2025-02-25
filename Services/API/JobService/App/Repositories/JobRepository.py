@@ -2,15 +2,22 @@ import logging
 from typing import List
 
 from firebase_admin import db
-from JobService.App.Entities.JobEntities import JobEntity
 
+from JobService.App.DTOs import JobDTO
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 class JobRepository:
     def __init__(self, user_id: str):
         self.user_id = user_id
         self.ref = db.reference(f"users/{self.user_id}/jobs")
 
-    def insert_job(self, job: JobEntity):
+    def insert_job(self, job: JobDTO):
         try:
             job_ref = self.ref.push()
             job_data = job.dict()
@@ -38,15 +45,18 @@ class JobRepository:
         except Exception as e:
             logging.error(f"Error fetching job by ID: {str(e)}")
             return None
+
     def get_all_jobs(self) -> List[dict]:
         try:
             jobs_ref = self.ref.get()
+
             if not jobs_ref:
                 return []
 
-            return list(jobs_ref.values())
+            return [{"id": job_id, **job_data} for job_id, job_data in jobs_ref.items()]
+
         except Exception as e:
-            print(f"Error fetching all jobs: {str(e)}")
+            logger.error(f"Error fetching all jobs: {str(e)}")
             return []
 
     def update_job(self, job_id: str, updated_data: dict):

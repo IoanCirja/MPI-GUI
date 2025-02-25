@@ -2,20 +2,20 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';  // Import AppRoutingModule
-import { MatToolbarModule } from '@angular/material/toolbar';  // Import Material Toolbar
+import { AppRoutingModule } from './app.routes';  
+import { MatToolbarModule } from '@angular/material/toolbar';  
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
-  declarations: [
-    AppComponent  // Root component declaration
-  ],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,  // Required for Material animations
-    AppRoutingModule,         // Import the routing module
-    MatToolbarModule          // Import Angular Material's Toolbar
+    BrowserAnimationsModule,  
+    AppRoutingModule,         
+    MatToolbarModule,
+    AppComponent,
+    HeaderComponent,
+    AppRoutingModule          
   ],
   providers: [],
-  bootstrap: [AppComponent]  // Bootstrap the main AppComponent
 })
 export class AppModule { }

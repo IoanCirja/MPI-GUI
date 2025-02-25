@@ -1,36 +1,61 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import {
+  trigger,
+  transition,
+  style,
+  animate,
+  query,
+} from '@angular/animations';
 import { FileUploadService } from '../upload/upload.service';
 import { WebSocketService } from './websocket.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-status',
   templateUrl: './job-status.component.html',
-  styleUrls: ['./job-status.component.css']
+  styleUrls: ['./job-status.component.css'],
+  imports: [CommonModule],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms 100ms', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
 })
 export class JobStatusComponent implements OnInit {
   jobData: any[] = [];
   expandedJobs: Set<number> = new Set();
+  loading: boolean = true;
 
   constructor(
     private fileUploadService: FileUploadService,
     private webSocketService: WebSocketService,
-    private cdRef: ChangeDetectorRef  
+    private cdRef: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
-  ngOnInit(): void {
-    this.getJobStatus();
+  async ngOnInit(): Promise<void> {
+    await this.getJobStatus();
     this.listenToWebSocketUpdates();
   }
 
-  getJobStatus(): void {
-    this.fileUploadService.getJobStatus().subscribe({
-      next: (response: any) => {
-        this.jobData = response;
-        console.log('Fetched job data:', this.jobData);
-      },
-      error: (error) => {
-        console.error('Error fetching job data:', error);
-      }
+  getJobStatus(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.fileUploadService.getJobStatus().subscribe({
+        next: (response: any) => {
+          this.jobData = [...response];
+          console.log('Fetched job data:', this.jobData);
+          this.loading = false;
+          this.cdRef.detectChanges();
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error fetching job data:', error);
+          reject(error);
+        },
+      });
     });
   }
 
@@ -42,26 +67,49 @@ export class JobStatusComponent implements OnInit {
     }
   }
 
+  decodeBase64(encodedString: string): string {
+    try {
+      return atob(encodedString);
+    } catch (e) {
+      console.error('Failed to decode Base64:', e);
+      return encodedString;
+    }
+  }
+
   listenToWebSocketUpdates(): void {
     this.webSocketService.connect().subscribe((update: any) => {
-      console.log('WebSocket update:', update);
-  
-      const updatedJobData = this.jobData.map(job => {
-        if (job.id === update.jobId) {
-          return {
-            ...job,
+      console.log('WebSocket update received:', update);
+
+      this.ngZone.run(() => {
+        const index = this.jobData.findIndex(
+          (job) => String(job.id) === String(update.jobId)
+        );
+
+        if (index !== -1) {
+          this.jobData[index] = {
+            ...this.jobData[index],
             status: update.status,
             output: update.output,
-            isLoading: update.status === 'pending' ? true : false
+            isLoading: update.status === 'pending',
           };
+        } else {
+          this.jobData = [
+            ...this.jobData,
+            {
+              id: update.jobId,
+              jobName: 'New Job',
+              status: update.status,
+              output: update.output,
+              isLoading: update.status === 'pending',
+            },
+          ];
         }
-        return job;
+
+        console.log('Updated job data:', this.jobData);
+
+        this.jobData = [...this.jobData];
+        this.cdRef.detectChanges();
       });
-  
-      this.jobData = updatedJobData;
-  
-      this.cdRef.detectChanges();
     });
   }
-  
 }

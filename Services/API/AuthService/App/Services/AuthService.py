@@ -31,7 +31,8 @@ class UserService:
         token_data = {
             "iss": iss,
             "sub": userData["id"],
-            "exp": datetime.utcnow() + timedelta(hours=1),
+            "iat": datetime.utcnow(),
+            "exp": datetime.utcnow() + timedelta(hours=1),  # 1 minute expiration
             "jti": str(uuid.uuid4()),
             'username':userData["username"],
             'email': userData["email"],
@@ -43,6 +44,11 @@ class UserService:
 
     @staticmethod
     def createUser(createUserRequest: SignUpRequest):
+        if UserRepository.getUserByUsername(createUserRequest.username):
+            raise ValueError("Username already exists")
+        if UserRepository.getUserByEmail(createUserRequest.email):
+            raise ValueError("Email already exists")
+
         if createUserRequest.password != createUserRequest.retypePassword:
             raise ValueError("Passwords do not match")
 
@@ -58,4 +64,3 @@ class UserService:
         }
 
         UserRepository.addUser(data)
-

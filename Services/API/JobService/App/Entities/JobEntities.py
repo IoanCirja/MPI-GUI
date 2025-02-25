@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 class JobEntity(BaseModel):
+    id: str
     jobName : str
     jobDescription : str
     lastExecutionDate : str

@@ -1,100 +1,143 @@
 <div class="upload-container">
-  <div class="card left-card">
-    <h3>Job Details</h3>
+  <div class="encapsulating-card">
+    <div class="card left-card">
+      <h3>Job Details</h3>
 
-    <div class="input-group">
-      <label for="jobName">Job Name</label>
-      <input type="text" id="jobName" [(ngModel)]="jobName" placeholder="Enter job name" />
-    </div>
+      <div class="input-group">
+        <label for="jobName">Job Name</label>
+        <input
+          type="text"
+          id="jobName"
+          [(ngModel)]="jobName"
+          placeholder="Enter job name"
+        />
+      </div>
 
-    <div class="input-group">
-      <label for="jobDescription">Job Description</label>
-      <textarea id="jobDescription" [(ngModel)]="jobDescription" placeholder="Enter job description"></textarea>
-    </div>
+      <div class="input-group">
+        <label for="jobDescription">Job Description</label>
+        <textarea
+          id="jobDescription"
+          [(ngModel)]="jobDescription"
+          placeholder="Enter job description"
+        ></textarea>
+      </div>
 
-    <div class="input-group">
-      <label for="fileInput">Upload Executable</label>
-      <input 
-        type="file" 
-        (change)="onFileSelected($event)" 
-        accept=".exe,.cpp" 
-        id="fileInput"
-        class="file-input"
-      />
-      <div *ngIf="selectedFile">
-        <p>Selected file: {{ selectedFile.name }}</p>
+      <div class="input-group">
+        <div
+          class="upload-dropzone"
+          (click)="triggerFileInput()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onFileDropped($event)"
+        >
+          <p *ngIf="!selectedFile">
+            Click to browse or drag & drop your .exe or .cpp file here
+          </p>
+          <p *ngIf="selectedFile">Selected file: {{ selectedFile.name }}</p>
+          <button
+            *ngIf="selectedFile"
+            class="clear-file-button"
+            (click)="clearSelectedFile($event)"
+          >
+            &times;
+          </button>
+          <input
+            type="file"
+            (change)="onFileSelected($event)"
+            accept=".exe,.cpp"
+            id="fileInput"
+            class="hidden-file-input"
+          />
+        </div>
+        <div *ngIf="selectedFile && isValidFile" class="file-valid-message">
+          <span>&#10004; File is valid!</span>
+        </div>
+        <div *ngIf="uploadMessage && !isValidFile" class="error-message">
+          {{ uploadMessage }}
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="card right-card">
-    <h3>Process and Host Configuration</h3>
+    <div class="card right-card">
+      <h3>Process and Host Configuration</h3>
 
-    <div class="input-group">
-      <label for="numProcesses">Number of Processes:</label>
-      <input 
-        type="number" 
-        id="numProcesses" 
-        [(ngModel)]="numProcesses" 
-        required 
-      />
-    </div>
+      <div class="input-group">
+        <label for="numProcesses">Number of Processes:</label>
+        <input
+          type="number"
+          id="numProcesses"
+          [(ngModel)]="numProcesses"
+          required
+        />
+      </div>
 
-    <div class="input-group">
-      <label for="allowOverSubscription">Allow Oversubscribe</label>
-      <input 
-        type="checkbox"
-        id="allowOverSubscription"
-        [(ngModel)]="allowOverSubscription"
-        class="styled-checkbox"
-      />
-      <label for="allowOverSubscription" class="styled-label">Yes, allow oversubscription</label>
-    </div>
-
-    <div class="input-group">
-      <h4>Select Nodes:</h4>
-      <div *ngFor="let node of nodeList; let i = index">
-        <input 
-          type="checkbox" 
-          [(ngModel)]="selectedNodes[i]" 
-          [id]="'node-' + i"
+      <div class="input-group">
+        <label for="allowOverSubscription">Oversubscription</label>
+        <input
+          type="checkbox"
+          id="allowOverSubscription"
+          [(ngModel)]="allowOverSubscription"
           class="styled-checkbox"
         />
-        <label for="node-{{ i }}" class="styled-label">{{ node }}</label>
+      </div>
 
-        <div *ngIf="selectedNodes[i]" class="slots-group">
-          <label for="numSlots-{{ i }}">Number of Slots for {{ node }} (default 10):</label>
-          <input 
-            type="number" 
-            id="numSlots-{{ i }}" 
-            [(ngModel)]="slots[i]"
-            [min]="1"
-            [max]="10"
-            class="number-input"
-          />
+      <div class="input-group title-container">
+        <mat-icon
+          class="info-icon"
+          matTooltip="Select nodes to allocate slots for processing. You can select multiple nodes."
+          matTooltipPosition="above"
+        >
+          info
+        </mat-icon>
+        <h4>Select Nodes:</h4>
+      </div>
+
+      <div class="node-selection-container">
+        <div class="node-grid">
+          <div *ngFor="let node of nodeList; let i = index" class="node-option">
+            <input
+              type="checkbox"
+              [checked]="selectedNodes[i]"
+              (change)="toggleNodeSelection(i)"
+              [id]="'node-' + i"
+              class="styled-checkbox"
+            />
+            <label [for]="'node-' + i">{{ node }}</label>
+            <input
+              *ngIf="selectedNodes[i]"
+              type="number"
+              [(ngModel)]="slots[i]"
+              min="1"
+              max="10"
+              class="slot-input"
+              [id]="'slots-' + i"
+              placeholder="Slots"
+            />
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  
-  <div class="card output-card">
-    <h3>Execution Output</h3>
-    <div *ngIf="executionOutput">
-      <pre>{{ executionOutput }}</pre>
-    </div>
-    <div *ngIf="!executionOutput">
-      <p>No output available yet. Run a job to see the results.</p>
-    </div>
-  </div>
 </div>
 
-
 <div class="sticky-footer">
-  <button (click)="uploadFile()" [disabled]="!selectedFile || !numProcesses || !hasSelectedNodes()">Run Job</button>
-  <button (click)="cancelJob()">Cancel</button>
-  <button (click)="clearForm()">Clear Form</button>
-  <button (click)="previewCommand()">Preview Command</button>
+  <div class="button-group-left">
+    <div class="button cancel" (click)="clearForm()">Clear</div>
+  </div>
+
+  <div
+    class="button run"
+    (click)="uploadFile()"
+    [ngClass]="{
+      disabled: !selectedFile || !numProcesses || !hasSelectedNodes()
+    }"
+  >
+    Run Job
+  </div>
+
+  <div class="button-group-right">
+    <div class="button" (click)="previewCommand()">Preview Command</div>
+  </div>
 </div>
 
 <div *ngIf="isLoading" class="loading-overlay">

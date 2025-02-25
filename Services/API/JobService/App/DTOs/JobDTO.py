@@ -10,4 +10,4 @@ class JobDTO(BaseModel):
     hostfile: str
     command: str
     output: str
-    status:str
+    status: str

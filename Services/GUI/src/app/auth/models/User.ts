@@ -8,5 +8,4 @@ export interface SignUp{
 export interface Login{
     username: string,
     email: string,
-
 }

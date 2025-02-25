@@ -1,27 +1,40 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
-import {Subscription} from "rxjs";
-
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { UserService } from '../auth/services/user.service';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatToolbarModule,
+    CommonModule,
+    RouterModule,
+  ],
+  styleUrls: ['./header.component.css'],
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit {
+  user: any;
 
-
-  constructor() {}
-
-  ngOnInit(): void {
-
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
+  ) {}
+  ngOnInit() {
+    this.userService.getUser().subscribe((user) => {
+      this.user = user;
+      this.cdr.detectChanges();
+    });
   }
 
-  ngOnDestroy(): void {
-
+  logout() {
+    localStorage.removeItem('userData');
+    this.userService.setUser(null);
+    this.router.navigate(['/login']);
   }
-
-  logout(): void {
-
-
-} }
+}

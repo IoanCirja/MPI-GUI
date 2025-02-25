@@ -19,7 +19,7 @@ class JobService:
         file_base64 = self.encode_file_to_base64(file_content)
         hostfile_base64 = self.encode_file_to_base64(hostfile_content)
 
-        job = JobEntity(
+        job = JobDTO(
             jobName=job_data.jobName,
             jobDescription=job_data.jobDescription,
             lastExecutionDate=job_data.lastExecutionDate,
@@ -44,13 +44,13 @@ class JobService:
             print(f"Error fetching job by ID: {str(e)}")
             return None
 
-    def get_all_jobs(self) -> List[JobDTO]:
+    def get_all_jobs(self) -> List[JobEntity]:
         try:
             jobs_data = self.repository.get_all_jobs()
             if not jobs_data:
                 return []
 
-            return [JobDTO(**job) for job in jobs_data]
+            return [JobEntity(**job) for job in jobs_data]
         except Exception as e:
             print(f"Error fetching all jobs: {str(e)}")
             return []
