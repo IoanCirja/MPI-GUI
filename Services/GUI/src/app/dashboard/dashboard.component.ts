@@ -1,11 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
+
+declare var monaco: any;  // Monaco global object
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
 
+  constructor() {}
+
+
+
+  initializeEditor() {
+    monaco.editor.create(document.getElementById('container')!, {
+      value: '#include <mpi.h>\nint main() {\n  MPI_Init(NULL, NULL);\n  MPI_Finalize();\n  return 0;\n}',
+      language: 'cpp',
+      theme: 'vs-dark',
+      automaticLayout: true
+    });
+  }
 }

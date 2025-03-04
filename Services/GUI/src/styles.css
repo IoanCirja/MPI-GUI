@@ -82,6 +82,30 @@ body {
     transform: translateX(25%);
   }
 }
+/* Global scrollbar styles */
+::-webkit-scrollbar {
+  width: 12px; /* width of the scrollbar */
+  height: 12px; /* height of the scrollbar for horizontal scrolling */
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(226, 232, 240, 1); /* track color */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--blue-1); /* scrollbar thumb color */
+  border-radius: 10px;
+  border: 3px solid rgba(226, 232, 240, 1); /* thumb border */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--blue-2); /* change thumb color on hover */
+}
+
+::-webkit-scrollbar-button {
+  display: none; /* hide scrollbar buttons (e.g., arrows) */
+}
 
 .button {
   text-decoration: none;

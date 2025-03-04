@@ -1,4 +1,5 @@
 import asyncio
+import re
 import tempfile
 from typing import List
 import vt
@@ -91,13 +92,13 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         active_connections.remove(websocket)
 
-def notify_frontend(job_id: str, status: str, output: str):
+def notify_frontend(job_id: str, status: str, output: str, endDate:str):
     for connection in active_connections:
         asyncio.create_task(
-            connection.send_json({"jobId": job_id, "status": status, "output": output})
+            connection.send_json({"jobId": job_id, "status": status, "output": output, "endDate": endDate})
         )
 
-async def execute_job_in_background(job_id: str, file_path: str, host_path: str, filename: str, hostname: str, user_id: str, numProcesses: int, allowOverSubscription: bool):
+async def execute_job_in_background(job_id: str, file_path: str, host_path: str, filename: str, hostname: str, user_id: str, numProcesses: int, allowOverSubscription: bool, env_vars_str: str, displayMap : str, rankBy : str, mapBy : str):
     try:
         
         ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
@@ -105,20 +106,30 @@ async def execute_job_in_background(job_id: str, file_path: str, host_path: str,
 
         remote_path_exe = f"/home/mpi.cluster/mpi-apps-ioan/{filename}"
         remote_path_host = f"/home/mpi.cluster/mpi-apps-ioan/{hostname}"
+        remote_pid_path = f"/home/mpi.cluster/mpi-apps-ioan/pids/{job_id}.txt"
 
-        
+        await asyncio.to_thread(ssh_service.ensure_pids_folder_exists, "/home/mpi.cluster/mpi-apps-ioan/pids")
         await asyncio.to_thread(ssh_service.upload_file, file_path, remote_path_exe)
         await asyncio.to_thread(ssh_service.upload_file, host_path, remote_path_host)
 
-        oversubscribe_flag = "--oversubscribe" if allowOverSubscription else ""
-        mpirun_command = f"mpirun -hostfile {remote_path_host} -np {numProcesses} {remote_path_exe} {oversubscribe_flag}"
+        mpirun_command = f"mpirun {env_vars_str} -hostfile {remote_path_host} -np {numProcesses} --report-pid {remote_pid_path}"
 
+        if mapBy:
+            mpirun_command += f" --map-by {mapBy}"
+        if rankBy:
+            mpirun_command += f" --rank-by {rankBy}"
+        if displayMap:
+            mpirun_command += " --display-map"
+        if allowOverSubscription:
+            mpirun_command += " --oversubscribe"
+
+        mpirun_command += f" {remote_path_exe}"
         
         await asyncio.to_thread(ssh_service.send_file_to_hosts, file_path, host_path)
 
         
         output = await asyncio.to_thread(ssh_service.execute_command, mpirun_command, remote_path_exe, remote_path_host)
-
+        #remove pid once job is over
         if not output:
             output = "No output from mpirun, please check the command execution or file permissions."
         
@@ -126,10 +137,11 @@ async def execute_job_in_background(job_id: str, file_path: str, host_path: str,
         job_data = job_service.get_job_by_id(job_id)
         job_data.output = output
         job_data.status = "completed"
+        job_data.endDate = datetime.now().strftime("%Y-%d-%m %H:%M:%S")
         job_service.update_job_status_and_output(job_id, job_data)
 
         
-        notify_frontend(job_id, job_data.status, job_data.output)
+        notify_frontend(job_id, job_data.status, job_data.output, job_data.endDate)
 
     except Exception as e:
         
@@ -148,13 +160,16 @@ async def upload_file(
     file: UploadFile = File(...),
     hostfile: UploadFile = File(...),
     jobDescription: str = Form(...),
-    lastExecutionTime: str = Form(...),
     numProcesses: int = Form(...),
     allowOverSubscription: bool = Form(...),
+    environmentVars: str = Form(...),
+    displayMap: str = Form(...),
+    rankBy: str = Form(...),
+    mapBy: str = Form(...),
     token: str = Depends(get_token_from_header),
 ):
     try:
-        if not (file.filename.endswith(".exe") or file.filename.endswith(".cpp")):
+        if not (file.filename.endswith(".exe"):
             raise HTTPException(status_code=400, detail="Only .exe or .cpp files are allowed!")
 
         decoded_token = verifyAccessToken(token)
@@ -175,28 +190,57 @@ async def upload_file(
 
         remote_path_exe = f"/home/mpi.cluster/mpi-apps-ioan/{file.filename}"
         remote_path_host = f"/home/mpi.cluster/mpi-apps-ioan/{hostfile.filename}"
+        remote_pid_path = f"/home/mpi.cluster/mpi-apps-ioan/pids/{file.filename}.txt"
 
-        oversubscribe_flag = "--oversubscribe" if allowOverSubscription else ""
-        mpirun_command = f"mpirun -hostfile {remote_path_host}   -np {numProcesses} {remote_path_exe} {oversubscribe_flag}"
+        env_vars_list = []
+        if environmentVars.strip():
+            env_pattern = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=[^;&|$()<>`]+$")
+            for env_var in environmentVars.split(","):
+                env_var = env_var.strip()
+                if not env_pattern.match(env_var):
+                    raise HTTPException(status_code=400, detail=f"Invalid environment variable: {env_var}")
+                env_vars_list.append(f"-x {env_var}")
 
-        
+        env_vars_str = " ".join(env_vars_list)
+
+
+        mpirun_command = f"mpirun {env_vars_str} -hostfile {remote_path_host} -np {numProcesses} --report-pid {remote_pid_path}"
+
+        if mapBy:
+            mpirun_command += f" --map-by {mapBy}"
+        if rankBy:
+            mpirun_command += f" --rank-by {rankBy}"
+        if displayMap:
+            mpirun_command += " --display-map"
+        if allowOverSubscription:
+            mpirun_command += " --oversubscribe"
+
+        mpirun_command += f" {remote_path_exe}"
+
+        beginDate = datetime.now().strftime("%Y-%d-%m %H:%M:%S")
+
         job_service = JobService(userId)
         job_data = JobDTO(
             jobName=jobName,
             jobDescription=jobDescription,
-            lastExecutionDate=lastExecutionTime,
+            beginDate = beginDate,
+            endDate = 'pending',
             numProcesses=numProcesses,
             allowOverSubscription=allowOverSubscription,
             file=file.filename,
             hostfile=hostfile.filename,
             command=mpirun_command,
             output="",
-            status="pending"
+            status="pending",
+            environmentVars=env_vars_str,
+            displayMap = displayMap,
+            rankBy = rankBy,
+            mapBy = mapBy
         )
         job_id = job_service.create_and_save_job(job_data, content, host_content, mpirun_command)
 
         
-        background_tasks.add_task(execute_job_in_background,job_id, file_path, host_path, file.filename, hostfile.filename, userId, numProcesses, allowOverSubscription)
+        background_tasks.add_task(execute_job_in_background,job_id, file_path, host_path, file.filename, hostfile.filename, userId, numProcesses, allowOverSubscription, env_vars_str, displayMap, rankBy, mapBy)
 
         return {"jobId": job_id}
     except Exception as e:
@@ -264,6 +308,50 @@ async def get_job_details(job_id: str,
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve job: {str(e)}")
+
+
+@router.post("/jobs/{job_id}/kill")
+def kill_job(job_id: str, background_tasks: BackgroundTasks, token: str = Depends(get_token_from_header)):
+    try:
+        decoded_token = verifyAccessToken(token)
+        user_id = decoded_token["sub"]
+
+        job_service = JobService(user_id)
+        job_data = job_service.get_job_by_id(job_id)
+
+        if not job_data:
+            raise HTTPException(status_code=404, detail="Job not found")
+
+        if job_data.status not in ["running", "pending"]:
+            raise HTTPException(status_code=400, detail="Job is not currently running")
+
+        ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
+        ssh_service.connect()
+
+        background_tasks.add_task(kill_job_background, job_id, job_service, ssh_service)
+
+        return {"message": "Process termination initiated", "jobId": job_id}
+
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error initiating job termination: {str(e)}")
+
+
+def kill_job_background(job_id: str, job_service: JobService, ssh_service: SSHService):
+    try:
+        killed = ssh_service.kill_mpi_process(job_id)
+
+        if killed:
+            job_data = job_service.get_job_by_id(job_id)
+            job_data.status = "killed"
+            job_service.update_job_status_and_output(job_id, job_data)
+            notify_frontend(job_id, job_data.status, "Process killed successfully",
+                            datetime.now().strftime("%Y-%d-%m %H:%M:%S"))
+        else:
+            notify_frontend(job_id, "error", "Failed to kill process", datetime.now().strftime("%Y-%d-%m %H:%M:%S"))
+    except Exception as e:
+        notify_frontend(job_id, "error", f"Error killing job: {str(e)}", datetime.now().strftime("%Y-%d-%m %H:%M:%S"))
 
 
 @router.post("/uploadsss/")

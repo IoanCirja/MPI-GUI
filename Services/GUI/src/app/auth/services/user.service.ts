@@ -59,9 +59,25 @@ export class UserService {
 
   getProfile() {
     return this.http.get<any>(this.profileUrl).pipe(
-      tap((response) => {}),
+      tap((response) => {
+        const decodedToken: any = jwtDecode(response.token);
+        const userData = {
+          token: response.token,
+          email: decodedToken.email,
+          username: decodedToken.username,
+        };
+
+        localStorage.setItem('userData', JSON.stringify(userData));
+
+        this.setUser(userData);
+        this.setupAutoLogout();
+      }),
       catchError((error) => {
+        this.setUser(null);
+        this.router.navigate(['/login']);
+
         throw error;
+
       })
     );
   }

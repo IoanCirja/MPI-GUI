@@ -11,7 +11,18 @@ export class FileUploadService {
 
   constructor(private http: HttpClient) {}
 
-  uploadFile(file: File, numProcesses: number, allowOverSubscription:boolean, hostifle: File, jobName:string, jobDescription:string, lastExecutionTime:string): Observable<any> {
+  uploadFile(
+    file: File,
+    numProcesses: number,
+    allowOverSubscription: boolean,
+    hostifle: File,
+    jobName: string,
+    jobDescription: string,
+    environmentVars: string,
+    displayMap: string,
+    rankBy: string,
+    mapBy: string
+  ): Observable<any> {
     const formData = new FormData();
     formData.append('numProcesses', numProcesses.toString());
     formData.append('file', file);
@@ -19,26 +30,31 @@ export class FileUploadService {
     formData.append('hostfile', hostifle);
     formData.append('jobName', jobName);
     formData.append('jobDescription', jobDescription);
-    formData.append('lastExecutionTime', lastExecutionTime);
+    formData.append('environmentVars', environmentVars);
+    formData.append('displayMap', displayMap);
+    formData.append('rankBy', rankBy);
+    formData.append('mapBy', mapBy);
+
 
     const token = localStorage.getItem('authToken');
 
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token}` : '',
     });
- 
-
 
     return this.http.post(this.apiUrl, formData, { headers });
   }
 
   getJobStatus(): Observable<any> {
-    const token = localStorage.getItem('authToken');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
 
-    return this.http.get(this.jobUrl, { headers });
+    return this.http.get(this.jobUrl);
   }
 
+  killJob(jobId: string): Observable<any> {
+    const url = `http://localhost:8001/api/jobs/${jobId}/kill`;
+
+  
+    return this.http.post(url, {});
+  }
+  
 }

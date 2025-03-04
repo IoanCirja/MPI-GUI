@@ -1,3 +1,5 @@
+import asyncio
+
 import paramiko
 import os
 from decouple import config
@@ -152,6 +154,80 @@ class SSHService:
         except Exception as e:
             print(f"Error in send_file_to_hosts: {e}")
             raise HTTPException(status_code=500, detail=f"Failed to send file to hosts: {str(e)}")
+
+    def ensure_pids_folder_exists(self, pids_folder_path: str):
+        """
+        Ensures that the pids folder exists on the remote server.
+        If it doesn't exist, create it.
+        """
+        try:
+            # Check if the folder exists
+            stdin, stdout, stderr = self.client.exec_command(
+                f"test -d {pids_folder_path} && echo exists || echo not_exists")
+            folder_status = stdout.read().decode('utf-8').strip()
+
+            # If the folder doesn't exist, create it
+            if folder_status == "not_exists":
+                stdin, stdout, stderr = self.client.exec_command(f"mkdir -p {pids_folder_path}")
+                errors = stderr.read().decode('utf-8')
+                if errors:
+                    print(f"Error creating directory {pids_folder_path}: {errors}")
+                else:
+                    print(f"Directory {pids_folder_path} created successfully.")
+            else:
+                print(f"Directory {pids_folder_path} already exists.")
+        except Exception as e:
+            print(f"Error ensuring pids folder exists: {e}")
+            raise HTTPException(status_code=500, detail="Error ensuring pids folder exists.")
+
+    import asyncio
+
+    async def kill_mpi_process(self, job_id: str):
+        """
+        Kills the MPI process using the PID stored in the pid file for the given job_id asynchronously.
+        """
+        try:
+            pid_file_path = f"/home/mpi.cluster/mpi-apps-ioan/pids/{job_id}.txt"
+
+            # Fetch the PID from the file
+            cat_command = f"cat -- {pid_file_path}"
+            stdin, stdout, stderr = await asyncio.to_thread(self.client.exec_command, cat_command)
+            pid = stdout.read().decode('utf-8').strip()
+
+            if not pid:
+                raise Exception(f"No PID found in the file {pid_file_path}")
+
+            print(f"Attempting to kill process {pid}...")
+
+            # Kill the process
+            kill_command = f"kill -9 {pid}"
+            await asyncio.to_thread(self.client.exec_command, kill_command)
+
+            # Wait a bit for the process to be killed
+            await asyncio.sleep(1)
+
+            # Verify if the process is still running
+            check_command = f"ps -p {pid}"
+            stdin, stdout, stderr = await asyncio.to_thread(self.client.exec_command, check_command)
+            output = stdout.read().decode('utf-8').strip()
+
+            if output:
+                print(f"Failed to kill process {pid}, it may still be running.")
+                return False
+            else:
+                print(f"Process {pid} has been successfully terminated.")
+
+                # Remove the PID file after killing the process
+                remove_pid_command = f"rm -f {pid_file_path}"
+                await asyncio.to_thread(self.client.exec_command, remove_pid_command)
+                print(f"PID file {pid_file_path} removed.")
+
+                return True
+
+        except Exception as e:
+            print(f"Error killing MPI process: {e}")
+            raise HTTPException(status_code=500, detail=f"Error killing MPI process: {str(e)}")
+
     def close(self):
         if self.sftp:
             self.sftp.close()

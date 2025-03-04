@@ -1,0 +1,6 @@
+/* dashboard.component.css */
+#container {
+    height: 400px;  /* Adjust the height of Monaco editor */
+    width: 100%;    /* Make the editor fill the container width */
+  }
+  

@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { HeaderComponent } from '../../header/header.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-upload',
@@ -18,6 +19,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatTooltipModule,
   ],
   styleUrls: ['./upload.component.css'],
+  animations: [
+      trigger('fadeIn', [
+        transition(':enter', [
+          style({ opacity: 0 }),
+          animate('300ms 100ms', style({ opacity: 1 })),
+        ]),
+      ]),
+    ],
 })
 export class UploadComponent {
   selectedFile: File | null = null;
@@ -28,7 +37,8 @@ export class UploadComponent {
   allowOverSubscription: boolean = false;
   jobName: string = '';
   jobDescription: string = '';
-  lastExecutionTime: Date = new Date();
+  endDate: string = '';
+  startDate: string = '';
   isValidFile: boolean = false;
 
   nodeList: string[] = Array.from(
@@ -38,10 +48,24 @@ export class UploadComponent {
   selectedNodes: boolean[] = new Array(21).fill(false);
   slots: number[] = new Array(21).fill(10);
   isDropdownVisible: boolean = false;
+  environmentVars: string = '';
+  displayMap: any;
+  rankBy: any;
+  mapBy: any;
+  
+// useHwThreads: any;
+// cpuSet: any;
+// timeout: any;
+
+// outputFile: any;
+// bindTo: any;
+// rankBy: any;    
+// mapBy: any;
+// displayMap: any;
 
   constructor(
     private fileUploadService: FileUploadService,
-    private router: Router
+    private router: Router,
   ) {}
 
   onFileSelected(event: Event): void {
@@ -159,12 +183,9 @@ export class UploadComponent {
     }
 
     const hostfile = this.generateHostfile();
-    this.router.navigate(['jobs/status']);
 
     this.isLoading = true;
-    console.log('Uploading file with numProcesses:', this.numProcesses);
-    console.log('Allow over subscription:', this.allowOverSubscription);
-    this.lastExecutionTime = new Date();
+
     this.fileUploadService
       .uploadFile(
         this.selectedFile,
@@ -173,7 +194,10 @@ export class UploadComponent {
         hostfile,
         this.jobName,
         this.jobDescription,
-        this.lastExecutionTime.toISOString()
+        this.environmentVars,
+        this.displayMap,
+        this.rankBy,
+        this.mapBy
       )
       .subscribe({
         next: (response: any) => {
@@ -181,6 +205,8 @@ export class UploadComponent {
           this.executionOutput =
             response.execution_output || 'No output from the command';
           this.isLoading = false;
+          this.router.navigate(['jobs/status']);
+
         },
         error: (error) => {
           console.log('Error:', error);
@@ -205,6 +231,7 @@ export class UploadComponent {
     this.slots = [];
     this.executionOutput = '';
     this.uploadMessage = '';
+
   }
 
   previewCommand() {}

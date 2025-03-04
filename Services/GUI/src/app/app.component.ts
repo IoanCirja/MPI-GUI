@@ -3,12 +3,15 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './header/header.component';
 import { UserService } from './auth/services/user.service';
 import { CommonModule } from '@angular/common';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, HeaderComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  
+
 })
 export class AppComponent implements OnInit {
   title = 'MPI Launcher';
@@ -20,8 +23,8 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.userService.getProfile().subscribe(() => {});
     this.userService.getUser().subscribe((user) => {
-      console.log('User state updated:', user);
       this.user = user;
       this.cdr.detectChanges();
     });

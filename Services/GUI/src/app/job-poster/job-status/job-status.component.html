@@ -18,6 +18,7 @@
         <div *ngIf="job.status === 'completed'" class="check-icon">✔</div>
         <div *ngIf="job.status === 'failed'" class="failed-icon">✖</div>
       </span>
+      <button (click)="killJob(job.id)">Kill Job</button>
       <span class="expand-icon">{{ expandedJobs.has(i) ? "↓" : "↑" }}</span>
     </div>
     <div class="job-details" [class.expanded]="expandedJobs.has(i)">
@@ -34,8 +35,12 @@
           </td>
         </tr>
         <tr>
-          <td><strong>Last Execution Time:</strong></td>
-          <td>{{ job.lastExecutionDate || "Not available" }}</td>
+          <td><strong>Begin Time:</strong></td>
+          <td>{{ job.beginDate || "Not available" }}</td>
+        </tr>
+        <tr>
+          <td><strong>End Time:</strong></td>
+          <td>{{ job.endDate || "Not available" }}</td>
         </tr>
         <tr>
           <td><strong>Number of Processes:</strong></td>
@@ -44,6 +49,22 @@
         <tr>
           <td><strong>Command:</strong></td>
           <td>{{ job.command || "Not available" }}</td>
+        </tr>
+        <tr>
+          <td><strong>Environment Variables:</strong></td>
+          <td>{{ job.environmentVars || "Not available" }}</td>
+        </tr>
+        <tr>
+          <td><strong>Display Map:</strong></td>
+          <td>{{ job.displayMap || "Not available" }}</td>
+        </tr>
+        <tr>
+          <td><strong>Rank By: </strong></td>
+          <td>{{ job.rankBy || "Not available" }}</td>
+        </tr>
+        <tr>
+          <td><strong>Map By:</strong></td>
+          <td>{{ job.mapBy || "Not available" }}</td>
         </tr>
         <tr>
           <td><strong>Hostfile:</strong></td>

@@ -3,7 +3,8 @@ from pydantic import BaseModel
 class JobDTO(BaseModel):
     jobName: str
     jobDescription: str
-    lastExecutionDate: str
+    beginDate: str
+    endDate: str
     numProcesses: int
     allowOverSubscription: bool
     file: str
@@ -11,3 +12,7 @@ class JobDTO(BaseModel):
     command: str
     output: str
     status: str
+    environmentVars: str
+    displayMap: str
+    rankBy: str
+    mapBy:str

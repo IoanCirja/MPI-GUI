@@ -22,14 +22,19 @@ class JobService:
         job = JobDTO(
             jobName=job_data.jobName,
             jobDescription=job_data.jobDescription,
-            lastExecutionDate=job_data.lastExecutionDate,
+            beginDate=job_data.beginDate,
+            endDate=job_data.endDate,
             numProcesses=job_data.numProcesses,
             allowOverSubscription=job_data.allowOverSubscription,
             file=file_base64,
             hostfile=hostfile_base64,
             command=command,
             output=job_data.output,
-            status='pending'
+            status='pending',
+            environmentVars=job_data.environmentVars,
+            displayMap=job_data.displayMap,
+            rankBy=job_data.rankBy,
+            mapBy=job_data.mapBy
         )
 
         job_id = self.repository.insert_job(job)
@@ -58,7 +63,8 @@ class JobService:
     def update_job_status_and_output(self, job_id: str, job_data: JobDTO):
         updated_data = {
             "status": job_data.status,
-            "output": job_data.output
+            "output": job_data.output,
+            "endDate": job_data.endDate,
         }
         success = self.repository.update_job(job_id, updated_data)
         if not success:

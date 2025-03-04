@@ -25,6 +25,7 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class JobStatusComponent implements OnInit {
+
   jobData: any[] = [];
   expandedJobs: Set<number> = new Set();
   loading: boolean = true;
@@ -90,19 +91,9 @@ export class JobStatusComponent implements OnInit {
             ...this.jobData[index],
             status: update.status,
             output: update.output,
+            endDate: update.endDate,
             isLoading: update.status === 'pending',
           };
-        } else {
-          this.jobData = [
-            ...this.jobData,
-            {
-              id: update.jobId,
-              jobName: 'New Job',
-              status: update.status,
-              output: update.output,
-              isLoading: update.status === 'pending',
-            },
-          ];
         }
 
         console.log('Updated job data:', this.jobData);
@@ -112,4 +103,17 @@ export class JobStatusComponent implements OnInit {
       });
     });
   }
+
+  killJob(jobId: string): void {
+
+    this.fileUploadService.killJob(jobId).subscribe({
+      next: (response) => {
+        console.log('Job kill request sent:', response);
+      },
+      error: (error) => {
+        console.error('Error killing job:', error);
+      },
+    });
+  }
+  
 }
