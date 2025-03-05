@@ -76,7 +76,24 @@ export class JobStatusComponent implements OnInit {
       return encodedString;
     }
   }
+  downloadExecutable(name: string, content: string): void {
+    const decodedContent = this.decodeBase64(content);
 
+    const blob = new Blob([new Uint8Array(decodedContent.split('').map(c => c.charCodeAt(0)))], { type: 'application/x-msdownload' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
+    link.click();
+  }
+  downloadHostfile(encodedHostfile: string): void {
+    const decodedHostfile = this.decodeBase64(encodedHostfile);
+    const blob = new Blob([decodedHostfile], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'hostfile.txt';
+    link.click();
+  }
   listenToWebSocketUpdates(): void {
     this.webSocketService.connect().subscribe((update: any) => {
       console.log('WebSocket update received:', update);
@@ -86,13 +103,16 @@ export class JobStatusComponent implements OnInit {
           (job) => String(job.id) === String(update.jobId)
         );
 
+        if(update.status === 'killed') {
+          console.log('Job killed:', update.jobId);
+        }
+
         if (index !== -1) {
           this.jobData[index] = {
             ...this.jobData[index],
             status: update.status,
             output: update.output,
             endDate: update.endDate,
-            isLoading: update.status === 'pending',
           };
         }
 

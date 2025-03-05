@@ -1,8 +1,6 @@
 from pydantic import BaseModel
 
-class JobDTO(BaseModel):
-    id: str
-
+class JobUploadDTO(BaseModel):
     jobName: str
     jobDescription: str
 
@@ -24,3 +22,6 @@ class JobDTO(BaseModel):
 
     status: str
     output: str
+
+
+

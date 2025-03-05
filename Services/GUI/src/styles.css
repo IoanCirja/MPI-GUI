@@ -82,29 +82,29 @@ body {
     transform: translateX(25%);
   }
 }
-/* Global scrollbar styles */
+
 ::-webkit-scrollbar {
-  width: 12px; /* width of the scrollbar */
-  height: 12px; /* height of the scrollbar for horizontal scrolling */
+  width: 12px; 
+  height: 12px; 
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgba(226, 232, 240, 1); /* track color */
+  background-color: rgba(226, 232, 240, 1); 
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--blue-1); /* scrollbar thumb color */
+  background-color: var(--blue-1); 
   border-radius: 10px;
-  border: 3px solid rgba(226, 232, 240, 1); /* thumb border */
+  border: 3px solid rgba(226, 232, 240, 1); 
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--blue-2); /* change thumb color on hover */
+  background-color: var(--blue-2); 
 }
 
 ::-webkit-scrollbar-button {
-  display: none; /* hide scrollbar buttons (e.g., arrows) */
+  display: none; 
 }
 
 .button {

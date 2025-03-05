@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { HeaderComponent } from '../../header/header.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { Job } from '../models/Job';
 
 @Component({
   selector: 'app-upload',
@@ -49,19 +50,11 @@ export class UploadComponent {
   slots: number[] = new Array(21).fill(10);
   isDropdownVisible: boolean = false;
   environmentVars: string = '';
-  displayMap: any;
+  displayMap: boolean = false;
   rankBy: any;
   mapBy: any;
   
-// useHwThreads: any;
-// cpuSet: any;
-// timeout: any;
 
-// outputFile: any;
-// bindTo: any;
-// rankBy: any;    
-// mapBy: any;
-// displayMap: any;
 
   constructor(
     private fileUploadService: FileUploadService,
@@ -177,48 +170,57 @@ export class UploadComponent {
 
   uploadFile(): void {
     if (!this.selectedFile || !this.numProcesses) {
-      this.uploadMessage =
-        'Please select a file and provide the number of processes!';
+      this.uploadMessage = 'Please select a file and provide the number of processes!';
       return;
     }
-
-    const hostfile = this.generateHostfile();
-
-    this.isLoading = true;
-
-    this.fileUploadService
-      .uploadFile(
-        this.selectedFile,
-        this.numProcesses!,
-        this.allowOverSubscription,
-        hostfile,
-        this.jobName,
-        this.jobDescription,
-        this.environmentVars,
-        this.displayMap,
-        this.rankBy,
-        this.mapBy
-      )
-      .subscribe({
-        next: (response: any) => {
-          this.uploadMessage = response.message;
-          this.executionOutput =
-            response.execution_output || 'No output from the command';
-          this.isLoading = false;
-          this.router.navigate(['jobs/status']);
-
-        },
-        error: (error) => {
-          console.log('Error:', error);
-          this.uploadMessage = `Failed to upload file: ${
-            error.error.message || 'Unknown error'
-          }`;
-          this.executionOutput =
-            error.error.detail || 'No output from the command';
-          this.isLoading = false;
-        },
-      });
+  
+    const reader = new FileReader();
+    const hostFileReader = new FileReader();
+  
+    reader.onload = () => {
+      hostFileReader.onload = () => {
+        const job: Job = {
+          jobName: this.jobName,
+          jobDescription: this.jobDescription,
+          beginDate: this.startDate,
+          endDate: this.endDate,
+          fileName: this.selectedFile!.name,
+          fileContent: (reader.result as string).split(',')[1],
+          hostFile: (hostFileReader.result as string).split(',')[1],
+          numProcesses: this.numProcesses!,
+          allowOverSubscription: this.allowOverSubscription,
+          environmentVars: this.environmentVars,
+          displayMap: this.displayMap,
+          rankBy: this.rankBy,
+          mapBy: this.mapBy,
+          status: 'pending',
+          output: '',
+        };
+        console.log('Uploading job:', job);
+        this.isLoading = true;
+  
+        this.fileUploadService.uploadFile(job).subscribe({
+          next: (response: any) => {
+            this.uploadMessage = response.message;
+            this.executionOutput = response.execution_output || 'No output from the command';
+            this.isLoading = false;
+            this.router.navigate(['jobs/status']);
+          },
+          error: (error) => {
+            console.log('Error:', error);
+            this.uploadMessage = `Failed to upload file: ${error.error.message || 'Unknown error'}`;
+            this.executionOutput = error.error.detail || 'No output from the command';
+            this.isLoading = false;
+          },
+        });
+      };
+  
+      hostFileReader.readAsDataURL(this.generateHostfile());
+    };
+  
+    reader.readAsDataURL(this.selectedFile);
   }
+  
   cancelJob() {}
 
   clearForm() {

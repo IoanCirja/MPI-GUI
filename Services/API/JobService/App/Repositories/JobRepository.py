@@ -19,14 +19,9 @@ class JobRepository:
 
     def insert_job(self, job: JobDTO):
         try:
-            job_ref = self.ref.push()
             job_data = job.dict()
-
-            logging.info(f"Inserting job into Firebase: {job_data}")
-
-            job_ref.set(job_data)
-            logging.info(f"Job successfully inserted with ID: {job_ref.key}")
-            return job_ref.key
+            self.ref.child(job.id).set(job_data)
+            return job.id
         except Exception as e:
             logging.error(f"Error inserting job: {str(e)}")
             return None
@@ -36,10 +31,7 @@ class JobRepository:
             job_ref = self.ref.child(job_id)
             job_data = job_ref.get()
 
-            if job_data:
-                logging.info(f"Fetched job data: {job_data}")
-            else:
-                logging.warning(f"No job found with ID: {job_id}")
+
 
             return job_data
         except Exception as e:

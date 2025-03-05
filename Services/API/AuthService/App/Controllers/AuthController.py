@@ -1,10 +1,10 @@
 from datetime import datetime
 
 import jwt
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, HTTPException, Request
 
 from AuthService.App.DTOs.LoginRequest import LoginRequest
-from AuthService.App.DTOs.SignUpRequest import SignUpResponse, SignUpRequest
+from AuthService.App.DTOs.SignUpRequest import SignUpRequest
 from AuthService.App.Services.AuthService import UserService, env
 
 router = APIRouter()

@@ -4,6 +4,8 @@
 </div>
 
 <div class="list-container">
+  <span class="loading-message" *ngIf="jobData.length===0 && !loading">No Jobs Found</span>
+
   <div
     class="job-status-container"
     *ngFor="let job of jobData; let i = index"
@@ -46,13 +48,23 @@
           <td><strong>Number of Processes:</strong></td>
           <td>{{ job.numProcesses || "Not available" }}</td>
         </tr>
-        <tr>
-          <td><strong>Command:</strong></td>
-          <td>{{ job.command || "Not available" }}</td>
-        </tr>
+
         <tr>
           <td><strong>Environment Variables:</strong></td>
           <td>{{ job.environmentVars || "Not available" }}</td>
+        </tr>
+
+        <tr>
+          <td><strong>Executable:</strong></td>
+          <td>
+            <a
+              *ngIf="job.fileName"
+              href="javascript:void(0)"
+              (click)="downloadExecutable(job.fileName, job.fileContent)"
+            >
+              {{ job.fileName }}
+            </a>
+          </td>
         </tr>
         <tr>
           <td><strong>Display Map:</strong></td>
@@ -69,9 +81,10 @@
         <tr>
           <td><strong>Hostfile:</strong></td>
           <td>
-            <pre>{{
-              decodeBase64(job.hostfile) || "No hostfile available"
-            }}</pre>
+            <button *ngIf="job.hostFile" (click)="downloadHostfile(job.hostFile)">
+              Download Hostfile
+            </button>
+            <pre>{{ decodeBase64(job.hostFile) || "No hostfile available" }}</pre>
           </td>
         </tr>
         <tr>

@@ -1,6 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 
-declare var monaco: any;  // Monaco global object
+declare var monaco: any;
 
 @Component({
   selector: 'app-dashboard',

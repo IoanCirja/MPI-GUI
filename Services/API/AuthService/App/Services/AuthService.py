@@ -32,7 +32,7 @@ class UserService:
             "iss": iss,
             "sub": userData["id"],
             "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(hours=1),  # 1 minute expiration
+            "exp": datetime.utcnow() + timedelta(hours=1),
             "jti": str(uuid.uuid4()),
             'username':userData["username"],
             'email': userData["email"],

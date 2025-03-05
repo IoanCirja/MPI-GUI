@@ -1,11 +1,24 @@
 import asyncio
 
+import asyncssh
+
 import paramiko
 import os
-from decouple import config
+from decouple import RepositoryEnv, Config
 from fastapi import HTTPException
+envPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+env = Config(RepositoryEnv(envPath))
 
+BASE_DIRECTORY = env('BASE_DIRECTORY')
+SSH_HOST = env('SSH_HOST')
+SSH_PORT = env('SSH_PORT')
+SSH_USERNAME = env('SSH_USERNAME')
+SSH_PASSWORD = env('SSH_PASSWORD')
+MPI_HOSTS = env('MPI_HOSTS').split(',')
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 class SSHService:
     def __init__(self, host: str, port: int, username: str, password: str):
         self.host = host
@@ -14,6 +27,8 @@ class SSHService:
         self.password = password
         self.client = None
         self.sftp = None
+
+        #self.ssh_keyscan()
 
     def connect(self):
         try:
@@ -26,47 +41,6 @@ class SSHService:
             print(f"Error establishing SSH connection: {e}")
             raise HTTPException(status_code=500, detail="SSH connection failed.")
 
-    def upload_file(self, local_path: str, remote_path: str):
-        try:
-
-            if not os.path.exists(local_path):
-                raise Exception(f"Local file {local_path} does not exist.")
-
-            try:
-
-                self.sftp.put(local_path, remote_path)
-                print(f"File {local_path} uploaded to {remote_path}")
-
-                chmod_command = f"chmod +x {remote_path}"
-                stdin, stdout, stderr = self.client.exec_command(chmod_command)
-
-                errors = stderr.read().decode('utf-8')
-                if errors:
-                    print(f"Error running chmod on {remote_path}: {errors}")
-                else:
-                    print(f"Successfully set executable permission on {remote_path}")
-
-            except Exception as e:
-                raise Exception(f"Error uploading file to remote path {remote_path}: {str(e)}")
-
-        except Exception as e:
-            print(f"Error in upload_file: {e}")
-            raise e
-
-    def download_file(self, remote_path: str, local_path: str):
-        try:
-
-            try:
-                self.sftp.stat(remote_path)
-            except FileNotFoundError:
-                raise Exception(f"Remote file {remote_path} does not exist.")
-
-            self.sftp.get(remote_path, local_path)
-            print(f"File {remote_path} downloaded to {local_path}")
-
-        except Exception as e:
-            print(f"Error in download_file: {e}")
-            raise e
 
     def execute_command(self, command: str, remote_path_exe: str, remote_path_host:str):
         try:
@@ -96,136 +70,91 @@ class SSHService:
             print(f"Error executing command: {e}")
             raise HTTPException(status_code=500, detail=f"Error executing command: {str(e)}")
 
-    def delete_file(self, remote_path: str):
+
+    async def send_file_to_host(self, fqdn, job_id, local_exe, local_hostfile):
+        remote_job_dir = f"{BASE_DIRECTORY}/job_{job_id}"
         try:
+            async with asyncssh.connect(fqdn, port=self.port, username=self.username, password=self.password, known_hosts=None) as conn:
+
+                await conn.run(f"mkdir -p {remote_job_dir}", check=True)
+
+                remote_exe_path = f"{remote_job_dir}/{os.path.basename(local_exe)}"
+                await asyncssh.scp(local_exe, (conn, remote_exe_path))
+
+                remote_hostfile_path = f"{remote_job_dir}/hostfile_{job_id}.txt"
+                await asyncssh.scp(local_hostfile, (conn, remote_hostfile_path))
+
+                await conn.run(f"chmod +x {remote_exe_path}", check=True)
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error sending files to {fqdn}: {str(e)}")
+
+    async def send_file_to_hosts(self, job_id, local_exe, local_hostfile):
+        try:
+            with open(local_hostfile, 'r') as hostfile:
+                hosts = [line.strip().split()[0] for line in hostfile if line.strip()]
+
+            if not hosts:
+                raise ValueError("Hostfile is empty or invalid!")
+
+            master_node = "c05-00"
+            if master_node not in hosts:
+                hosts.insert(0, master_node)
+
+            tasks = []
+            for host in hosts:
+                fqdn = f"{host.lower()}.cs.tuiasi.ro"
+                tasks.append(self.send_file_to_host(fqdn, job_id, local_exe, local_hostfile))
+
+            await asyncio.gather(*tasks)
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to send files to hosts: {str(e)}")
+
+
+    async def request_kill(self, job_id: str):
+        try:
+            remote_job_dir = f"{BASE_DIRECTORY}/job_{job_id}"
+            pid_file_path = f"{remote_job_dir}/pid_{job_id}.txt"
 
             try:
-                self.sftp.stat(remote_path)
+                self.sftp.stat(pid_file_path)
+                logger.info(f"Found PID file at {pid_file_path}.")
             except FileNotFoundError:
-                raise Exception(f"Remote file {remote_path} does not exist.")
+                logger.error(f"PID file not found for job {job_id}.")
+                raise HTTPException(status_code=404, detail="PID file not found.")
 
-            self.sftp.remove(remote_path)
-            print(f"File {remote_path} deleted successfully.")
+            with self.sftp.open(pid_file_path, 'r') as pid_file:
+                pid = pid_file.read().decode('utf-8').strip()
+                logger.info(f"Retrieved PID: {pid} for job {job_id}.")
 
-        except Exception as e:
-            print(f"Error in delete_file: {e}")
-            raise e
-
-    def send_file_to_hosts(self, local_file: str, hostfile_path: str):
-        try:
-            with open(hostfile_path, 'r') as hostfile:
-                hosts = hostfile.readlines()
-
-            for host_line in hosts:
-                host_line = host_line.strip()
-                if host_line:
-                    host = host_line.split()[0]
-
-                    fqdn = f"{host.lower()}.cs.tuiasi.ro"
-                    print(f"Sending file to host: {fqdn}")
-
-                    try:
-                        ssh_client = paramiko.SSHClient()
-                        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                        ssh_client.connect(fqdn, port=self.port, username=self.username, password=self.password)
-                        sftp_client = ssh_client.open_sftp()
-
-                        remote_path = f"/home/{self.username}/mpi-apps-ioan/{os.path.basename(local_file)}"
-                        sftp_client.put(local_file, remote_path)
-                        print(f"File uploaded to {fqdn}:{remote_path}")
-
-                        chmod_command = f"chmod +x {remote_path}"
-                        stdin, stdout, stderr = ssh_client.exec_command(chmod_command)
-                        errors = stderr.read().decode('utf-8')
-                        if errors:
-                            print(f"Error setting permissions on {fqdn}: {errors}")
-                        else:
-                            print(f"File {remote_path} set as executable on {fqdn}")
-
-                        
-                        sftp_client.close()
-                        ssh_client.close()
-
-                    except Exception as e:
-                        print(f"Error sending file to {fqdn}: {e}")
-                        continue
-
-            print("File successfully sent to all hosts.")
-        except Exception as e:
-            print(f"Error in send_file_to_hosts: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to send file to hosts: {str(e)}")
-
-    def ensure_pids_folder_exists(self, pids_folder_path: str):
-        """
-        Ensures that the pids folder exists on the remote server.
-        If it doesn't exist, create it.
-        """
-        try:
-            # Check if the folder exists
-            stdin, stdout, stderr = self.client.exec_command(
-                f"test -d {pids_folder_path} && echo exists || echo not_exists")
-            folder_status = stdout.read().decode('utf-8').strip()
-
-            # If the folder doesn't exist, create it
-            if folder_status == "not_exists":
-                stdin, stdout, stderr = self.client.exec_command(f"mkdir -p {pids_folder_path}")
-                errors = stderr.read().decode('utf-8')
-                if errors:
-                    print(f"Error creating directory {pids_folder_path}: {errors}")
-                else:
-                    print(f"Directory {pids_folder_path} created successfully.")
-            else:
-                print(f"Directory {pids_folder_path} already exists.")
-        except Exception as e:
-            print(f"Error ensuring pids folder exists: {e}")
-            raise HTTPException(status_code=500, detail="Error ensuring pids folder exists.")
-
-    import asyncio
-
-    async def kill_mpi_process(self, job_id: str):
-        """
-        Kills the MPI process using the PID stored in the pid file for the given job_id asynchronously.
-        """
-        try:
-            pid_file_path = f"/home/mpi.cluster/mpi-apps-ioan/pids/{job_id}.txt"
-
-            # Fetch the PID from the file
-            cat_command = f"cat -- {pid_file_path}"
-            stdin, stdout, stderr = await asyncio.to_thread(self.client.exec_command, cat_command)
-            pid = stdout.read().decode('utf-8').strip()
-
-            if not pid:
-                raise Exception(f"No PID found in the file {pid_file_path}")
-
-            print(f"Attempting to kill process {pid}...")
-
-            # Kill the process
             kill_command = f"kill -9 {pid}"
-            await asyncio.to_thread(self.client.exec_command, kill_command)
+            logger.info(f"Attempting to kill process with PID {pid} for job {job_id}.")
+            stdin, stdout, stderr = self.client.exec_command(kill_command)
 
-            # Wait a bit for the process to be killed
-            await asyncio.sleep(1)
+            command_output = stdout.read().decode('utf-8')
+            command_error = stderr.read().decode('utf-8')
 
-            # Verify if the process is still running
+            if command_error:
+                logger.error(f"Error killing process: {command_error}")
+                raise HTTPException(status_code=500, detail=f"Error killing process: {command_error}")
+
+            logger.info(f"Process with PID {pid} killed successfully for job {job_id}.")
+
             check_command = f"ps -p {pid}"
-            stdin, stdout, stderr = await asyncio.to_thread(self.client.exec_command, check_command)
-            output = stdout.read().decode('utf-8').strip()
+            stdin, stdout, stderr = self.client.exec_command(check_command)
+            command_output = stdout.read().decode('utf-8')
+            command_error = stderr.read().decode('utf-8')
 
-            if output:
-                print(f"Failed to kill process {pid}, it may still be running.")
-                return False
+            if pid not in command_output:
+                logger.info(f"Process with PID {pid} is no longer running.")
+                return True  # Successfully killed
             else:
-                print(f"Process {pid} has been successfully terminated.")
-
-                # Remove the PID file after killing the process
-                remove_pid_command = f"rm -f {pid_file_path}"
-                await asyncio.to_thread(self.client.exec_command, remove_pid_command)
-                print(f"PID file {pid_file_path} removed.")
-
-                return True
+                logger.error(f"Process with PID {pid} could not be killed.")
+                return False  # Process is still running
 
         except Exception as e:
-            print(f"Error killing MPI process: {e}")
+            logger.error(f"Error killing MPI process for job {job_id}: {e}")
             raise HTTPException(status_code=500, detail=f"Error killing MPI process: {str(e)}")
 
     def close(self):

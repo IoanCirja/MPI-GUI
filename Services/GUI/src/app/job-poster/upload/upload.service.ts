@@ -1,49 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Job } from '../models/Job';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FileUploadService {
-  private apiUrl = 'http://127.0.0.1:8001/api/upload/';
-  private jobUrl = 'http://localhost:8001/api/jobs/';
+  private apiUrl = 'http://127.0.0.1:8000/api/upload/';
+  private jobUrl = 'http://localhost:8000/api/jobs/';
 
   constructor(private http: HttpClient) {}
 
-  uploadFile(
-    file: File,
-    numProcesses: number,
-    allowOverSubscription: boolean,
-    hostifle: File,
-    jobName: string,
-    jobDescription: string,
-    environmentVars: string,
-    displayMap: string,
-    rankBy: string,
-    mapBy: string
-  ): Observable<any> {
-    const formData = new FormData();
-    formData.append('numProcesses', numProcesses.toString());
-    formData.append('file', file);
-    formData.append('allowOverSubscription', allowOverSubscription.toString());
-    formData.append('hostfile', hostifle);
-    formData.append('jobName', jobName);
-    formData.append('jobDescription', jobDescription);
-    formData.append('environmentVars', environmentVars);
-    formData.append('displayMap', displayMap);
-    formData.append('rankBy', rankBy);
-    formData.append('mapBy', mapBy);
-
-
-    const token = localStorage.getItem('authToken');
-
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
+  uploadFile(job: Job): Observable<any> {
+    console.log("payload", JSON.stringify(job));
+    return this.http.post(this.apiUrl, JSON.stringify(job), {
+      headers: { 'Content-Type': 'application/json' }
     });
-
-    return this.http.post(this.apiUrl, formData, { headers });
   }
+    
 
   getJobStatus(): Observable<any> {
 
@@ -51,7 +26,7 @@ export class FileUploadService {
   }
 
   killJob(jobId: string): Observable<any> {
-    const url = `http://localhost:8001/api/jobs/${jobId}/kill`;
+    const url = `http://localhost:8000/api/jobs/${jobId}/kill`;
 
   
     return this.http.post(url, {});
