@@ -44,6 +44,14 @@ export class UserService {
           token: response.token,
           email: decodedToken.email,
           username: decodedToken.username,
+          max_processes_per_user: decodedToken.max_processes_per_user,
+          max_parallel_jobs_per_user: decodedToken.max_parallel_jobs_per_user,
+          max_jobs_in_queue: decodedToken.max_jobs_in_queue,
+          max_memory_usage_per_user_per_cluster: decodedToken.max_memory_usage_per_user_per_cluster,
+          max_memory_usage_per_process: decodedToken.max_memory_usage_per_process,
+          max_allowed_nodes: decodedToken.max_allowed_nodes,
+          max_job_time: decodedToken.max_job_time,
+          rights: decodedToken.rights
         };
 
         localStorage.setItem('userData', JSON.stringify(userData));
@@ -65,6 +73,14 @@ export class UserService {
           token: response.token,
           email: decodedToken.email,
           username: decodedToken.username,
+          max_processes_per_user: decodedToken.max_processes_per_user,
+          max_parallel_jobs_per_user: decodedToken.max_parallel_jobs_per_user,
+          max_jobs_in_queue: decodedToken.max_jobs_in_queue,
+          max_memory_usage_per_user_per_cluster: decodedToken.max_memory_usage_per_user_per_cluster,
+          max_memory_usage_per_process: decodedToken.max_memory_usage_per_process,
+          max_allowed_nodes: decodedToken.max_allowed_nodes,
+          max_job_time: decodedToken.max_job_time,
+          rights: decodedToken.rights
         };
 
         localStorage.setItem('userData', JSON.stringify(userData));

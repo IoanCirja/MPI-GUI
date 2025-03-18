@@ -1,0 +1,39 @@
+<div class="admin-container">
+    <h1>All Users</h1>
+  
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+  
+    <table *ngIf="users.length > 0" class="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Rights</th>
+          <th>Max Processes</th>
+          <th>Max Parallel Jobs</th>
+          <th>Max Jobs in Queue</th>
+          <th>Max Memory (User)</th>
+          <th>Max Memory (Process)</th>
+          <th>Max Allowed Nodes</th>
+          <th>Max Job Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.rights }}</td>
+          <td>{{ user.max_processes_per_user }}</td>
+          <td>{{ user.max_parallel_jobs_per_user }}</td>
+          <td>{{ user.max_jobs_in_queue }}</td>
+          <td>{{ user.max_memory_usage_per_user_per_cluster }}</td>
+          <td>{{ user.max_memory_usage_per_process }}</td>
+          <td>{{ user.max_allowed_nodes }}</td>
+          <td>{{ user.max_job_time }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

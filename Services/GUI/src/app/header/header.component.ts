@@ -29,7 +29,11 @@ export class HeaderComponent implements OnInit {
     this.userService.getUser().subscribe((user) => {
       this.user = user;
       this.cdr.detectChanges();
+
+      console.log("User", this.user);
     });
+
+    
   }
 
   logout() {

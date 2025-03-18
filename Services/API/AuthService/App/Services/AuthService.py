@@ -34,8 +34,16 @@ class UserService:
             "iat": datetime.utcnow(),
             "exp": datetime.utcnow() + timedelta(hours=1),
             "jti": str(uuid.uuid4()),
-            'username':userData["username"],
+            'username': userData["username"],
             'email': userData["email"],
+            "max_processes_per_user": userData.get("max_processes_per_user", 5),
+            "max_parallel_jobs_per_user": userData.get("max_parallel_jobs_per_user", 3),
+            "max_jobs_in_queue": userData.get("max_jobs_in_queue", 10),
+            "max_memory_usage_per_user_per_cluster": userData.get("max_memory_usage_per_user_per_cluster", "8GB"),
+            "max_memory_usage_per_process": userData.get("max_memory_usage_per_process", "2GB"),
+            "max_allowed_nodes": userData.get("max_allowed_nodes", 7),
+            "max_job_time": userData.get("max_job_time", "2h"),
+            "rights": userData.get("rights", "base")
         }
 
         token = jwt.encode(token_data, key=env("SECRET_KEY"), algorithm=env("ALGORITHM"))
@@ -60,7 +68,23 @@ class UserService:
             "username": createUserRequest.username,
             "email": createUserRequest.email,
             "password": hashedPassword,
-            "salt": salt
+            "salt": salt,
+            "max_processes_per_user": 5,
+            "max_parallel_jobs_per_user": 3,
+            "max_jobs_in_queue": 10,
+            "max_memory_usage_per_user_per_cluster": "8GB", # total memory usage
+            "max_memory_usage_per_process": "2GB", # memory for a signle process
+            "max_allowed_nodes": 7, # max node job distribution
+            "max_job_time": "2h", # max time for a job
+            "rights": "base"
         }
 
         UserRepository.addUser(data)
+
+    @staticmethod
+    def getAllNonAdminUsers():
+        all_users = UserRepository.getAllUsers()
+
+        non_admin_users = [user for user in all_users if user.get("rights") != "admin"]
+
+        return non_admin_users

@@ -20,10 +20,6 @@ app.add_middleware(
 app.include_router(router, prefix="/api")
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
 
 initializeFirebaseConnection()
 

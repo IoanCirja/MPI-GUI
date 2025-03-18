@@ -5,12 +5,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
 import { HelpMenuComponent } from './help-menu/help-menu.component';
 import { AuthGuard } from './auth.guard';
+import { AdminComponent } from './admin/admin.component';
+import { NonAuthGuard } from './non-auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
+
   },
   {
     path: 'jobs',
@@ -25,6 +28,7 @@ export const routes: Routes = [
   },
   { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
   { path: 'help', component: HelpMenuComponent, canActivate: [AuthGuard] },
+  { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
 
   { path: '**', redirectTo: '/auth/login' },
 ];

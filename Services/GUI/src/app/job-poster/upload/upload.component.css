@@ -451,3 +451,28 @@ h4 {
   font-style: italic;
   margin-top: 10px;
 }
+
+.disabled-node {
+  background-color: red;  
+  cursor: not-allowed;    
+  opacity: 0.6;           
+}
+
+
+.node-option input[disabled] {
+  pointer-events: none; 
+}
+
+
+.node-option.disabled-node label {
+  color: white;  
+}
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fdd;
+  border: 1px solid #f00;
+  border-radius: 5px;
+}

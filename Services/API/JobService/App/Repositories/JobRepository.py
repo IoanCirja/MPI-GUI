@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from firebase_admin import db
+from pymongo import MongoClient
 
 from JobService.App.DTOs import JobDTO
 
@@ -15,51 +15,61 @@ logger.addHandler(ch)
 class JobRepository:
     def __init__(self, user_id: str):
         self.user_id = user_id
-        self.ref = db.reference(f"users/{self.user_id}/jobs")
+        self.client = MongoClient("mongodb://localhost:27017/")
+        self.db = self.client["job_service_db"]
+        self.jobs_collection = self.db["jobs"]
 
     def insert_job(self, job: JobDTO):
         try:
             job_data = job.dict()
-            self.ref.child(job.id).set(job_data)
-            return job.id
+            job_data["_id"] = job_data.pop("id")
+            job_data["user_id"] = self.user_id
+
+            self.jobs_collection.insert_one(job_data)
+            return job_data["_id"]
         except Exception as e:
             logging.error(f"Error inserting job: {str(e)}")
             return None
 
     def get_job_by_id(self, job_id: str):
         try:
-            job_ref = self.ref.child(job_id)
-            job_data = job_ref.get()
-
-
-
-            return job_data
+            job_data = self.jobs_collection.find_one({"_id": job_id, "user_id": self.user_id})
+            if job_data:
+                job_data["id"] = str(job_data["_id"])
+                del job_data["_id"]
+            return job_data if job_data else None
         except Exception as e:
-            logging.error(f"Error fetching job by ID: {str(e)}")
+            logger.error(f"Error fetching job by ID: {str(e)}")
             return None
 
     def get_all_jobs(self) -> List[dict]:
         try:
-            jobs_ref = self.ref.get()
+            jobs = self.jobs_collection.find({"user_id": self.user_id})
+            jobs_list = list(jobs) if jobs else []
 
-            if not jobs_ref:
-                return []
-
-            return [{"id": job_id, **job_data} for job_id, job_data in jobs_ref.items()]
-
+            for job in jobs_list:
+                job["id"] = str(job["_id"])
+                del job["_id"]
+            return jobs_list
         except Exception as e:
             logger.error(f"Error fetching all jobs: {str(e)}")
             return []
 
-    def update_job(self, job_id: str, updated_data: dict):
+    def update_job(self, job_id: str, updated_data: dict) -> bool:
         try:
-            job_ref = self.ref.child(job_id)
-
-            job_ref.update(updated_data)
-
-            logging.info(f"Job with ID {job_id} successfully updated with data: {updated_data}")
-            return True
+            result = self.jobs_collection.update_one(
+                {"_id": job_id, "user_id": self.user_id},
+                {"$set": updated_data}
+            )
+            return result.modified_count > 0
         except Exception as e:
-            logging.error(f"Error updating job: {str(e)}")
+            logger.error(f"Error updating job: {str(e)}")
             return False
 
+    def get_pending_jobs_count_for_user(self):
+        try:
+            pending_jobs_count = self.jobs_collection.count_documents({"user_id": self.user_id, "status": "pending"})
+            return pending_jobs_count
+        except Exception as e:
+            logger.error(f"Error fetching pending jobs count: {str(e)}")
+            return 0

@@ -1,5 +1,11 @@
 <div class="upload-container"     [@fadeIn]
+
+
+
 >
+<div *ngIf="errorMessage" class="error-message">
+  <p>{{ errorMessage }}</p>
+</div>
   <div class="encapsulating-card">
     <div class="card left-card">
       <h3>Job Details</h3>
@@ -112,8 +118,9 @@
     
       <div class="node-selection-container">
         <div class="node-grid">
-          <div *ngFor="let node of nodeList; let i = index" class="node-option">
-            <input type="checkbox" [checked]="selectedNodes[i]" (change)="toggleNodeSelection(i)" [id]="'node-' + i" class="styled-checkbox" />
+          <div *ngFor="let node of nodeList; let i = index" class="node-option"       [ngClass]="{ 'disabled-node': !availableNodes[i] }"
+           >
+            <input type="checkbox" [checked]="selectedNodes[i]"               [disabled]="!availableNodes[i]" (change)="toggleNodeSelection(i)" [id]="'node-' + i" class="styled-checkbox" />
             <label [for]="'node-' + i">{{ node }}</label>
             <input *ngIf="selectedNodes[i]" type="number" [(ngModel)]="slots[i]" min="1" max="10" class="slot-input" [id]="'slots-' + i" placeholder="Slots" />
           </div>
@@ -144,7 +151,7 @@
   </div>
 
   <div class="button-group-right">
-    <div class="button" (click)="previewCommand()">Preview Command</div>
+    <div class="button" >Preview Command</div>
   </div>
 </div>
 

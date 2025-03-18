@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
@@ -13,11 +13,11 @@ export class AuthGuard implements CanActivate, OnDestroy {
     this.addStorageEventListener();
   }
 
-  canActivate(): Observable<boolean> | Promise<boolean> | boolean {
-    return this.isTokenValid();
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    return this.isTokenValid(state.url);
   }
 
-  private isTokenValid(): boolean {
+  private isTokenValid(url: string): boolean {
     const userData = localStorage.getItem('userData');
     const token = userData ? JSON.parse(userData).token : null;
 
@@ -32,9 +32,29 @@ export class AuthGuard implements CanActivate, OnDestroy {
       const decodedToken: any = jwtDecode(token);
       const expirationDate = decodedToken.exp * 1000;
       const currentDate = new Date().getTime();
+      const userRights = decodedToken.rights || 'base';
+
 
       if (currentDate >= expirationDate) {
         this.router.navigate(['/auth/login']);
+        return false;
+      }
+      
+
+      if (url.startsWith('/auth')) {
+        console.log('URL:', url);
+        this.router.navigate(['/']);
+        return false;
+      }
+
+
+      if (userRights === 'admin' && !url.startsWith('/admin')) {
+        this.router.navigate(['/admin']);
+        return false;
+      }
+
+      if (userRights === 'base' && url.startsWith('/admin')) {
+        this.router.navigate(['/']);
         return false;
       }
 
@@ -49,13 +69,14 @@ export class AuthGuard implements CanActivate, OnDestroy {
   private addStorageEventListener(): void {
     this.storageListener = (event: StorageEvent) => {
       if (event.key === 'userData') {
-        if (!this.isTokenValid()) {
+        if (!this.isTokenValid(window.location.pathname)) {
           this.router.navigate(['/auth/login']);
         }
       }
     };
     window.addEventListener('storage', this.storageListener);
   }
+
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.storageListener);

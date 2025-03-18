@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FileUploadService } from './upload.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { HeaderComponent } from '../../header/header.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Job } from '../models/Job';
+import { WebSocketService } from './websocket.service';
 
 @Component({
   selector: 'app-upload',
@@ -29,7 +30,7 @@ import { Job } from '../models/Job';
       ]),
     ],
 })
-export class UploadComponent {
+export class UploadComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   uploadMessage: string = '';
   numProcesses: number | null = null;
@@ -53,13 +54,45 @@ export class UploadComponent {
   displayMap: boolean = false;
   rankBy: any;
   mapBy: any;
-  
+  availableNodes: boolean[] = new Array(21).fill(false); 
+  errorMessage: string = '';  
+
 
 
   constructor(
     private fileUploadService: FileUploadService,
     private router: Router,
+    private webSocketService: WebSocketService,
+    
   ) {}
+
+
+  ngOnInit(): void {
+    this.listenToWebSocketUpdates();
+
+  }
+
+    ngOnDestroy(): void {
+    this.webSocketService.disconnect(); 
+  }
+
+  listenToWebSocketUpdates(): void {
+    this.webSocketService.connect().subscribe(
+      (update: any) => {
+        console.log('WebSocket update received:', update);
+        
+        
+        this.availableNodes = this.nodeList.map((node) => update[node] || false);
+
+        console.log('Available nodes:', this.availableNodes);
+        console.log('Selected nodes:', update);
+      },
+      (error) => {
+        console.error('WebSocket error:', error);
+      }
+    );
+  }
+
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -211,6 +244,8 @@ export class UploadComponent {
             this.uploadMessage = `Failed to upload file: ${error.error.message || 'Unknown error'}`;
             this.executionOutput = error.error.detail || 'No output from the command';
             this.isLoading = false;
+            this.errorMessage = error.error.detail || 'Failed to upload file';
+
           },
         });
       };
@@ -236,5 +271,6 @@ export class UploadComponent {
 
   }
 
-  previewCommand() {}
+
+
 }

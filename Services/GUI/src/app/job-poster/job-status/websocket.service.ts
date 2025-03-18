@@ -9,7 +9,7 @@ export class WebSocketService {
   private messages: Subject<any> = new Subject();
 
   connect(): Observable<any> {
-    this.socket = new WebSocket('ws://localhost:8001/api/ws');
+    this.socket = new WebSocket('ws://localhost:8002/api/ws');
 
     this.socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
@@ -25,6 +25,10 @@ export class WebSocketService {
       console.warn('WebSocket connection closed');
     };
 
+    
+
     return this.messages.asObservable();
   }
+
+
 }

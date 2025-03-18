@@ -29,7 +29,9 @@ SSH_HOST = env('SSH_HOST')
 SSH_PORT = env('SSH_PORT')
 SSH_USERNAME = env('SSH_USERNAME')
 SSH_PASSWORD = env('SSH_PASSWORD')
+
 active_connections = []
+active_tcp_comm_node_ports = {}
 
 vtKey = env('VT_API_KEY')
 
@@ -40,6 +42,25 @@ class JobService:
     def __init__(self, user_id: str):
         self.user_id = user_id
         self.repository = JobRepository(user_id)
+
+    def allocate_port_range(self, job_id: str) -> str:
+        global active_tcp_comm_node_ports
+        start_port = 10000
+        end_port = 30000
+        port_range_size = 20
+
+        for port in range(start_port, end_port, port_range_size):
+            port_range = f"{port}-{port + port_range_size - 1}"
+            if port_range not in active_tcp_comm_node_ports.values():
+                active_tcp_comm_node_ports[job_id] = port_range
+                return port_range
+
+        raise Exception("No available ports. Please try again later.")
+
+    def release_port_range(self, job_id: str):
+        global active_tcp_comm_node_ports
+        if job_id in active_tcp_comm_node_ports:
+            del active_tcp_comm_node_ports[job_id]
 
     def validate_environment_vars(self, environmentVars: str) -> str:
         env_vars_list = []
@@ -129,6 +150,9 @@ class JobService:
             ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
             ssh_service.connect()
 
+            port_range = self.allocate_port_range(job_id)
+
+
             remote_job_dir = f"{BASE_DIRECTORY}/job_{job_id}"
             remote_path_exe = f"{remote_job_dir}/job_{job_id}.exe"
             remote_path_host = f"{remote_job_dir}/hostfile_{job_id}.txt"
@@ -145,7 +169,7 @@ class JobService:
             temp_exe_path = correct_exe_path
 
             scan_result = self.scan_file_with_virustotal(temp_exe_path)
-            if scan_result != 0:  # Non-zero result indicates issues
+            if scan_result != 0:
                 raise HTTPException(status_code=400, detail="File flagged by VirusTotal")
 
             with tempfile.NamedTemporaryFile(delete=False) as temp_hostfile:
@@ -158,7 +182,7 @@ class JobService:
 
             await ssh_service.send_file_to_hosts(job_id, temp_exe_path, temp_hostfile_path)
 
-            mpirun_command = f"mpirun {env_vars_str} -hostfile {remote_path_host} -np {job_data.numProcesses} --report-pid {remote_pid_path} --output-filename {output_path}"
+            mpirun_command = f"mpirun {env_vars_str} -hostfile {remote_path_host} -np {job_data.numProcesses} --mca oob_tcp_dynamic_ipv4_ports {port_range} --report-pid {remote_pid_path} --output-filename {output_path}"
 
             if job_data.mapBy:
                 mpirun_command += f" --map-by {job_data.mapBy}"
@@ -198,8 +222,9 @@ class JobService:
                 os.remove(temp_exe_path)
 
             if temp_hostfile_path and os.path.exists(temp_hostfile_path):
-
                 os.remove(temp_hostfile_path)
+            self.release_port_range(job_id)
+
 
 
     async def kill_job_in_background(self, job_id: str):
@@ -282,3 +307,11 @@ class JobService:
                     return 2
                 else:
                     return 0
+
+    async def get_pending_jobs_for_user(self):
+        try:
+            pending_jobs = self.repository.get_pending_jobs_count_for_user()
+            return pending_jobs
+        except Exception as e:
+            logger.error(f"Error checking pending jobs: {str(e)}")
+            return None

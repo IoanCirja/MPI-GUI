@@ -148,10 +148,10 @@ class SSHService:
 
             if pid not in command_output:
                 logger.info(f"Process with PID {pid} is no longer running.")
-                return True  # Successfully killed
+                return True
             else:
                 logger.error(f"Process with PID {pid} could not be killed.")
-                return False  # Process is still running
+                return False
 
         except Exception as e:
             logger.error(f"Error killing MPI process for job {job_id}: {e}")
