@@ -1,11 +1,7 @@
-<div class="upload-container"     [@fadeIn]
-
-
-
->
-<div *ngIf="errorMessage" class="error-message">
-  <p>{{ errorMessage }}</p>
-</div>
+<div class="upload-container" [@fadeIn]>
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
   <div class="encapsulating-card">
     <div class="card left-card">
       <h3>Job Details</h3>
@@ -67,71 +63,140 @@
 
     <div class="card right-card">
       <h3>Process and Host Configuration</h3>
-    
+
       <div class="input-group">
         <label for="numProcesses">Number of Processes:</label>
-        <input type="number" id="numProcesses" [(ngModel)]="numProcesses" required />
-      </div>
-    
-      <div class="input-group">
-        <label for="allowOverSubscription">Oversubscription</label>
-        <input type="checkbox" id="allowOverSubscription" [(ngModel)]="allowOverSubscription" class="styled-checkbox" />
+        <input
+          type="number"
+          id="numProcesses"
+          [value]="numProcesses"
+          readonly
+        />
       </div>
 
-          
+      <div class="input-group">
+        <label for="allowOverSubscription">Oversubscription</label>
+        <input
+          type="checkbox"
+          id="allowOverSubscription"
+          [(ngModel)]="allowOverSubscription"
+          class="styled-checkbox"
+        />
+      </div>
+
       <div class="input-group">
         <label for="environmentVars">Environment Variables:</label>
-        <input type="text" id="environmentVars" [(ngModel)]="environmentVars" placeholder="VAR1=value1 VAR2=value2" />
+        <input
+          type="text"
+          id="environmentVars"
+          [(ngModel)]="environmentVars"
+          placeholder="VAR1=value1 VAR2=value2"
+        />
       </div>
-    
+
       <div class="input-group">
         <label for="mapBy">Map By:</label>
-        <mat-icon class="info-icon" matTooltip="Map the processes to specific resources like node, socket, or core." matTooltipPosition="above">info</mat-icon>
+        <mat-icon
+          class="info-icon"
+          matTooltip="Map the processes to specific resources like node, socket, or core."
+          matTooltipPosition="above"
+          >info</mat-icon
+        >
         <select id="mapBy" [(ngModel)]="mapBy" class="styled-select">
           <option value="node">Node</option>
           <option value="socket">Socket</option>
           <option value="core">Core</option>
         </select>
       </div>
-      
+
       <div class="input-group">
         <label for="rankBy">Rank By:</label>
-        <mat-icon class="info-icon" matTooltip="Rank the processes based on resources like socket or core." matTooltipPosition="above">info</mat-icon>
+        <mat-icon
+          class="info-icon"
+          matTooltip="Rank the processes based on resources like socket or core."
+          matTooltipPosition="above"
+          >info</mat-icon
+        >
         <select id="rankBy" [(ngModel)]="rankBy" class="styled-select">
           <option value="socket">Socket</option>
           <option value="core">Core</option>
         </select>
       </div>
-      
+
       <div class="input-group">
         <label for="displayMap">Display Map:</label>
-        <mat-icon class="info-icon" matTooltip="Display the allocation map of the processes." matTooltipPosition="above">info</mat-icon>
-        <input type="checkbox" id="displayMap" [(ngModel)]="displayMap" class="styled-checkbox" />
+        <mat-icon
+          class="info-icon"
+          matTooltip="Display the allocation map of the processes."
+          matTooltipPosition="above"
+          >info</mat-icon
+        >
+        <input
+          type="checkbox"
+          id="displayMap"
+          [(ngModel)]="displayMap"
+          class="styled-checkbox"
+        />
       </div>
-      
 
-    
+      <div class="input-group">
+        <label for="displayMap">Fail Safe:</label>
+        <mat-icon
+          class="info-icon"
+          matTooltip="Retry if the job fails"
+          matTooltipPosition="above"
+          >info</mat-icon
+        >
+        <input
+          type="checkbox"
+          id="displayMap"
+          [(ngModel)]="displayMap"
+          class="styled-checkbox"
+        />
+      </div>
+
       <div class="input-group title-container">
-        <mat-icon class="info-icon" matTooltip="Select nodes to allocate slots for processing. You can select multiple nodes." matTooltipPosition="above">info</mat-icon>
+        <mat-icon
+          class="info-icon"
+          matTooltip="Select nodes to allocate slots for processing. You can select multiple nodes."
+          matTooltipPosition="above"
+          >info</mat-icon
+        >
         <h4>Select Nodes:</h4>
       </div>
-    
+
       <div class="node-selection-container">
         <div class="node-grid">
-          <div *ngFor="let node of nodeList; let i = index" class="node-option"       [ngClass]="{ 'disabled-node': !availableNodes[i] }"
-           >
-            <input type="checkbox" [checked]="selectedNodes[i]"               [disabled]="!availableNodes[i]" (change)="toggleNodeSelection(i)" [id]="'node-' + i" class="styled-checkbox" />
+          <div
+            *ngFor="let node of nodeList; let i = index"
+            class="node-option"
+            [ngClass]="{ 'disabled-node': !availableNodes[i] }"
+          >
+            <input
+              type="checkbox"
+              [checked]="selectedNodes[i]"
+              [disabled]="!availableNodes[i]"
+              (change)="toggleNodeSelection(i)"
+              [id]="'node-' + i"
+              class="styled-checkbox"
+            />
             <label [for]="'node-' + i">{{ node }}</label>
-            <input *ngIf="selectedNodes[i]" type="number" [(ngModel)]="slots[i]" min="1" max="10" class="slot-input" [id]="'slots-' + i" placeholder="Slots" />
+            <input
+              *ngIf="selectedNodes[i]"
+              type="number"
+              [(ngModel)]="slots[i]"
+              min="1"
+              max="10"
+              class="slot-input"
+              [id]="'slots-' + i"
+              placeholder="Slots"
+              (ngModelChange)="updateNumProcesses()" 
+
+            />
           </div>
         </div>
       </div>
-    
-
-
-
     </div>
-    
   </div>
 </div>
 
@@ -151,7 +216,8 @@
   </div>
 
   <div class="button-group-right">
-    <div class="button" >Preview Command</div>
+    <div class="button">Load</div>
+    <div class="button" (click) = "saveJobData()">Save</div>
   </div>
 </div>
 

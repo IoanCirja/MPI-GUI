@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Login, SignUp } from '../models/User';
+import { Login, SignUp } from '../auth/models/User';
 import { BehaviorSubject, catchError, Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';

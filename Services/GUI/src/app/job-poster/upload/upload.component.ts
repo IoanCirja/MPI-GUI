@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FileUploadService } from './upload.service';
+import { FileUploadService } from '../../services/upload.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -114,6 +114,8 @@ export class UploadComponent implements OnInit, OnDestroy {
 
   toggleNodeDropdown() {
     this.isDropdownVisible = !this.isDropdownVisible;
+    this.updateNumProcesses();
+
   }
   triggerFileInput(): void {
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
@@ -168,6 +170,16 @@ export class UploadComponent implements OnInit, OnDestroy {
         this.slots.splice(nodeIndex, 1);
       }
     }
+
+    this.updateNumProcesses();
+
+  }
+
+  updateNumProcesses(): void {
+    // Sum all selected node slots
+    this.numProcesses = this.slots.reduce((sum, slot, index) => {
+      return this.selectedNodes[index] ? sum + slot : sum;
+    }, 0);
   }
 
   hasSelectedNodes(): boolean {
@@ -220,6 +232,7 @@ export class UploadComponent implements OnInit, OnDestroy {
           fileName: this.selectedFile!.name,
           fileContent: (reader.result as string).split(',')[1],
           hostFile: (hostFileReader.result as string).split(',')[1],
+          hostNumber: this.selectedNodesList.length,
           numProcesses: this.numProcesses!,
           allowOverSubscription: this.allowOverSubscription,
           environmentVars: this.environmentVars,
@@ -271,6 +284,37 @@ export class UploadComponent implements OnInit, OnDestroy {
 
   }
 
+  saveJobData(): void {
+    const jobData = {
+      jobName: this.jobName,
+      jobDescription: this.jobDescription,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      allowOverSubscription: this.allowOverSubscription,
+      environmentVars: this.environmentVars,
+      displayMap: this.displayMap,
+      rankBy: this.rankBy,
+      mapBy: this.mapBy,
+      selectedFile: this.selectedFile ? this.selectedFile.name : null,
+      selectedNodes: this.nodeList.filter((_, index) => this.selectedNodes[index]),
+      slots: this.selectedNodes.map((selected, index) => selected ? this.slots[index] : 0),
+      numProcesses: this.numProcesses,
+    };
 
+    // Convert the job data to JSON
+    const jsonData = JSON.stringify(jobData, null, 2); // pretty-print the JSON
 
+    // Create a Blob with the JSON data
+    const blob = new Blob([jsonData], { type: 'application/json' });
+
+    // Create a link element to trigger the download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${this.jobName || 'job'}_data.json`; // Set a default filename
+    link.click();
+  }
+
+  // Other methods related to the form...
 }
+
+

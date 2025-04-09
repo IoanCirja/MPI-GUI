@@ -52,4 +52,4 @@ async def broadcast_node_statuses():
 
         except Exception as e:
             logging.error(f"Error while broadcasting node statuses: {e}")
-            await asyncio.sleep(60)
+            await asyncio.sleep(10)

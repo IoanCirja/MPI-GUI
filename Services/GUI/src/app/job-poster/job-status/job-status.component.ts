@@ -6,7 +6,7 @@ import {
   animate,
   query,
 } from '@angular/animations';
-import { FileUploadService } from '../upload/upload.service';
+import { FileUploadService } from '../../services/upload.service';
 import { WebSocketService } from './websocket.service';
 import { CommonModule } from '@angular/common';
 
@@ -25,6 +25,21 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class JobStatusComponent implements OnInit {
+failSafeJob(arg0: any) {
+throw new Error('Method not implemented.');
+}
+replayJob(arg0: any) {
+throw new Error('Method not implemented.');
+}
+exportJob(arg0: any) {
+throw new Error('Method not implemented.');
+}
+downloadExe(arg0: any) {
+throw new Error('Method not implemented.');
+}
+downloadHostfileForJob(arg0: any) {
+throw new Error('Method not implemented.');
+}
 
   jobData: any[] = [];
   expandedJobs: Set<number> = new Set();
@@ -96,7 +111,7 @@ export class JobStatusComponent implements OnInit {
   }
   listenToWebSocketUpdates(): void {
     this.webSocketService.connect().subscribe((update: any) => {
-      console.log('WebSocket update received:', update);
+      console.log('Wbby update received:', update);
 
       this.ngZone.run(() => {
         const index = this.jobData.findIndex(
@@ -106,6 +121,19 @@ export class JobStatusComponent implements OnInit {
         if(update.status === 'killed') {
           console.log('Job killed:', update.jobId);
         }
+
+        if(update.status === 'running') {
+          console.log('Job running:', update.jobId);
+        }
+
+        if(update.status === 'completed') {
+          console.log('Job running running:', update.jobId);
+        }
+
+        if(update.status === 'pending') {
+          console.log('Job running pending:', update.jobId);
+        }
+
 
         if (index !== -1) {
           this.jobData[index] = {
@@ -135,5 +163,31 @@ export class JobStatusComponent implements OnInit {
       },
     });
   }
+
+  deleteJob(jobId: string): void {
+    this.fileUploadService.deleteJob(jobId).subscribe({
+      next: (response) => {
+        console.log('Job deleted:', response);
+        // Remove job from the list after successful deletion
+        this.jobData = this.jobData.filter(job => job.id !== jobId);
+      },
+      error: (error) => {
+        console.error('Error deleting job:', error);
+      },
+    });
+  }
+
+  clearHistory(): void {
+    this.fileUploadService.deleteJobs().subscribe({
+      next: (response) => {
+        console.log('All jobs deleted:', response);
+        this.jobData = [];  // Clear the job list after deletion
+      },
+      error: (error) => {
+        console.error('Error clearing jobs:', error);
+      },
+    });
+  }
+
   
 }

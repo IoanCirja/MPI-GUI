@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { UploadComponent } from './upload/upload.component';
 import { FormsModule } from '@angular/forms';  
 import { JobStatusComponent } from './job-status/job-status.component';
-import { FileUploadService } from './upload/upload.service';
+import { FileUploadService } from '../services/upload.service';
 import { AuthGuard } from '../auth.guard';  
 
 const routes: Routes = [

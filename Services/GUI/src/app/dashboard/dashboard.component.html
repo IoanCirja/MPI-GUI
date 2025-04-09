@@ -1,2 +1,21 @@
-<p>dashboard works!</p>
-<div id="container" style="height: 400px;"></div>
+<p class="chart-title">Job Execution Timeline</p>
+
+<div class="chart-container">
+  <ngx-charts-line-chart
+    [view]="view"
+    [scheme]="'cool'"
+    [results]="chartData"
+    [legend]="legend"
+    [xAxis]="showXAxis"
+    [yAxis]="showYAxis"
+    [yAxisLabel]="'Nodes'"
+    [xAxisLabel]="'Time'"
+    [autoScale]="false"
+    [roundDomains]="false"
+    [showGridLines]="showGridLines"
+    [curve]="curveType"
+    [xAxisTickFormatting]="xAxisTickFormatting"
+    [yAxisTickFormatting]="yAxisTickFormatting"
+    (select)="onSelect($event)">
+  </ngx-charts-line-chart>
+</div>

@@ -19,13 +19,14 @@
   background: linear-gradient(135deg, #edf6ff, #a4c5e0);
   color: rgb(8, 8, 90);
   padding: 10px;
-  cursor: pointer;
+  cursor: auto;
   font-weight: bold;
   border-radius: 4px;
 }
 
 .job-name {
   font-size: 16px;
+  margin-left: 16px;
 }
 
 .expand-icon {
@@ -125,4 +126,115 @@
 
 .job-details p {
   margin: 5px 0;
+}
+
+.right-end-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 6px;
+
+}
+
+.circle.completed {
+  background-color: green;
+
+}
+
+.circle.failed {
+  background-color: rgb(148, 53, 53);
+
+}
+
+.circle.killed {
+  background-color: rgb(255, 94, 0);
+
+}
+
+.loading-spinner-pending {
+  width: 20px;
+  height: 20px;
+  border: 4px solid #07c5ff;
+  border-radius: 50%;
+  animation: pulse2 1.5s ease-in-out infinite;
+  background-color: #07c5ff;
+}
+
+.loading-spinner-running {
+  width: 20px;
+  height: 20px;
+  border: 4px solid #ffc107;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+  background-color: #ffc107;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.7;
+    box-shadow: 0 0 5px #ffc107, 0 0 15px #ffc107;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.4;
+    box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffcc00;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0.7;
+    box-shadow: 0 0 5px #ffc107, 0 0 15px #ffc107;
+  }
+}
+
+@keyframes pulse2 {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.7;
+    box-shadow: 0 0 5px #07c5ff, 0 0 15px #07c5ff;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.4;
+    box-shadow: 0 0 10px #00bfff, 0 0 20px #1e90ff, 0 0 30px #4682b4;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0.7;
+    box-shadow: 0 0 5px #07c5ff, 0 0 15px #07c5ff;
+  }
+}
+
+.circle.button-circle {
+  background-color: #496d92;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.circle.button-circle:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 5px #007bff, 0 0 10px #0056b3;
+}
+
+.circle.button-circle img {
+  width: 16px;
+  height: 16px;
+}
+
+.expand-button img {
+  width: 14px;
+  height: 14px;
 }

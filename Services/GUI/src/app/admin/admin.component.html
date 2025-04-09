@@ -1,39 +1,130 @@
 <div class="admin-container">
-    <h1>All Users</h1>
-  
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-  
-    <table *ngIf="users.length > 0" class="users-table">
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Rights</th>
-          <th>Max Processes</th>
-          <th>Max Parallel Jobs</th>
-          <th>Max Jobs in Queue</th>
-          <th>Max Memory (User)</th>
-          <th>Max Memory (Process)</th>
-          <th>Max Allowed Nodes</th>
-          <th>Max Job Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users">
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.rights }}</td>
-          <td>{{ user.max_processes_per_user }}</td>
-          <td>{{ user.max_parallel_jobs_per_user }}</td>
-          <td>{{ user.max_jobs_in_queue }}</td>
-          <td>{{ user.max_memory_usage_per_user_per_cluster }}</td>
-          <td>{{ user.max_memory_usage_per_process }}</td>
-          <td>{{ user.max_allowed_nodes }}</td>
-          <td>{{ user.max_job_time }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <h1>All Users</h1>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
   </div>
-  
+
+  <table *ngIf="users.length > 0" class="users-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Rights</th>
+        <th>Max Processes</th>
+        <th>Max Parallel Jobs</th>
+        <th>Max Jobs in Queue</th>
+        <th>Max Memory (User)</th>
+        <th>Max Memory (Process)</th>
+        <th>Max Allowed Nodes</th>
+        <th>Max Job Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>
+          <input
+            [(ngModel)]="user.username"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.email"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.rights"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_processes_per_user"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_parallel_jobs_per_user"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_jobs_in_queue"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_memory_usage_per_user_per_cluster"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_memory_usage_per_process"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_allowed_nodes"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_job_time"
+            (ngModelChange)="markAsModified(user.id)"
+          />
+        </td>
+        <td>
+          <div *ngIf="user.suspensions && user.suspensions.length > 0">
+            <div *ngFor="let suspension of user.suspensions">
+              Suspended from {{ suspension.start_date | date: 'short' }} for {{ suspension.suspend_time }} mins
+            </div>
+          </div>
+          <span *ngIf="!user.suspensions || user.suspensions.length === 0">
+            Not suspended
+          </span>
+        </td>
+        
+        <td>
+          <button class="suspend-btn" (click)="openSuspendModal(user)">
+            +
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <div class="suspension-modal-overlay" *ngIf="showSuspendModal">
+    <div class="suspension-modal">
+      <h2 class="modal-header">Suspend User: {{ selectedUser?.username }}</h2>
+      <p>Start Time: {{ currentDate }}</p>
+      <label for="suspendTime">Suspend Time (mins):</label>
+      <input type="number" id="suspendTime" [(ngModel)]="suspendTime" />
+      <div class="modal-buttons">
+        <button class="ok-btn" (click)="confirmSuspend()">OK</button>
+        <button class="cancel-btn" (click)="closeSuspendModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <button
+      class="push-changes-btn"
+      *ngIf="modifiedUsers.size > 0"
+      (click)="pushChanges()"
+    >
+      Push Changes
+    </button>
+  </div>
+</div>

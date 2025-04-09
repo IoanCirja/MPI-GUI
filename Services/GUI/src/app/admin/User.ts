@@ -10,5 +10,6 @@ export interface User {
     max_memory_usage_per_process?: string;
     max_allowed_nodes?: number;
     max_job_time?: string;
+    suspensions?: any;
   }
   

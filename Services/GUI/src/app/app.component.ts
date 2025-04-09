@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, effect, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './header/header.component';
-import { UserService } from './auth/services/user.service';
+import { UserService } from './services/user.service';
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 

@@ -11,6 +11,7 @@ class JobUploadDTO(BaseModel):
     fileContent: str
 
     hostFile: str
+    hostNumber: int
 
     numProcesses: int
     allowOverSubscription: bool
@@ -23,5 +24,6 @@ class JobUploadDTO(BaseModel):
     status: str
     output: str
 
-
-
+    # scheduled: bool
+    # scheduledDate: str
+    #

@@ -45,7 +45,7 @@ class JobService:
 
     def allocate_port_range(self, job_id: str) -> str:
         global active_tcp_comm_node_ports
-        start_port = 10000
+        start_port = 12000
         end_port = 30000
         port_range_size = 20
 
@@ -91,6 +91,7 @@ class JobService:
             fileContent=job_data.fileContent,
 
             hostFile=job_data.hostFile,
+            hostNumber = job_data.hostNumber,
 
             numProcesses=job_data.numProcesses,
             allowOverSubscription=job_data.allowOverSubscription,
@@ -116,16 +117,23 @@ class JobService:
             print(f"Error fetching job by ID: {str(e)}")
             return None
 
-    def get_all_jobs(self) -> List[JobDTO]:
+    async def compute_cluster_usage(self):
         try:
-            jobs_data = self.repository.get_all_jobs()
-            if not jobs_data:
-                return []
+            return self.repository.compute_cluster_usage()
 
-            return [JobDTO(**job) for job in jobs_data]
+
         except Exception as e:
-            print(f"Error fetching all jobs: {str(e)}")
-            return []
+            print(f"Error fetching job by ID: {str(e)}")
+
+    async def compute_request_usage(self):
+        try:
+            return self.repository.compute_request_usage()
+
+
+        except Exception as e:
+            print(f"Error fetching job by ID: {str(e)}")
+
+
 
     def update_job_status_and_output(self, job_id: str, job_data: JobDTO):
         updated_data = {
@@ -144,72 +152,128 @@ class JobService:
                 connection.send_json({"jobId": job_id, "status": status, "output": output, "endDate": endDate})
             )
 
-    async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO):
+    async def clear_jobs_on_cluster(self, jobId: str = None):
         try:
-
             ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
             ssh_service.connect()
 
-            port_range = self.allocate_port_range(job_id)
-
-
-            remote_job_dir = f"{BASE_DIRECTORY}/job_{job_id}"
-            remote_path_exe = f"{remote_job_dir}/job_{job_id}.exe"
-            remote_path_host = f"{remote_job_dir}/hostfile_{job_id}.txt"
-            remote_pid_path = f"{remote_job_dir}/pid_{job_id}.txt"
-            output_path = f"{BASE_DIRECTORY}/job_{job_id}/output_{job_id}"
-            env_vars_str = self.validate_environment_vars(job_data.environmentVars)
-
-            with tempfile.NamedTemporaryFile(delete=False) as temp_exe:
-                temp_exe.write(base64.b64decode(job_data.fileContent.encode('utf-8')))
-                temp_exe.flush()
-
-            correct_exe_path = os.path.join(os.path.dirname(temp_exe.name), f"job_{job_id}.exe")
-            os.rename(temp_exe.name, correct_exe_path)
-            temp_exe_path = correct_exe_path
-
-            scan_result = self.scan_file_with_virustotal(temp_exe_path)
-            if scan_result != 0:
-                raise HTTPException(status_code=400, detail="File flagged by VirusTotal")
-
-            with tempfile.NamedTemporaryFile(delete=False) as temp_hostfile:
-                temp_hostfile.write(base64.b64decode(job_data.hostFile.encode('utf-8')))
-                temp_hostfile.flush()
-
-            correct_hostfile_path = os.path.join(os.path.dirname(temp_hostfile.name), f"hostfile_{job_id}.txt")
-            os.rename(temp_hostfile.name, correct_hostfile_path)
-            temp_hostfile_path = correct_hostfile_path
-
-            await ssh_service.send_file_to_hosts(job_id, temp_exe_path, temp_hostfile_path)
-
-            mpirun_command = f"mpirun {env_vars_str} -hostfile {remote_path_host} -np {job_data.numProcesses} --mca oob_tcp_dynamic_ipv4_ports {port_range} --report-pid {remote_pid_path} --output-filename {output_path}"
-
-            if job_data.mapBy:
-                mpirun_command += f" --map-by {job_data.mapBy}"
-            if job_data.rankBy:
-                mpirun_command += f" --rank-by {job_data.rankBy}"
-            if job_data.displayMap:
-                mpirun_command += " --display-map"
-            if job_data.allowOverSubscription:
-                mpirun_command += " --oversubscribe"
-
-            mpirun_command += f" {remote_path_exe}"
-            logger.info(f"Executing  {mpirun_command}")
-
-            output = await asyncio.to_thread(ssh_service.execute_command, mpirun_command, remote_path_exe,
-                                             remote_path_host)
-
-            job_data_db = self.get_job_by_id(job_id)
-            if job_data_db.status != "killed":
-                job_data_db.endDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                job_data_db.output = output
-                job_data_db.status = "completed"
-
-                self.update_job_status_and_output(job_id, job_data_db)
-                self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+            await ssh_service.clear_jobs_in_background(jobId)
 
         except Exception as e:
+            logging.error(f"Failed to clear jobs: {str(e)}")
+
+    async def update_quota_data(self, quota_data: dict):
+        try:
+            # Call the repository to insert or update quota data
+            self.repository.update_quota(quota_data)
+        except Exception as e:
+            logging.error(f"Error updating quota data for user {self.user_id}: {e}")
+            raise HTTPException(status_code=500, detail="Error updating quota data")
+    async def get_quotas(self):
+        try:
+            return self.repository.get_quotas()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="Error updating quota data")
+
+
+
+    async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO, timeout: int):
+        try:
+
+            updated_data = {
+                "status": 'running',
+                "output": '',
+                "endDate": '',
+            }
+            success = self.repository.update_job(job_id, updated_data)
+            if success:
+
+
+                self.notify_frontend(job_id, 'running', '', '')
+
+
+                ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
+                ssh_service.connect()
+
+                port_range = self.allocate_port_range(job_id)
+
+                remote_job_dir = f"{BASE_DIRECTORY}/job_{job_id}"
+                remote_path_exe = f"{remote_job_dir}/job_{job_id}.exe"
+                remote_path_host = f"{remote_job_dir}/hostfile_{job_id}.txt"
+                remote_pid_path = f"{remote_job_dir}/pid_{job_id}.txt"
+                output_path = f"{BASE_DIRECTORY}/job_{job_id}/output_{job_id}"
+                env_vars_str = self.validate_environment_vars(job_data.environmentVars)
+
+                with tempfile.NamedTemporaryFile(delete=False) as temp_exe:
+                    temp_exe.write(base64.b64decode(job_data.fileContent.encode('utf-8')))
+                    temp_exe.flush()
+
+                correct_exe_path = os.path.join(os.path.dirname(temp_exe.name), f"job_{job_id}.exe")
+                if os.path.exists(correct_exe_path):
+                    os.remove(correct_exe_path)
+
+                os.rename(temp_exe.name, correct_exe_path)
+                temp_exe_path = correct_exe_path
+
+                scan_result = self.scan_file_with_virustotal(temp_exe_path)
+                if scan_result != 0:
+                    raise HTTPException(status_code=400, detail="File flagged by VirusTotal")
+
+                with tempfile.NamedTemporaryFile(delete=False) as temp_hostfile:
+                    temp_hostfile.write(base64.b64decode(job_data.hostFile.encode('utf-8')))
+                    temp_hostfile.flush()
+
+                correct_hostfile_path = os.path.join(os.path.dirname(temp_hostfile.name), f"hostfile_{job_id}.txt")
+                if os.path.exists(correct_hostfile_path):
+                    os.remove(correct_hostfile_path)
+                os.rename(temp_hostfile.name, correct_hostfile_path)
+                temp_hostfile_path = correct_hostfile_path
+
+                await ssh_service.send_file_to_hosts(job_id, temp_exe_path, temp_hostfile_path)
+
+                mpirun_command = f"mpirun {env_vars_str if env_vars_str else ''} -hostfile {remote_path_host} -np {job_data.numProcesses} --mca oob_tcp_dynamic_ipv4_ports {port_range} --report-pid {remote_pid_path} --output-filename {output_path}"
+
+                if job_data.mapBy:
+                    mpirun_command += f" --map-by {job_data.mapBy}"
+                if job_data.rankBy:
+                    mpirun_command += f" --rank-by {job_data.rankBy}"
+                if job_data.displayMap:
+                    mpirun_command += " --display-map"
+                if job_data.allowOverSubscription:
+                    mpirun_command += " --oversubscribe"
+
+                mpirun_command += f" {remote_path_exe}"
+
+
+                try:
+                    output = await asyncio.wait_for(
+                        asyncio.to_thread(ssh_service.execute_command, mpirun_command, remote_path_exe, remote_path_host),
+                        timeout=timeout
+                    )
+                except asyncio.TimeoutError:
+                    job_data_db = self.get_job_by_id(job_id)
+                    job_data_db.status = "failed"
+                    job_data_db.output = f"Job execution timed out."
+                    await self.kill_job_in_background(job_id)
+
+                    self.update_job_status_and_output(job_id, job_data_db)
+                    self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+                    return
+
+                job_data_db = self.get_job_by_id(job_id)
+                if job_data_db.status != "killed":
+                    job_data_db.endDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    job_data_db.output = output
+                    job_data_db.status = "completed"
+
+                    self.update_job_status_and_output(job_id, job_data_db)
+                    self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+
+        except Exception as e:
+
+
             job_data_db = self.get_job_by_id(job_id)
+
             job_data_db.status = "failed"
             job_data_db.output = str(e)
 
@@ -315,3 +379,70 @@ class JobService:
         except Exception as e:
             logger.error(f"Error checking pending jobs: {str(e)}")
             return None
+    async def get_running_jobs_for_user(self):
+        try:
+            running_jobs = self.repository.get_running_jobs_count_for_user()
+            return running_jobs
+        except Exception as e:
+            logger.error(f"Error checking pending jobs: {str(e)}")
+            return None
+
+    async def get_all_pending_jobs(self):
+        try:
+            pending_jobs = self.repository.get_all_pending_jobs()
+            return pending_jobs
+        except Exception as e:
+            logger.error(f"Error checking pending jobs: {str(e)}")
+            return None
+
+    async def get_all_running_jobs(self):
+        try:
+            pending_jobs = self.repository.get_all_running_jobs()
+            return pending_jobs
+        except Exception as e:
+            logger.error(f"Error checking pending jobs: {str(e)}")
+            return None
+
+    def get_all_jobs(self) -> List[JobDTO]:
+        try:
+            jobs_data = self.repository.get_all_jobs()
+            if not jobs_data:
+                return []
+
+            return [JobDTO(**job) for job in jobs_data]
+        except Exception as e:
+            print(f"Error fetching all jobs: {str(e)}")
+            return []
+
+    def get_all_jobs_for_user(self) -> List[JobDTO]:
+        try:
+            jobs_data = self.repository.get_all_jobs_for_user()
+            if not jobs_data:
+                return []
+
+            return [JobDTO(**job) for job in jobs_data]
+        except Exception as e:
+            print(f"Error fetching all jobs: {str(e)}")
+            return []
+
+
+    def clear_jobs(self):
+        try:
+            success = self.repository.clear_jobs()
+            if success:
+                logger.info(f"All jobs for user {self.user_id} have been cleared.")
+            else:
+                logger.warning(f"No jobs found to clear for user {self.user_id}.")
+            return success
+        except Exception as e:
+            logger.error(f"Error clearing jobs for user {self.user_id}: {str(e)}")
+            return False
+    def clear_job(self, job_id):
+        try:
+            success = self.repository.clear_job(job_id)
+            return success
+        except Exception as e:
+            logger.error(f"Error clearing jobs for user {self.user_id}: {str(e)}")
+            return False
+
+

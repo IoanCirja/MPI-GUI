@@ -157,6 +157,44 @@ class SSHService:
             logger.error(f"Error killing MPI process for job {job_id}: {e}")
             raise HTTPException(status_code=500, detail=f"Error killing MPI process: {str(e)}")
 
+
+    async def clear_jobs_in_background(self, jobId: str = None):
+        try:
+            ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
+            ssh_service.connect()
+
+            tasks = []
+            for host in MPI_HOSTS:
+                tasks.append(self.clear_job_folders_on_node(host, jobId))
+
+            await asyncio.gather(*tasks)
+            return True
+        except Exception as e:
+            logger.error(f"Error triggering background job clearing: {str(e)}")
+            return False
+
+    async def clear_job_folders_on_node(self, fqdn, jobId: str = None):
+        try:
+            async with asyncssh.connect(fqdn, port=self.port, username=self.username, password=self.password, known_hosts=None) as conn:
+                if jobId is not None:
+                    await conn.run(f"rm -rf {BASE_DIRECTORY}/job_{jobId}", check=True)
+                    return
+
+                result = await conn.run(f"find {BASE_DIRECTORY}/ -mindepth 1 -maxdepth 1 -type d", check=True)
+
+                directories = result.stdout.splitlines()
+
+                logger.info(f"Found the following directories on {fqdn} to clear: {directories}")
+
+                for directory in directories:
+                    await conn.run(f"rm -rf {directory}", check=True)
+                    logger.info(f"Successfully cleared directory: {directory}")
+
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error sending files to {fqdn}: {str(e)}")
+
+
     def close(self):
         if self.sftp:
             self.sftp.close()

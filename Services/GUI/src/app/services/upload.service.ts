@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Job } from '../models/Job';
+import { Job } from '../job-poster/models/Job';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +30,15 @@ export class FileUploadService {
 
   
     return this.http.post(url, {});
+  }
+
+  deleteJob(jobId: string): Observable<any> {
+    const url = `${this.jobUrl}${jobId}`;
+    return this.http.delete(url);
+  }
+
+  deleteJobs(): Observable<any> {
+    return this.http.delete(this.jobUrl);
   }
   
 }

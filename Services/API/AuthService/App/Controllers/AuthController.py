@@ -59,32 +59,3 @@ async def get_user_profile(request: Request):
         raise HTTPException(status_code=401, detail="Token has expired")
 
 
-@router.get("/admin/users/")
-async def get_all_users(request: Request):
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-
-    token = auth_header.split(" ")[1] if "Bearer " in auth_header else None
-
-    if not token:
-        raise HTTPException(status_code=400, detail="Invalid token format")
-
-    try:
-        decoded_token = jwt.decode(token, key=env("SECRET_KEY"), algorithms=[env("ALGORITHM")])
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(decoded_token["exp"]):
-            raise HTTPException(status_code=401, detail="Token has expired")
-
-        if decoded_token.get("rights") != "admin":
-            raise HTTPException(status_code=403, detail="Access denied. Admin rights required.")
-
-        non_admin_users = UserService.getAllNonAdminUsers()
-
-        return {"users": non_admin_users}
-
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve users: {str(e)}")

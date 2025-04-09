@@ -6,6 +6,7 @@ export interface Job {
     fileName: string;
     fileContent: string;
     hostFile: string;
+    hostNumber: number;
     numProcesses: number;
     allowOverSubscription: boolean;
     environmentVars: string;

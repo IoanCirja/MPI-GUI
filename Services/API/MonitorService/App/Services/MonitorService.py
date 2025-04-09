@@ -62,7 +62,6 @@ class MonitorService:
     def close(self):
         if self.ssh_client:
             self.ssh_client.close()
-            logging.info("SSH connection closed.")
 
     def update_node_statuses_in_db(self):
         node_status_dtos = []
@@ -85,11 +84,7 @@ async def run_ssh_cycle_and_notify():
 
     try:
         while True:
-            logging.debug("Starting sequential node checks...")
-
             ssh_service.update_node_statuses_in_db()
-
-            logging.debug("Sleeping for 60 seconds before next cycle.")
-            await asyncio.sleep(60)
+            await asyncio.sleep(5)
     finally:
         await loop.run_in_executor(None, ssh_service.close)
