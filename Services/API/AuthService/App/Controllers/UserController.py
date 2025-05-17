@@ -2,11 +2,7 @@ from datetime import datetime
 import jwt
 from fastapi import APIRouter, HTTPException, Request
 from AuthService.App.Services.AuthService import UserService, env
-
 user_router = APIRouter()
-
-
-
 
 @user_router.get("/users/quotas")
 async def get_quotas(request: Request):

@@ -168,7 +168,7 @@ throw new Error('Method not implemented.');
     this.fileUploadService.deleteJob(jobId).subscribe({
       next: (response) => {
         console.log('Job deleted:', response);
-        // Remove job from the list after successful deletion
+        
         this.jobData = this.jobData.filter(job => job.id !== jobId);
       },
       error: (error) => {
@@ -181,7 +181,7 @@ throw new Error('Method not implemented.');
     this.fileUploadService.deleteJobs().subscribe({
       next: (response) => {
         console.log('All jobs deleted:', response);
-        this.jobData = [];  // Clear the job list after deletion
+        this.jobData = [];  
       },
       error: (error) => {
         console.error('Error clearing jobs:', error);

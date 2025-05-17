@@ -6,39 +6,28 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AdminController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AdminController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/UserController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/UserController.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthService/App/Entities/User.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Entities/User.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthService/App/Repositories/AuthRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Repositories/AuthRepository.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BroadCastService/App/Services/BroadCastService.py" beforeDir="false" afterPath="$PROJECT_DIR$/BroadCastService/App/Services/BroadCastService.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Repositories/JobRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Repositories/JobRepository.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Services/JobService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/JobService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MonitorService/App/Services/MonitorService.py" beforeDir="false" afterPath="$PROJECT_DIR$/MonitorService/App/Services/MonitorService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonitorService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MonitorService/App/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/User.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/User.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/app.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/app.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/auth/login/login.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/auth/services/user.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/auth/signup/signup.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/header/header.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/header/header.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/header/header.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/header/header.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-poster.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-poster.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/models/Job.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/models/Job.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.service.ts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,6 +162,13 @@
       <workItem from="1743502146264" duration="1154000" />
       <workItem from="1743583007415" duration="582000" />
       <workItem from="1743598945676" duration="6819000" />
+      <workItem from="1744293407426" duration="1187000" />
+      <workItem from="1744641436712" duration="1160000" />
+      <workItem from="1744694830739" duration="1320000" />
+      <workItem from="1745764211589" duration="21277000" />
+      <workItem from="1745995243221" duration="184000" />
+      <workItem from="1746685691167" duration="1287000" />
+      <workItem from="1747485877088" duration="779000" />
     </task>
     <servers />
   </component>

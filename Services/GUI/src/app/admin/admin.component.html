@@ -1,110 +1,64 @@
 <div class="admin-container">
-  <h1>All Users</h1>
+  <h1>User Quotas</h1>
+
+
+  <div *ngIf="showSuccessPopup" class="success-popup">
+    {{ successMessage }}
+  </div>
 
   <div *ngIf="errorMessage" class="error-message">
     {{ errorMessage }}
   </div>
 
+  
   <table *ngIf="users.length > 0" class="users-table">
     <thead>
       <tr>
         <th>Username</th>
         <th>Email</th>
-        <th>Rights</th>
-        <th>Max Processes</th>
-        <th>Max Parallel Jobs</th>
-        <th>Max Jobs in Queue</th>
-        <th>Max Memory (User)</th>
-        <th>Max Memory (Process)</th>
-        <th>Max Allowed Nodes</th>
+        <th>Max Processes/User</th>
+        <th>Max Processes/Node/User</th>
+        <th>Max Running Jobs</th>
+        <th>Max Pending Jobs</th>
         <th>Max Job Time</th>
+        <th>Allowed Nodes</th>
+        <th>Max Nodes/Job</th>
+        <th>Max Total Jobs</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let user of users">
+        <td><input [(ngModel)]="user.username" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidUsername(user.username)}" /></td>
+        <td><input [(ngModel)]="user.email" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidEmail(user.email)}" /></td>
+        <td><input type="number" [(ngModel)]="user.max_processes_per_user" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxProcesses(user.max_processes_per_user)}" /></td>
+        <td><input type="number" [(ngModel)]="user.max_processes_per_node_per_user" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxProcessesPerNode(user.max_processes_per_node_per_user)}" /></td>
+        <td><input type="number" [(ngModel)]="user.max_running_jobs" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxRunningJobs(user.max_running_jobs)}" /></td>
+        <td><input type="number" [(ngModel)]="user.max_pending_jobs" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxPendingJobs(user.max_pending_jobs)}" /></td>
+        <td><input [(ngModel)]="user.max_job_time" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxJobTime(user.max_job_time)}" /></td>
+        <td><input [(ngModel)]="user.allowed_nodes" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidAllowedNodes(user.allowed_nodes)}" /></td>
+        <td><input [(ngModel)]="user.max_nodes_per_job" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxNodesPerJob(user.max_nodes_per_job)}" /></td>
+        <td><input [(ngModel)]="user.max_total_jobs" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxTotalJobs(user.max_total_jobs)}" /></td>
         <td>
-          <input
-            [(ngModel)]="user.username"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.email"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.rights"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_processes_per_user"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_parallel_jobs_per_user"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_jobs_in_queue"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_memory_usage_per_user_per_cluster"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_memory_usage_per_process"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_allowed_nodes"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <input
-            [(ngModel)]="user.max_job_time"
-            (ngModelChange)="markAsModified(user.id)"
-          />
-        </td>
-        <td>
-          <div *ngIf="user.suspensions && user.suspensions.length > 0">
-            <div *ngFor="let suspension of user.suspensions">
-              Suspended from {{ suspension.start_date | date: 'short' }} for {{ suspension.suspend_time }} mins
-            </div>
-          </div>
-          <span *ngIf="!user.suspensions || user.suspensions.length === 0">
-            Not suspended
-          </span>
-        </td>
-        
-        <td>
-          <button class="suspend-btn" (click)="openSuspendModal(user)">
-            +
-          </button>
+          <button class="suspend-btn" (click)="openSuspendModal(user)">Suspend</button>
         </td>
       </tr>
     </tbody>
   </table>
 
 
+<div>
+  <button class="push-changes-btn"
+          *ngIf="modifiedUsers.size > 0"
+          [ngClass]="{'invalid': !isAllValid()}"
+          [disabled]="!isAllValid()"
+          (click)="pushChanges()">
+    Push Changes
+  </button>
+</div>
 
+
+  
   <div class="suspension-modal-overlay" *ngIf="showSuspendModal">
     <div class="suspension-modal">
       <h2 class="modal-header">Suspend User: {{ selectedUser?.username }}</h2>
@@ -118,13 +72,30 @@
     </div>
   </div>
 
-  <div>
-    <button
-      class="push-changes-btn"
-      *ngIf="modifiedUsers.size > 0"
-      (click)="pushChanges()"
-    >
-      Push Changes
-    </button>
-  </div>
+
+  
+  <h1>User Suspensions</h1>
+  <table *ngIf="suspensions.length > 0" class="suspensions-table">
+    <thead>
+      <tr>
+
+        <th>Username</th>
+        <th>Email</th>
+        <th>Suspend Date</th>
+        <th>Suspend Time (mins)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let suspension of suspensions">
+        <td>{{ suspension.username }}</td>
+        <td>{{ suspension.email }}</td>
+        <td>{{ suspension.start_date | date: 'short' }}</td>
+        <td>{{ suspension.suspend_time }}</td>
+        <td>
+          <button class="remove-btn" (click)="removeSuspension(suspension)">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

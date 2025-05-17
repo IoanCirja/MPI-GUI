@@ -5,14 +5,6 @@ class User(BaseModel):
     password: str
     retypePassword: str
 
-
-# status base
-# max proceses per user
-# max paralel jobs per user
-# max jobs per user  in a queue
-# max memory usage per user per cluster
-# max memory usage per proces
-# max alowwed nodes
 # max job time - kill it when it reaches that
 # clear job history
 # schedule a job to be recursive

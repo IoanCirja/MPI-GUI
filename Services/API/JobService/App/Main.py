@@ -13,7 +13,7 @@ from JobService.App.Repositories.JobRepository import logger
 from JobService.App.Services.JobService import JobService
 from JobService.App.Utils.FirebaseConnection import initializeFirebaseConnection
 
-MONITOR_INTERVAL = 30
+MONITOR_INTERVAL = 2
 NODES = [f"c05-{str(i).zfill(2)}.cs.tuiasi.ro" for i in range(21)]
 status_active_connections = []
 
@@ -55,6 +55,7 @@ async def startup_event():
 #     "max_running_jobs_per_user",
 #     "max_pending_jobs_per_user",
 # }
+
 
 
 from pydantic import ValidationError
@@ -140,6 +141,8 @@ async def monitor_pending_jobs():
 
                     # job_author = job.get("user_id")
                     # job_quotas = quotas.get(job_author)
+                    #
+                    # logger.info(f'STARSS {job_quotas['']}');
 
                     asyncio.create_task(job_service.execute_job_in_background(str(job["_id"]), job_dto, 700))
                     job_started = True

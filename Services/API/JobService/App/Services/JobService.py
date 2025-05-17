@@ -178,6 +178,9 @@ class JobService:
 
 
     async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO, timeout: int):
+
+        temp_exe_path = None
+        temp_hostfile_path = None
         try:
 
             updated_data = {
@@ -374,14 +377,14 @@ class JobService:
 
     async def get_pending_jobs_for_user(self):
         try:
-            pending_jobs = self.repository.get_pending_jobs_count_for_user()
+            pending_jobs = self.repository.get_pending_jobs_for_user()
             return pending_jobs
         except Exception as e:
             logger.error(f"Error checking pending jobs: {str(e)}")
             return None
     async def get_running_jobs_for_user(self):
         try:
-            running_jobs = self.repository.get_running_jobs_count_for_user()
+            running_jobs = self.repository.get_running_jobs_for_user()
             return running_jobs
         except Exception as e:
             logger.error(f"Error checking pending jobs: {str(e)}")

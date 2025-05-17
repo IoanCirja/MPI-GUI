@@ -159,24 +159,21 @@ export class UploadComponent implements OnInit, OnDestroy {
 
   toggleNodeSelection(index: number) {
     this.selectedNodes[index] = !this.selectedNodes[index];
-
+  
     if (this.selectedNodes[index]) {
-      this.selectedNodesList.push(this.nodeList[index]);
-      this.slots.push(1);
-    } else {
-      const nodeIndex = this.selectedNodesList.indexOf(this.nodeList[index]);
-      if (nodeIndex > -1) {
-        this.selectedNodesList.splice(nodeIndex, 1);
-        this.slots.splice(nodeIndex, 1);
+      if (!this.slots[index]) {
+        this.slots[index] = 1;
       }
+    } else {
+      this.slots[index] = 0;
     }
-
+  
     this.updateNumProcesses();
-
   }
+  
 
   updateNumProcesses(): void {
-    // Sum all selected node slots
+    
     this.numProcesses = this.slots.reduce((sum, slot, index) => {
       return this.selectedNodes[index] ? sum + slot : sum;
     }, 0);
@@ -301,20 +298,20 @@ export class UploadComponent implements OnInit, OnDestroy {
       numProcesses: this.numProcesses,
     };
 
-    // Convert the job data to JSON
-    const jsonData = JSON.stringify(jobData, null, 2); // pretty-print the JSON
+    
+    const jsonData = JSON.stringify(jobData, null, 2); 
 
-    // Create a Blob with the JSON data
+    
     const blob = new Blob([jsonData], { type: 'application/json' });
 
-    // Create a link element to trigger the download
+    
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${this.jobName || 'job'}_data.json`; // Set a default filename
+    link.download = `${this.jobName || 'job'}_data.json`; 
     link.click();
   }
 
-  // Other methods related to the form...
+  
 }
 
 

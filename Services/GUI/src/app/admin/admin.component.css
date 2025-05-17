@@ -14,9 +14,15 @@
   border-bottom: 1px solid #ddd;
 }
 
+
 .users-table th {
   background-color: #f2f2f2;
 }
+.invalid {
+  border-color: red !important;
+  background-color: #b88787 !important;
+}
+
 
 .error-message {
   color: red;
@@ -37,23 +43,23 @@ button:hover {
   background-color: #45a049;
 }
 
-/* Styling the input fields */
+
 .users-table input {
   width: 100%;
   padding: 8px;
   border-radius: 4px;
   border: none;
   font-size: 14px;
-  background-color: transparent; /* No background color */
-  box-sizing: border-box; /* Ensures padding doesn't affect width */
-  margin: 4px 0; /* Adds spacing between input fields */
+  background-color: transparent; 
+  box-sizing: border-box; 
+  margin: 4px 0; 
   cursor: pointer;
 }
 
 .users-table input:focus {
   outline: none;
   border-color: #4CAF50;
-  background-color: #f2f2f2; /* Light background on focus for contrast */
+  background-color: #f2f2f2; 
   border: 1px solid #ddd;
 
 }
@@ -111,4 +117,57 @@ button:hover {
 .modal-buttons .cancel-btn {
   background-color: #f44336;
   color: white;
+}
+
+.suspensions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.suspensions-table th, .suspensions-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.suspensions-table th {
+  background-color: #f2f2f2;
+}
+.users-table th:nth-child(2),
+.users-table td:nth-child(2),
+.suspensions-table th:nth-child(2),
+.suspensions-table td:nth-child(2) {
+  min-width: 250px; 
+  word-break: break-all;
+}
+
+td, h1{
+  color: white;
+}
+.users-table input {
+  color: white !important;
+}
+
+
+/* Success Popup Styles */
+.success-popup {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+  font-weight: bold;
+  text-align: center;
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }

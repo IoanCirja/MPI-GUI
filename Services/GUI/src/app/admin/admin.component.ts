@@ -3,6 +3,7 @@ import { AdminService } from './admin.service';
 import { User } from './User';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Suspension } from './Suspension';
 
 @Component({
   selector: 'app-admin',
@@ -20,11 +21,75 @@ export class AdminComponent implements OnInit {
   suspendTime: number = 10;  
   currentDate: string = new Date().toISOString(); 
   constructor(private adminService: AdminService) {}
-  suspensions: any[] = [];
-
+  suspensions: Suspension[] = [];
+  successMessage: string = '';  // This will hold the success message
+  showSuccessPopup: boolean = false;  // Flag to show/hide the success popup
 
   ngOnInit(): void {
     this.fetchAllUsers();
+    this.fetchSuspensions();
+  }
+
+  
+
+
+  isAllValid(): boolean {
+    return this.users.every(user => 
+      this.isValidUsername(user.username) &&
+      this.isValidEmail(user.email) &&
+      this.isValidMaxProcesses(user.max_processes_per_user) &&
+      this.isValidMaxProcessesPerNode(user.max_processes_per_node_per_user) &&
+      this.isValidMaxRunningJobs(user.max_running_jobs) &&
+      this.isValidMaxPendingJobs(user.max_pending_jobs) &&
+      this.isValidMaxJobTime(user.max_job_time) &&
+      this.isValidAllowedNodes(user.allowed_nodes) &&
+      this.isValidMaxNodesPerJob(user.max_nodes_per_job) &&
+      this.isValidMaxTotalJobs(user.max_total_jobs)
+    );
+  }
+
+  
+  isValidUsername(username: string): boolean {
+    return Boolean(username && username.length > 0);
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+  }
+
+  isValidMaxProcesses(maxProcesses: number): boolean {
+    console.log('TEST',maxProcesses >= 1 && maxProcesses <= 70 );
+    return maxProcesses >= 1 && maxProcesses <= 70;
+  }
+
+  isValidMaxProcessesPerNode(maxProcesses: number): boolean {
+    return maxProcesses >= 1 && maxProcesses <= 10;
+  }
+
+  isValidMaxRunningJobs(maxRunningJobs: number): boolean {
+    return maxRunningJobs >= 1 && maxRunningJobs <= 30;
+  }
+
+  isValidMaxPendingJobs(maxPendingJobs: number): boolean {
+    return maxPendingJobs >= 1 && maxPendingJobs <= 30;
+  }
+
+  isValidMaxJobTime(maxJobTime: number): boolean {
+    return maxJobTime >= 100 && maxJobTime <= 100000;
+  }
+
+  isValidAllowedNodes(allowedNodes: string): boolean {
+    const nodesPattern = /^C[0-9]{2}$/;
+    return allowedNodes.split(',').every(node => nodesPattern.test(node.trim()));
+  }
+
+  isValidMaxNodesPerJob(maxNodes: number): boolean {
+    return maxNodes >= 1 && maxNodes <= 20;
+  }
+
+  isValidMaxTotalJobs(maxTotalJobs: number): boolean {
+    return maxTotalJobs >= 1 && maxTotalJobs <= 100;
   }
 
   fetchAllUsers(): void {
@@ -50,40 +115,81 @@ export class AdminComponent implements OnInit {
   isModified(userId: string): boolean {
     return this.modifiedUsers.has(userId);
   }
-
+  getRequestKeys(request: any): string[] {
+    return Object.keys(request);
+  }
+  
+  prettifyKey(key: string): string {
+    return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+  
+  
+  removeSuspension(suspension: Suspension): void {
+    if (!confirm('Are you sure you want to remove this suspension?')) {
+      return;
+    }
+  
+    const payload = {
+      user_id: suspension.user_id,
+      suspension_id: suspension.id
+    };
+  
+    this.adminService.removeSuspension(payload).subscribe(
+      () => {
+        console.log('Suspension removed successfully');
+        this.fetchSuspensions(); // Refresh the suspensions list
+      },
+      (error) => {
+        console.error('Error removing suspension:', error);
+        this.errorMessage = 'Failed to remove suspension.';
+      }
+    );
+  }
+  
+  
+  
   pushChanges(): void {
-    const modifiedUsersData = this.users.filter(user => this.isModified(user.id)).map(user => ({
+    const modifiedUsersData = this.users
+      .filter(user => this.isModified(user.id))
+      .map(user => ({
         id: user.id,
         username: user.username,
         email: user.email,
-        rights: user.rights,
         max_processes_per_user: user.max_processes_per_user,
-        max_parallel_jobs_per_user: user.max_parallel_jobs_per_user,
-        max_jobs_in_queue: user.max_jobs_in_queue,
-        max_memory_usage_per_user_per_cluster: user.max_memory_usage_per_user_per_cluster,
-        max_memory_usage_per_process: user.max_memory_usage_per_process,
-        max_allowed_nodes: user.max_allowed_nodes,
-        max_job_time: user.max_job_time
-    }));
-
+        max_processes_per_node_per_user: user.max_processes_per_node_per_user,
+        max_running_jobs: user.max_running_jobs,
+        max_pending_jobs: user.max_pending_jobs,
+        max_job_time: user.max_job_time,
+        allowed_nodes: user.allowed_nodes,
+        max_nodes_per_job: user.max_nodes_per_job,
+        max_total_jobs: user.max_total_jobs,
+      }));
+  
     const payload = { users: modifiedUsersData };
-
+  
     this.adminService.updateUsers(payload).subscribe(
-        () => {
-            console.log('Users updated successfully');
-            this.modifiedUsers.clear();  
-        },
-        (error) => {
-            console.error('Error updating users:', error);
-            this.errorMessage = 'Failed to update users. Please try again.';
-        }
+      () => {
+        console.log('Users updated successfully');
+        this.modifiedUsers.clear();
+        this.successMessage = 'Changes successfully applied!';  // Set the success message
+        this.showSuccessPopup = true;
+        setTimeout(() => {
+          this.showSuccessPopup = false;  // Hide the popup after 3 seconds
+        }, 3000);
+      },
+      (error) => {
+        console.error('Error updating users:', error);
+        this.errorMessage = 'Failed to update users. Please try again.';
+      }
     );
-}
+  }
+  
 
 fetchSuspensions(): void {
   this.adminService.getAllSuspensions().subscribe(
     (response) => {
       this.suspensions = response.suspensions;
+      console.log('TEST', this.suspensions);
     },
     (error) => {
       this.errorMessage = 'Failed to load suspensions.';

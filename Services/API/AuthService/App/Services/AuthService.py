@@ -76,19 +76,40 @@ class UserService:
 
         hashedPassword = hashlib.sha256((createUserRequest.password + salt).encode('utf-8')).hexdigest()
 
+##admin
+        # data = {
+        #     "username": createUserRequest.username,
+        #     "email": createUserRequest.email,
+        #     "password": hashedPassword,
+        #     "salt": salt,
+        #     "max_processes_per_user": 999,
+        #     "max_processes_per_node_per_user": 999,
+        #     "max_running_jobs": 999,
+        #     "max_pending_jobs": 999,
+        #     "max_job_time": 999,
+        #     "allowed_nodes": "C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20",
+        #     "max_nodes_per_job": 999,
+        #     "max_total_jobs": 999,
+        #     "suspensions": [],
+        #     "rights": 'admin'
+        # }
+
+
         data = {
             "username": createUserRequest.username,
             "email": createUserRequest.email,
             "password": hashedPassword,
             "salt": salt,
             "max_processes_per_user": 5,
-            "max_parallel_jobs_per_user": 3,
-            "max_jobs_in_queue": 10,
-            "max_memory_usage_per_user_per_cluster": "8GB", # total memory usage
-            "max_memory_usage_per_process": "2GB", # memory for a signle process
-            "max_allowed_nodes": 7, # max node job distribution
-            "max_job_time": 60,
-            "rights": "base"
+            "max_processes_per_node_per_user": 3,
+            "max_running_jobs": 10,
+            "max_pending_jobs": 8,
+            "max_job_time": 500,
+            "allowed_nodes": "C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15",
+            "max_nodes_per_job": 5,
+            "max_total_jobs": 50,
+            "suspensions": [],
+            "rights": 'base'
         }
 
         UserRepository.addUser(data)
@@ -102,15 +123,15 @@ class UserService:
         return non_admin_users
 
     @staticmethod
-    def getUserById(user_id: str) -> dict:
-        return UserRepository.getUserById(user_id)
+    def getUserByIdforQuota(user_id: str) -> dict:
+        return UserRepository.getUserByIdforQuota(user_id)
     @staticmethod
     def getQuotas() -> dict:
         return UserRepository.getQuotas()
 
     @staticmethod
     def updateUser(user_id: str, user_data: dict) -> dict:
-        existing_user = UserRepository.getUserById(user_id)
+        existing_user = UserRepository.getUserByIdforQuota(user_id)
 
         if not existing_user:
             return None  # User does not exist
@@ -121,15 +142,13 @@ class UserService:
         # Filter the allowed fields to prevent unauthorized changes
         allowed_fields = {
             "max_processes_per_user",
-            "max_parallel_jobs_per_user",
-            "max_jobs_in_queue",
-            "max_memory_usage_per_user_per_cluster",
-            "max_memory_usage_per_process",
-            "max_allowed_nodes",
+            "max_processes_per_node_per_user",
+            "max_running_jobs",
+            "max_pending_jobs",
             "max_job_time",
-            "username",
-            "email",
-            "rights"
+            "allowed_nodes",
+            "max_nodes_per_job",
+            "max_total_jobs",
         }
 
         filtered_update = {key: value for key, value in updated_user_data.items() if key in allowed_fields}
@@ -141,24 +160,20 @@ class UserService:
 
     @staticmethod
     def suspendUser(user_id: str, suspend_time: int) -> dict:
-        """Suspend a user by adding a suspension period."""
-        existing_user = UserRepository.getUserById(user_id)
+        """Suspend a user by delegating to the repository."""
+        updated_user = UserRepository.suspendUser(user_id, suspend_time)
 
-        if not existing_user:
+        if not updated_user:
             raise ValueError("User not found")
 
-        # Get current suspensions or initialize an empty list
-        suspensions = existing_user.get("suspensions", [])
+        return updated_user
 
-        # Append a new suspension record
-        suspensions.append({
-            "start_date": datetime.utcnow().isoformat(),
-            "suspend_time": suspend_time
-        })
 
-        # Update user data
-        updated_user_data = {"suspensions": suspensions}
-        UserRepository.updateUser(user_id, updated_user_data)
+    def removeSuspension(user_id: str, suspension_id: str) -> dict:
+        """Remove a suspension by suspension_id for the given user."""
+        updated_user = UserRepository.removeSuspension(user_id, suspension_id)
 
-        return {**existing_user, **updated_user_data}
+        if not updated_user:
+            raise ValueError("Suspension not found or user not found")
 
+        return updated_user

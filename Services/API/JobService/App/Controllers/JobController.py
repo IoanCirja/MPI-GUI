@@ -1,3 +1,4 @@
+import base64
 import logging
 from typing import List
 
@@ -48,10 +49,6 @@ async def get_quota_data(token: str) -> dict:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(f"http://localhost:8001/api/users/quotas", headers=headers)
 
-        logging.info(f"Response Status Code: {response.status_code}")
-        logging.info(f"Response Content: {response}")
-        logging.info(f"Response Status Code: {response.status_code}")
-
         if response.status_code == 200:
             return response.json()
         elif response.status_code == 404:
@@ -67,6 +64,17 @@ async def get_quota_data(token: str) -> dict:
         logging.error(f"Error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+    #     max_processes_per_user: number; // 1 - 70 ------------------
+    #     max_processes_per_node_per_user: number; // 1 - 10
+    #     max_running_jobs: number; // 1 - 30 --------------------
+    #     max_pending_jobs: number; // 1- 30-------------------------
+    #     max_job_time: number; // 100 - 100000
+    #     allowed_nodes: string; // C00, C01, pana la C20
+    #     max_nodes_per_job: number; // 1 - 20  job data len node request <= quota max_nodes_per_job
+    #     max_total_jobs: number; // 100 get all jobs for user.length ------------------
+    #   }
+
+
 @router.post("/upload/")
 async def upload_file(
         job_data: JobUploadDTO = Body(...),
@@ -75,23 +83,67 @@ async def upload_file(
 ):
     try:
         if not job_data.fileName.endswith(".exe"):
-            logger.warning(f"Invalid file type: {job_data.fileName}. Only .exe files are allowed.")
-            raise HTTPException(status_code=400, detail="Only .exe files are allowed!")
+            raise HTTPException(status_code=415, detail="Only .exe files are allowed!")
 
         userId = decoded_token["sub"]
-        logger.info(f"User {userId} is attempting to upload a file: {job_data.fileName}")
-
         job_service = JobService(userId)
-        token = authorization[7:]
 
+        token = authorization[7:]
         quotas = await get_quota_data(token)
+        quotas_for_user = quotas['quotas'].get(userId)
         await job_service.update_quota_data(quotas)
 
+        job_history_for_user = job_service.get_all_jobs_for_user()
+        running_jobs_for_user = await job_service.get_running_jobs_for_user()
+        pending_jobs_for_user = await job_service.get_pending_jobs_for_user()
 
+        if len(job_history_for_user) >= quotas_for_user['max_total_jobs']:
+            raise HTTPException(status_code=429, detail="Max total jobs limit reached!")
+
+        if len(running_jobs_for_user) >= quotas_for_user['max_running_jobs']:
+            raise HTTPException(status_code=429, detail="Max running jobs limit reached!")
+
+        if len(pending_jobs_for_user) >= quotas_for_user['max_pending_jobs']:
+            raise HTTPException(status_code=429, detail="Max pending jobs limit reached!")
+
+        if job_data.numProcesses >= quotas_for_user['max_processes_per_user']:
+            raise HTTPException(status_code=403, detail="Exceeded max processes per user!")
+
+        node_request = {}
+        encoded_hostfile = job_data.hostFile
+        decoded_content = base64.b64decode(encoded_hostfile).decode("utf-8")
+        lines = decoded_content.splitlines()
+
+        for line in lines:
+            parts = line.split()
+            if len(parts) == 2 and "slots=" in parts[1]:
+                node = parts[0]
+                slots = int(parts[1].split("=")[1])
+                node_request[node] = slots
+
+        allowed_nodes = quotas_for_user['allowed_nodes'].strip().split(",")
+        allowed_nodes_with_prefix = []
+
+        for node in allowed_nodes:
+            allowed_nodes_with_prefix.append(node.replace("C", "C05-", 1).strip())
+
+        total_requested_nodes = 0
+
+        for node, slots in node_request.items():
+            logger.info(f"STAAAAARS nodes with prefix: {node} {slots} {quotas_for_user['max_processes_per_node_per_user']}")
+
+            if slots > quotas_for_user['max_processes_per_node_per_user']:
+                raise HTTPException(status_code=413, detail=f"Node {node} exceeds the max process count per node!")
+
+            if node not in allowed_nodes_with_prefix:
+                raise HTTPException(status_code=403, detail=f"Node {node} is not allowed!")
+
+            total_requested_nodes += 1
+
+        if total_requested_nodes > quotas_for_user['max_nodes_per_job']:
+            raise HTTPException(status_code=413, detail="Exceeded max nodes per job!")
 
         job_id = await job_service.create_and_save_job(job_data)
-
-
         return {"jobId": job_id}
 
     except ValidationError as e:
@@ -100,6 +152,7 @@ async def upload_file(
     except HTTPException as e:
         logger.error(f"Failed to upload file and execute command for user {decoded_token['sub']}: {str(e)}")
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+
 
 @router.delete('/jobs/', response_model=List[JobDTO])
 async def clear_jobs(        background_tasks: BackgroundTasks

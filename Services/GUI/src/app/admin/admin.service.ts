@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from './User';
+import { Suspension } from './Suspension';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-
-  private usersUrl = 'http://127.0.0.1:8001/api/admin/users';
-  private suspendUrl = 'http://127.0.0.1:8001/api/admin/suspend';
-  private suspensionsUrl = 'http://127.0.0.1:8001/api/admin/suspensions';
+  private usersUrl = 'http://127.0.0.1:8001/api/admin/users/';
+  private suspendUrl = 'http://127.0.0.1:8001/api/admin/suspend/';
+  private suspensionsUrl = 'http://127.0.0.1:8001/api/admin/suspensions/';
 
   constructor(private http: HttpClient) {}
 
@@ -18,21 +18,25 @@ export class AdminService {
     return this.http.get<{ users: User[] }>(this.usersUrl);
   }
 
-  updateUser(userId: string, payload: Partial<User>): Observable<any> {
-    const url = `${this.usersUrl}/${userId}`;
-    return this.http.patch(url, payload);
-  }
 
-  updateUsers(payload: { users: any[] }): Observable<any> {
+  updateUsers(payload: { users: Partial<User>[] }): Observable<{ message: string }> {
     const url = `${this.usersUrl}`;
-    return this.http.patch(url, payload);
+    return this.http.patch<{ message: string }>(url, payload);
   }
 
-  getAllSuspensions(): Observable<{ suspensions: any[] }> {
-    return this.http.get<{ suspensions: any[] }>(this.suspensionsUrl);
+  getAllSuspensions(): Observable<{ suspensions: Suspension[] }> {
+    return this.http.get<{ suspensions: Suspension[] }>(this.suspensionsUrl);
   }
 
-  suspendUser(payload: any): Observable<any> {
-    return this.http.post(this.suspendUrl, payload);
+  suspendUser(payload: { user_id: string; suspend_time: number }): Observable<{ message: string; user: User }> {
+    return this.http.post<{ message: string; user: User }>(this.suspendUrl, payload);
   }
+
+  removeSuspension(payload: { user_id: string, suspension_id: string }): Observable<{ message: string }> {
+    const url = `${this.suspensionsUrl}`; 
+    console.log('TEST', payload);
+    return this.http.delete<{ message: string }>(url, { body: payload });
+  }
+  
+  
 }

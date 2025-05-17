@@ -170,12 +170,10 @@
           <div
             *ngFor="let node of nodeList; let i = index"
             class="node-option"
-            [ngClass]="{ 'disabled-node': !availableNodes[i] }"
           >
             <input
               type="checkbox"
               [checked]="selectedNodes[i]"
-              [disabled]="!availableNodes[i]"
               (change)="toggleNodeSelection(i)"
               [id]="'node-' + i"
               class="styled-checkbox"

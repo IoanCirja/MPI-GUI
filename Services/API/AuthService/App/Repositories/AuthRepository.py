@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from firebase_admin import db
@@ -48,7 +49,7 @@ class UserRepository:
         return all_users
 
     @staticmethod
-    def getUserById(user_id: str) -> dict:
+    def getUserByIdforQuota(user_id: str) -> dict:
         ref = db.reference(f"users/{user_id}")
         user_data = ref.get()
 
@@ -71,6 +72,18 @@ class UserRepository:
         return None
 
     @staticmethod
+    def getUserById(user_id: str) -> dict:
+        ref = db.reference(f"users/{user_id}")
+        user_data = ref.get()
+
+        if user_data:
+            user_data["id"] = user_id
+
+            return user_data
+
+        return None
+
+    @staticmethod
     def getQuotas() -> dict:
         ref = db.reference("users")
         users_data = ref.get()
@@ -78,12 +91,13 @@ class UserRepository:
         if users_data:
             allowed_keys = {
                 "max_processes_per_user",
-                "max_parallel_jobs_per_user",
-                "max_jobs_in_queue",
-                "max_memory_usage_per_user_per_cluster",
-                "max_memory_usage_per_process",
-                "max_allowed_nodes",
+                "max_processes_per_node_per_user",
+                "max_running_jobs",
+                "max_pending_jobs",
                 "max_job_time",
+                "allowed_nodes",
+                "max_nodes_per_job",
+                "max_total_jobs",
             }
 
             user_quotas = {}
@@ -104,23 +118,46 @@ class UserRepository:
 
     @staticmethod
     def suspendUser(user_id: str, suspend_time: int) -> dict:
-        """Adds a new suspension entry to the user's data."""
         ref = db.reference(f"users/{user_id}")
         user_data = ref.get()
 
         if not user_data:
-            return None  # User does not exist
+            return None
 
-        # Retrieve or initialize suspensions list
         suspensions = user_data.get("suspensions", [])
 
-        # Add new suspension entry
         suspensions.append({
+            "id": str(uuid.uuid4()),
+            'user_id': user_id,
+            "username": user_data.get("username", ""),
+            "email": user_data.get("email", ""),
             "start_date": datetime.utcnow().isoformat(),
             "suspend_time": suspend_time
         })
 
-        # Update Firebase
         ref.update({"suspensions": suspensions})
 
         return {"id": user_id, "suspensions": suspensions}
+
+    @staticmethod
+    def removeSuspension(user_id: str, suspension_id: str) -> dict:
+        """Remove a suspension by suspension_id for the given user."""
+        ref = db.reference(f"users/{user_id}")
+        user_data = ref.get()
+
+        if not user_data:
+            return None  # User not found
+
+        suspensions = user_data.get("suspensions", [])
+
+        # Filter out the suspension with the given ID
+        updated_suspensions = [suspension for suspension in suspensions if suspension["id"] != suspension_id]
+
+        # If no suspensions were removed, return None
+        if len(updated_suspensions) == len(suspensions):
+            return None
+
+        # Update the user with the new suspensions list
+        ref.update({"suspensions": updated_suspensions})
+
+        return {"id": user_id, "suspensions": updated_suspensions}
