@@ -15,6 +15,5 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def start_background_tasks():
-
     asyncio.create_task(run_ssh_cycle_and_notify())
 

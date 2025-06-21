@@ -5,7 +5,7 @@ from AuthService.App.Controllers.AdminController import admin_router
 from AuthService.App.Controllers.UserController import user_router
 from AuthService.App.Controllers.AuthController import router
 
-from AuthService.App.Utils.FirebaseConnection import initializeFirebaseConnection
+# from AuthService.App.Utils.FirebaseConnection import initializeFirebaseConnection
 
 app = FastAPI()
 
@@ -24,6 +24,6 @@ app.include_router(router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
 
-initializeFirebaseConnection()
+# initializeFirebaseConnection()
 
 

@@ -42,6 +42,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   endDate: string = '';
   startDate: string = '';
   isValidFile: boolean = false;
+  alertOnFinish: boolean = false;
 
   nodeList: string[] = Array.from(
     { length: 21 },
@@ -238,6 +239,7 @@ export class UploadComponent implements OnInit, OnDestroy {
           mapBy: this.mapBy,
           status: 'pending',
           output: '',
+          alertOnFinish: this.alertOnFinish,
         };
         console.log('Uploading job:', job);
         this.isLoading = true;

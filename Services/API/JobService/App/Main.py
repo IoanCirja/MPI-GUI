@@ -11,7 +11,6 @@ from JobService.App.Controllers.JobController import router
 from JobService.App.DTOs.JobUploadDTO import JobUploadDTO
 from JobService.App.Repositories.JobRepository import logger
 from JobService.App.Services.JobService import JobService
-from JobService.App.Utils.FirebaseConnection import initializeFirebaseConnection
 
 MONITOR_INTERVAL = 2
 NODES = [f"c05-{str(i).zfill(2)}.cs.tuiasi.ro" for i in range(21)]
@@ -63,7 +62,7 @@ from pydantic import ValidationError
 async def monitor_pending_jobs():
     job_service = JobService(None)
 
-    MAX_RUNNING_JOBS_PER_CLUSTER = 2
+    MAX_RUNNING_JOBS_PER_CLUSTER = 3
     MAX_NODE_USAGE_PER_CLUSTER = 20
     MAX_PENDING_JOBS_PER_CLUSTER = 15
     MAX_TOTAL_USAGE_PER_CLUSTER = 300
@@ -115,6 +114,7 @@ async def monitor_pending_jobs():
                         mapBy=job.get("mapBy"),
                         status=job.get("status"),
                         output=job.get("output"),
+                        alertOnFinish=job.get("alertOnFinish"),
                     )
                     node_request = {}
                     encoded_hostfile = job["hostFile"]

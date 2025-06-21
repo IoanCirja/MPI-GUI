@@ -24,6 +24,8 @@ class JobUploadDTO(BaseModel):
     status: str
     output: str
 
+    alertOnFinish: bool
+
     # scheduled: bool
     # scheduledDate: str
     #

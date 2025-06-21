@@ -64,16 +64,30 @@ async def get_quota_data(token: str) -> dict:
         logging.error(f"Error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-    #     max_processes_per_user: number; // 1 - 70 ------------------
-    #     max_processes_per_node_per_user: number; // 1 - 10
-    #     max_running_jobs: number; // 1 - 30 --------------------
-    #     max_pending_jobs: number; // 1- 30-------------------------
-    #     max_job_time: number; // 100 - 100000
-    #     allowed_nodes: string; // C00, C01, pana la C20
-    #     max_nodes_per_job: number; // 1 - 20  job data len node request <= quota max_nodes_per_job
-    #     max_total_jobs: number; // 100 get all jobs for user.length ------------------
-    #   }
 
+async def get_user_data(token: str) -> dict:
+    headers = {"Authorization": f"Bearer {token}"}
+    logging.info(f"Sending request to http://localhost:8001/api/users/quotas")
+    logging.info(f"Headers: {headers}")
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"http://localhost:8001/api/users/quotas", headers=headers)
+
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 404:
+            raise HTTPException(status_code=404, detail="User not found")
+        elif response.status_code == 403:
+            raise HTTPException(status_code=403, detail="Access denied")
+        elif response.status_code == 401:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        else:
+            raise HTTPException(status_code=500, detail="Failed to retrieve user data")
+
+    except Exception as e:
+        logging.error(f"Error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/upload/")
 async def upload_file(
@@ -97,16 +111,16 @@ async def upload_file(
         running_jobs_for_user = await job_service.get_running_jobs_for_user()
         pending_jobs_for_user = await job_service.get_pending_jobs_for_user()
 
-        if len(job_history_for_user) >= quotas_for_user['max_total_jobs']:
+        if len(job_history_for_user) >= int(quotas_for_user['max_total_jobs']):
             raise HTTPException(status_code=429, detail="Max total jobs limit reached!")
 
-        if len(running_jobs_for_user) >= quotas_for_user['max_running_jobs']:
+        if len(running_jobs_for_user) >= int(quotas_for_user['max_running_jobs']):
             raise HTTPException(status_code=429, detail="Max running jobs limit reached!")
 
-        if len(pending_jobs_for_user) >= quotas_for_user['max_pending_jobs']:
+        if len(pending_jobs_for_user) >= int(quotas_for_user['max_pending_jobs']):
             raise HTTPException(status_code=429, detail="Max pending jobs limit reached!")
 
-        if job_data.numProcesses >= quotas_for_user['max_processes_per_user']:
+        if job_data.numProcesses >= int(quotas_for_user['max_processes_per_user']):
             raise HTTPException(status_code=403, detail="Exceeded max processes per user!")
 
         node_request = {}
@@ -130,9 +144,8 @@ async def upload_file(
         total_requested_nodes = 0
 
         for node, slots in node_request.items():
-            logger.info(f"STAAAAARS nodes with prefix: {node} {slots} {quotas_for_user['max_processes_per_node_per_user']}")
 
-            if slots > quotas_for_user['max_processes_per_node_per_user']:
+            if slots > int(quotas_for_user['max_processes_per_node_per_user']):
                 raise HTTPException(status_code=413, detail=f"Node {node} exceeds the max process count per node!")
 
             if node not in allowed_nodes_with_prefix:
@@ -140,7 +153,7 @@ async def upload_file(
 
             total_requested_nodes += 1
 
-        if total_requested_nodes > quotas_for_user['max_nodes_per_job']:
+        if total_requested_nodes > int(quotas_for_user['max_nodes_per_job']):
             raise HTTPException(status_code=413, detail="Exceeded max nodes per job!")
 
         job_id = await job_service.create_and_save_job(job_data)

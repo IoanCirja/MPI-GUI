@@ -1,9 +1,11 @@
 import asyncio
 import os
 import re
+import smtplib
 import tempfile
 import uuid
 from datetime import datetime
+from email.message import EmailMessage
 from typing import List
 import base64
 import logging
@@ -103,6 +105,7 @@ class JobService:
 
             status="pending",
             output="",
+            alertOnFinish=job_data.alertOnFinish,
         )
 
         self.repository.insert_job(job)
@@ -175,7 +178,67 @@ class JobService:
         except Exception as e:
             raise HTTPException(status_code=500, detail="Error updating quota data")
 
+    def send_job_status_email(self, job_id: str, job_data_db):
+        smtp_email = env("SMTP_EMAIL")
+        smtp_password = env("SMTP_PASSWORD")
+        smtp_server = env("SMTP_SERVER")
+        smtp_port = 587
 
+        if not smtp_email or not smtp_password or not smtp_server:
+            raise ValueError("SMTP configuration is missing in environment variables.")
+
+        subject = f"[Job Status: {job_data_db.status.upper()}"
+        body = f"""
+        Hello,
+
+        This is an automated message from the MPI Launcher Job Processing System.
+
+        Your submitted job has completed processing. Below are the execution details:
+
+        ────────────────────────────────────────
+        🧾 Job Details
+        ────────────────────────────────────────
+        Job ID      : {job_id}
+        Job Name    : {job_data_db.jobName}
+        Status      : {job_data_db.status.upper()}
+        Start Time  : {job_data_db.beginDate or 'N/A'}
+        End Time    : {job_data_db.endDate or 'N/A'}
+
+        ────────────────────────────────────────
+        📄 Job Output
+        ────────────────────────────────────────
+        {job_data_db.output or 'No output was produced during execution.'}
+
+        ────────────────────────────────────────
+        📬 Notes
+        ────────────────────────────────────────
+        - If the job status is "FAILED", please check the output section for error details.
+        - If the job was terminated manually, the status will show as "KILLED".
+
+        Thank you for using MPI Launcher.
+
+        Best regards,  
+        MPI Launcher Job Processing System
+        """
+
+        msg = EmailMessage()
+        msg["Subject"] = subject
+        msg["From"] = smtp_email
+        msg["To"] = "ioan.cirja.00@gmail.com"
+        msg.set_content(body)
+
+        try:
+            logger.info(f"Connecting to SMTP server: {smtp_server}:{smtp_port}")
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.ehlo()
+                server.starttls()
+                logger.info("Starting TLS encryption.")
+                server.login(smtp_email, smtp_password)
+                logger.info(f"Logged in as {smtp_email}. Sending email...")
+                server.send_message(msg)
+                logger.info("Email sent successfully.")
+        except Exception as e:
+            logger.error(f"Failed to send email: {e}")
 
     async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO, timeout: int):
 
@@ -255,12 +318,15 @@ class JobService:
                     )
                 except asyncio.TimeoutError:
                     job_data_db = self.get_job_by_id(job_id)
+                    job_data_db.endDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     job_data_db.status = "failed"
                     job_data_db.output = f"Job execution timed out."
                     await self.kill_job_in_background(job_id)
 
                     self.update_job_status_and_output(job_id, job_data_db)
                     self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+                    if job_data.alertOnFinish:
+                        self.send_job_status_email(job_id, job_data_db)
                     return
 
                 job_data_db = self.get_job_by_id(job_id)
@@ -271,6 +337,8 @@ class JobService:
 
                     self.update_job_status_and_output(job_id, job_data_db)
                     self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+                    if job_data.alertOnFinish:
+                        self.send_job_status_email(job_id, job_data_db)
 
         except Exception as e:
 
@@ -282,7 +350,8 @@ class JobService:
 
             self.update_job_status_and_output(job_id, job_data_db)
             self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
-
+            if job_data.alertOnFinish:
+                self.send_job_status_email(job_id, job_data_db)
         finally:
 
             if temp_exe_path and os.path.exists(temp_exe_path):

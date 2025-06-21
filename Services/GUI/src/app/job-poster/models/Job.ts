@@ -15,4 +15,5 @@ export interface Job {
     mapBy: string;
     status: string;
     output: string;
+    alertOnFinish?: boolean
   }

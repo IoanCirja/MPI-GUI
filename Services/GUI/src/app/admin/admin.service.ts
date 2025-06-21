@@ -34,7 +34,6 @@ export class AdminService {
 
   removeSuspension(payload: { user_id: string, suspension_id: string }): Observable<{ message: string }> {
     const url = `${this.suspensionsUrl}`; 
-    console.log('TEST', payload);
     return this.http.delete<{ message: string }>(url, { body: payload });
   }
   

@@ -1,0 +1,119 @@
+<div class="charts-container">
+  <div class="chart-section" *ngIf="userQuota">
+    <h3>User Quota</h3>
+    <table
+      style="
+        width: 90%;
+        max-width: 500px;
+        margin: 0 auto;
+        border-collapse: collapse;
+      "
+    >
+      <tbody>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Processes per User
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_processes_per_user }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Processes per Node per User
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_processes_per_node_per_user }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Running Jobs
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_running_jobs }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Pending Jobs
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_pending_jobs }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Job Time (seconds)
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_job_time }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Allowed Nodes
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.allowed_nodes }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Nodes per Job
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_nodes_per_job }}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd; font-weight: 600">
+            Max Total Jobs
+          </td>
+          <td style="padding: 8px; border: 1px solid #ddd">
+            {{ userQuota.max_total_jobs }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-section">
+    <h3>Job Count by Status</h3>
+    <canvas
+      baseChart
+      [data]="statusChartData"
+      [type]="statusChartType"
+      [options]="chartOptions"
+      height="200"
+      style="max-width: 100%; width: 100%"
+    >
+    </canvas>
+  </div>
+
+  <div class="chart-section">
+    <h3>Processes per Job</h3>
+    <canvas
+      baseChart
+      [data]="processesChartData"
+      [type]="processesChartType"
+      [options]="chartOptions"
+      height="200"
+      style="max-width: 100%; width: 100%"
+    >
+    </canvas>
+  </div>
+
+  <div class="chart-section">
+    <h3>Job Duration</h3>
+    <canvas
+      baseChart
+      [data]="durationChartData"
+      [type]="durationChartType"
+      [options]="chartOptions"
+      height="200"
+      style="max-width: 100%; width: 100%"
+    >
+    </canvas>
+  </div>
+</div>
