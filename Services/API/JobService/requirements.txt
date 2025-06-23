@@ -1,0 +1,9 @@
+fastapi
+starlette
+httpx
+pydantic
+pymongo
+requests
+python-decouple
+asyncssh
+paramiko

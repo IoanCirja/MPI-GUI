@@ -9,11 +9,9 @@ from email.message import EmailMessage
 from typing import List
 import base64
 import logging
-
 import requests
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 from decouple import RepositoryEnv, Config
 from starlette.exceptions import HTTPException
 
@@ -21,12 +19,17 @@ from JobService.App.DTOs.JobDTO import JobDTO
 from JobService.App.DTOs.JobUploadDTO import JobUploadDTO
 from JobService.App.Repositories.JobRepository import JobRepository
 from JobService.App.Services.SSHService import SSHService
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 envPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
 env = Config(RepositoryEnv(envPath))
+
 UPLOAD_DIRECTORY = "uploaded_files"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+
 BASE_DIRECTORY = env('BASE_DIRECTORY')
+
 SSH_HOST = env('SSH_HOST')
 SSH_PORT = env('SSH_PORT')
 SSH_USERNAME = env('SSH_USERNAME')
@@ -36,7 +39,6 @@ active_connections = []
 active_tcp_comm_node_ports = {}
 
 vtKey = env('VT_API_KEY')
-
 VT_UPLOAD_URL = "https://www.virustotal.com/api/v3/files"
 VT_ANALYSIS_URL = "https://www.virustotal.com/api/v3/analyses/{}"
 
@@ -46,73 +48,77 @@ class JobService:
         self.repository = JobRepository(user_id)
 
     def allocate_port_range(self, job_id: str) -> str:
-        global active_tcp_comm_node_ports
-        start_port = 12000
-        end_port = 30000
-        port_range_size = 20
+        try:
+            global active_tcp_comm_node_ports
+            start_port = 12000
+            end_port = 30000
+            port_range_size = 20
 
-        for port in range(start_port, end_port, port_range_size):
-            port_range = f"{port}-{port + port_range_size - 1}"
-            if port_range not in active_tcp_comm_node_ports.values():
-                active_tcp_comm_node_ports[job_id] = port_range
-                return port_range
+            for port in range(start_port, end_port, port_range_size):
+                port_range = f"{port}-{port + port_range_size - 1}"
+                if port_range not in active_tcp_comm_node_ports.values():
+                    active_tcp_comm_node_ports[job_id] = port_range
+                    return port_range
 
-        raise Exception("No available ports. Please try again later.")
+            raise Exception("Service Error: No available ports. Please try again later.")
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
 
     def release_port_range(self, job_id: str):
-        global active_tcp_comm_node_ports
-        if job_id in active_tcp_comm_node_ports:
-            del active_tcp_comm_node_ports[job_id]
+        try:
+            global active_tcp_comm_node_ports
+            if job_id in active_tcp_comm_node_ports:
+                del active_tcp_comm_node_ports[job_id]
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
 
     def validate_environment_vars(self, environmentVars: str) -> str:
-        env_vars_list = []
-        if environmentVars.strip():
-            env_pattern = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=[^;&|$()<>`]+$")
-            for env_var in environmentVars.split(","):
-                env_var = env_var.strip()
-                if not env_pattern.match(env_var):
-                    raise HTTPException(status_code=400, detail=f"Invalid environment variable: {env_var}")
-                env_vars_list.append(f"-x {env_var}")
-        return " ".join(env_vars_list)
+        try:
+            env_vars_list = []
+            if environmentVars.strip():
+                env_pattern = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=[^;&|$()<>`]+$")
+                for env_var in environmentVars.split(","):
+                    env_var = env_var.strip()
+                    if not env_pattern.match(env_var):
+                        raise Exception(f"Service Error: Invalid environment variable: {env_var}")
+                    env_vars_list.append(f"-x {env_var}")
+            return " ".join(env_vars_list)
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
 
-    async def create_and_save_job(self, job_data: JobUploadDTO):
-        job_id = str(uuid.uuid4())
-        beginDate = datetime.now().strftime("%Y-%d-%m %H:%M:%S")
+    async def create_and_save_job(self, job_data: JobUploadDTO) -> str:
+        try:
+            job_id = str(uuid.uuid4())
+            beginDate = datetime.now().strftime("%Y-%d-%m %H:%M:%S")
+            job = JobDTO(
+                id=job_id,
+                jobName=job_data.jobName,
+                jobDescription=job_data.jobDescription,
+                beginDate=beginDate,
+                endDate="",
+                fileName=job_data.fileName,
+                fileContent=job_data.fileContent,
+                hostFile=job_data.hostFile,
+                hostNumber=job_data.hostNumber,
+                numProcesses=job_data.numProcesses,
+                allowOverSubscription=job_data.allowOverSubscription,
+                environmentVars=job_data.environmentVars,
+                displayMap=job_data.displayMap,
+                rankBy=job_data.rankBy,
+                mapBy=job_data.mapBy,
+                status="pending",
+                output="",
+                alertOnFinish=job_data.alertOnFinish,
+                user_id=job_data.user_id,
+                userEmail=job_data.userEmail,
+            )
 
+            self.repository.insert_job(job)
+            return job_id
 
-        job = JobDTO(
-            id=job_id,
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
 
-            jobName=job_data.jobName,
-            jobDescription=job_data.jobDescription,
-
-            beginDate=beginDate,
-            endDate="",
-
-            fileName=job_data.fileName,
-            fileContent=job_data.fileContent,
-
-            hostFile=job_data.hostFile,
-            hostNumber = job_data.hostNumber,
-
-            numProcesses=job_data.numProcesses,
-            allowOverSubscription=job_data.allowOverSubscription,
-
-            environmentVars=job_data.environmentVars,
-            displayMap=job_data.displayMap,
-            rankBy=job_data.rankBy,
-            mapBy=job_data.mapBy,
-
-            status="pending",
-            output="",
-            alertOnFinish=job_data.alertOnFinish,
-
-            user_id=job_data.user_id,
-            userEmail=job_data.userEmail,
-        )
-
-        self.repository.insert_job(job)
-        return job_id
     def get_job_by_id(self, job_id: str):
         try:
             job_data = self.repository.get_job_by_id(job_id)
@@ -120,67 +126,65 @@ class JobService:
                 return JobDTO(**job_data)
             return None
         except Exception as e:
-            print(f"Error fetching job by ID: {str(e)}")
-            return None
+            raise Exception(f"Service Error: {e}")
 
     async def compute_cluster_usage(self):
         try:
             return self.repository.compute_cluster_usage()
-
-
         except Exception as e:
-            print(f"Error fetching job by ID: {str(e)}")
+            raise Exception(f"Service Error: {e}")
 
     async def compute_request_usage(self):
         try:
             return self.repository.compute_request_usage()
-
-
         except Exception as e:
-            print(f"Error fetching job by ID: {str(e)}")
-
-
+            raise Exception(f"Service Error: {e}")
 
     def update_job_status_and_output(self, job_id: str, job_data: JobDTO):
-        updated_data = {
-            "status": job_data.status,
-            "output": job_data.output,
-            "endDate": job_data.endDate,
-        }
-        success = self.repository.update_job(job_id, updated_data)
-        if not success:
-            logging.error(f"Failed to update job with ID {job_id}")
-        return success
+        try:
+            updated_data = {
+                "status": job_data.status,
+                "output": job_data.output,
+                "endDate": job_data.endDate,
+            }
+            success = self.repository.update_job(job_id, updated_data)
+            return success
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
 
-    def notify_frontend(self, job_id: str, status: str, output: str, endDate:str):
-        for connection in active_connections:
-            asyncio.create_task(
-                connection.send_json({"jobId": job_id, "status": status, "output": output, "endDate": endDate})
-            )
+    def notify_frontend(self, job_id: str, status: str, output: str, endDate: str) -> None:
+        try:
+            for connection in active_connections:
+                asyncio.create_task(
+                    connection.send_json({
+                        "jobId": job_id,
+                        "status": status,
+                        "output": output,
+                        "endDate": endDate
+                    })
+                )
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
 
     async def clear_jobs_on_cluster(self, jobId: str = None):
         try:
             ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
             ssh_service.connect()
-
             await ssh_service.clear_jobs_in_background(jobId)
-
         except Exception as e:
-            logging.error(f"Failed to clear jobs: {str(e)}")
+            raise Exception(f"Service Error: {e}")
 
 
     async def update_quota_data(self, quota_data: dict):
         try:
-            # Call the repository to insert or update quota data
             self.repository.update_quota(quota_data)
         except Exception as e:
-            logging.error(f"Error updating quota data for user {self.user_id}: {e}")
-            raise HTTPException(status_code=500, detail="Error updating quota data")
+            raise Exception(f"Service Error: {e}")
     async def get_quotas(self):
         try:
             return self.repository.get_quotas()
         except Exception as e:
-            raise HTTPException(status_code=500, detail="Error updating quota data")
+            raise Exception(f"Service Error: {e}")
 
     def send_job_status_email(self, job_id: str, job_data_db):
         smtp_email = env("SMTP_EMAIL")
@@ -242,14 +246,12 @@ class JobService:
                 server.send_message(msg)
                 logger.info("Email sent successfully.")
         except Exception as e:
-            logger.error(f"Failed to send email: {e}")
+            raise Exception(f"Service Error: {e}")
 
     async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO, timeout: int):
-
         temp_exe_path = None
         temp_hostfile_path = None
         try:
-
             updated_data = {
                 "status": 'running',
                 "output": '',
@@ -257,10 +259,7 @@ class JobService:
             }
             success = self.repository.update_job(job_id, updated_data)
             if success:
-
-
                 self.notify_frontend(job_id, 'running', '', '')
-
 
                 ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
                 ssh_service.connect()
@@ -272,6 +271,7 @@ class JobService:
                 remote_path_host = f"{remote_job_dir}/hostfile_{job_id}.txt"
                 remote_pid_path = f"{remote_job_dir}/pid_{job_id}.txt"
                 output_path = f"{BASE_DIRECTORY}/job_{job_id}/output_{job_id}"
+
                 env_vars_str = self.validate_environment_vars(job_data.environmentVars)
 
                 with tempfile.NamedTemporaryFile(delete=False) as temp_exe:
@@ -287,7 +287,7 @@ class JobService:
 
                 scan_result = self.scan_file_with_virustotal(temp_exe_path)
                 if scan_result != 0:
-                    raise HTTPException(status_code=400, detail="File flagged by VirusTotal")
+                    raise Exception("File flagged by VirusTotal")
 
                 with tempfile.NamedTemporaryFile(delete=False) as temp_hostfile:
                     temp_hostfile.write(base64.b64decode(job_data.hostFile.encode('utf-8')))
@@ -313,7 +313,6 @@ class JobService:
                     mpirun_command += " --oversubscribe"
 
                 mpirun_command += f" {remote_path_exe}"
-
 
                 try:
                     output = await asyncio.wait_for(
@@ -345,27 +344,22 @@ class JobService:
                         self.send_job_status_email(job_id, job_data_db)
 
         except Exception as e:
-
-
             job_data_db = self.get_job_by_id(job_id)
 
             job_data_db.status = "failed"
             job_data_db.output = str(e)
 
             self.update_job_status_and_output(job_id, job_data_db)
+
             self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
             if job_data.alertOnFinish:
                 self.send_job_status_email(job_id, job_data_db)
         finally:
-
             if temp_exe_path and os.path.exists(temp_exe_path):
                 os.remove(temp_exe_path)
-
             if temp_hostfile_path and os.path.exists(temp_hostfile_path):
                 os.remove(temp_hostfile_path)
             self.release_port_range(job_id)
-
-
 
     async def kill_job_in_background(self, job_id: str):
         try:
@@ -420,10 +414,7 @@ class JobService:
 
         analysis_id = response.json().get("data", {}).get("id")
         if not analysis_id:
-            logger.error("Failed to retrieve analysis ID from VirusTotal response.")
             raise HTTPException(status_code=500, detail="VirusTotal analysis ID missing")
-
-        logger.info(f"File uploaded successfully. Analysis ID: {analysis_id}")
 
         return self.get_analysis_report(analysis_id)
 
@@ -447,7 +438,6 @@ class JobService:
                 undetected = stats.get("undetected", 0)
 
                 logger.info(f"Scan Results - undetected: {undetected}, Suspicious: {suspicious}")
-
                 if malicious > 0:
                     return 1
                 elif suspicious > 0:
@@ -460,31 +450,28 @@ class JobService:
             pending_jobs = self.repository.get_pending_jobs_for_user()
             return pending_jobs
         except Exception as e:
-            logger.error(f"Error checking pending jobs: {str(e)}")
-            return None
+            raise Exception(f"Service Error: {e}")
+
     async def get_running_jobs_for_user(self):
         try:
             running_jobs = self.repository.get_running_jobs_for_user()
             return running_jobs
         except Exception as e:
-            logger.error(f"Error checking pending jobs: {str(e)}")
-            return None
+            raise Exception(f"Service Error: {e}")
 
     async def get_all_pending_jobs(self):
         try:
             pending_jobs = self.repository.get_all_pending_jobs()
             return pending_jobs
         except Exception as e:
-            logger.error(f"Error checking pending jobs: {str(e)}")
-            return None
+            raise Exception(f"Service Error: {e}")
 
     async def get_all_running_jobs(self):
         try:
             pending_jobs = self.repository.get_all_running_jobs()
             return pending_jobs
         except Exception as e:
-            logger.error(f"Error checking pending jobs: {str(e)}")
-            return None
+            raise Exception(f"Service Error: {e}")
 
     def get_all_jobs(self) -> List[JobDTO]:
         try:
@@ -494,8 +481,7 @@ class JobService:
 
             return [JobDTO(**job) for job in jobs_data]
         except Exception as e:
-            print(f"Error fetching all jobs: {str(e)}")
-            return []
+            raise Exception(f"Service Error: {e}")
 
     def get_all_jobs_for_user(self) -> List[JobDTO]:
         try:
@@ -505,9 +491,7 @@ class JobService:
 
             return [JobDTO(**job) for job in jobs_data]
         except Exception as e:
-            print(f"Error fetching all jobs: {str(e)}")
-            return []
-
+            raise Exception(f"Service Error: {e}")
 
     def clear_jobs(self) -> List[str]:
         try:
@@ -515,14 +499,12 @@ class JobService:
             if not job_ids:
                 return []
             return job_ids
-        except Exception:
-            return []
+        except Exception as e:
+            raise Exception(f"Service Error: {e}")
+
     def clear_job(self, job_id):
         try:
             success = self.repository.clear_job(job_id)
             return success
         except Exception as e:
-            logger.error(f"Error clearing jobs for user {self.user_id}: {str(e)}")
-            return False
-
-
+            raise Exception(f"Service Error: {e}")

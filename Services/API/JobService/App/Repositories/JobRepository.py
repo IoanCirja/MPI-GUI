@@ -1,9 +1,7 @@
 import base64
 from collections import defaultdict
 from typing import List
-
 from pymongo import MongoClient
-
 from JobService.App.DTOs import JobDTO
 
 
@@ -22,10 +20,9 @@ class JobRepository:
                 {"_id": "quota_report"},
                 {"$set": quota_data},
                 upsert=True
-
             )
         except Exception as e:
-            raise Exception(f"Error: {e}")
+            raise Exception(f"Repository Error: {e}")
 
     def get_quotas(self):
         try:
@@ -35,7 +32,7 @@ class JobRepository:
             else:
                 return {}
         except Exception as e:
-            return {}
+            raise Exception(f"Repository Error: {e}")
 
     def insert_job(self, job: JobDTO):
         try:
@@ -43,10 +40,9 @@ class JobRepository:
             job_data["_id"] = job_data.pop("id")
 
             self.jobs_collection.insert_one(job_data)
-
             return job_data["_id"]
         except Exception as e:
-            return None
+            raise Exception(f"Repository Error: {e}")
 
     def get_job_by_id(self, job_id: str):
         try:
@@ -56,7 +52,7 @@ class JobRepository:
                 del job_data["_id"]
             return job_data if job_data else None
         except Exception as e:
-            return None
+            raise Exception(f"Repository Error: {e}")
 
     def get_all_jobs_for_user(self) -> List[dict]:
         try:
@@ -68,7 +64,7 @@ class JobRepository:
                 del job["_id"]
             return jobs_list
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def get_all_jobs(self) -> List[dict]:
         try:
@@ -80,7 +76,7 @@ class JobRepository:
                 del job["_id"]
             return jobs_list
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def update_job(self, job_id: str, updated_data: dict) -> bool:
         try:
@@ -90,35 +86,35 @@ class JobRepository:
             )
             return result.modified_count > 0
         except Exception as e:
-            return False
+            raise Exception(f"Repository Error: {e}")
 
     def get_pending_jobs_for_user(self):
         try:
             pending_jobs_for_user = list(self.jobs_collection.find({"user_id": self.user_id, "status": "pending"}))
             return pending_jobs_for_user
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def get_running_jobs_for_user(self):
         try:
             running_jobs_for_user = list(self.jobs_collection.find({"user_id": self.user_id, "status": "running"}))
             return running_jobs_for_user
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def get_all_pending_jobs(self):
         try:
             pending_jobs = list(self.jobs_collection.find({"status": "pending"}).sort("beginDate", 1))
             return pending_jobs
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def get_all_running_jobs(self):
         try:
             pending_jobs = list(self.jobs_collection.find({"status": "running"}))
             return pending_jobs
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def compute_cluster_usage(self):
         try:
@@ -180,7 +176,7 @@ class JobRepository:
             return node_slots
 
         except Exception as e:
-            return {}
+            raise Exception(f"Repository Error: {e}")
 
     def compute_request_usage(self):
         try:
@@ -242,7 +238,7 @@ class JobRepository:
             return node_slots
 
         except Exception as e:
-            return {}
+            raise Exception(f"Repository Error: {e}")
 
     def clear_jobs(self) -> List[str]:
         try:
@@ -260,7 +256,7 @@ class JobRepository:
             return job_ids
 
         except Exception as e:
-            return []
+            raise Exception(f"Repository Error: {e}")
 
     def clear_job(self, job_id: str) -> bool:
         try:
@@ -274,4 +270,4 @@ class JobRepository:
             else:
                 return False
         except Exception as e:
-            return False
+            raise Exception(f"Repository Error: {e}")

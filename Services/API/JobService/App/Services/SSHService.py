@@ -1,11 +1,11 @@
 import asyncio
-
 import asyncssh
-
 import paramiko
 import os
 from decouple import RepositoryEnv, Config
 from fastapi import HTTPException
+import logging
+
 envPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
 env = Config(RepositoryEnv(envPath))
 
@@ -16,9 +16,12 @@ SSH_USERNAME = env('SSH_USERNAME')
 SSH_PASSWORD = env('SSH_PASSWORD')
 MPI_HOSTS = env('MPI_HOSTS').split(',')
 
-import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+master_node = "c05-00"
+
+
 class SSHService:
     def __init__(self, host: str, port: int, username: str, password: str):
         self.host = host
@@ -28,48 +31,33 @@ class SSHService:
         self.client = None
         self.sftp = None
 
-        #self.ssh_keyscan()
-
     def connect(self):
         try:
             self.client = paramiko.SSHClient()
             self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.client.connect(self.host, port=self.port, username=self.username, password=self.password)
             self.sftp = self.client.open_sftp()
-            print("SSH connection established.")
         except Exception as e:
-            print(f"Error establishing SSH connection: {e}")
-            raise HTTPException(status_code=500, detail="SSH connection failed.")
-
+            raise Exception(f"SSH connection failed: {e}")
 
     def execute_command(self, command: str, remote_path_exe: str, remote_path_host:str):
         try:
-
             chmod_command = f"chmod +x {remote_path_exe}"
             stdin, stdout, stderr = self.client.exec_command(chmod_command)
 
             chmod_command = f"chmod +x {remote_path_host}"
-
             stdin, stdout, stderr = self.client.exec_command(chmod_command)
 
             stdin, stdout, stderr = self.client.exec_command(command)
-
             command_output = stdout.read().decode('utf-8')
             command_error = stderr.read().decode('utf-8')
-
-            print(f"Command output: {command_output}")
-            print(f"Command error: {command_error}")
 
             if command_error:
                 raise Exception(f"Error executing command: {command_error}")
 
-            print(f"Command executed successfully: {command}")
             return command_output
-
         except Exception as e:
-            print(f"Error executing command: {e}")
-            raise HTTPException(status_code=500, detail=f"Error executing command: {str(e)}")
-
+            raise Exception(f"Error executing command: {str(e)}")
 
     async def send_file_to_host(self, fqdn, job_id, local_exe, local_hostfile):
         remote_job_dir = f"{BASE_DIRECTORY}/job_{job_id}"
@@ -87,7 +75,7 @@ class SSHService:
                 await conn.run(f"chmod +x {remote_exe_path}", check=True)
 
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error sending files to {fqdn}: {str(e)}")
+            raise Exception(f"Error sending files to {fqdn}: {str(e)}")
 
     async def send_file_to_hosts(self, job_id, local_exe, local_hostfile):
         try:
@@ -97,7 +85,6 @@ class SSHService:
             if not hosts:
                 raise ValueError("Hostfile is empty or invalid!")
 
-            master_node = "c05-00"
             if master_node not in hosts:
                 hosts.insert(0, master_node)
 
@@ -109,7 +96,7 @@ class SSHService:
             await asyncio.gather(*tasks)
 
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to send files to hosts: {str(e)}")
+            raise Exception(f"Failed to send files to hosts: {str(e)}")
 
 
     async def request_kill(self, job_id: str):
@@ -119,14 +106,12 @@ class SSHService:
 
             try:
                 self.sftp.stat(pid_file_path)
-                logger.info(f"Found PID file at {pid_file_path}.")
             except FileNotFoundError:
                 logger.error(f"PID file not found for job {job_id}.")
-                raise HTTPException(status_code=404, detail="PID file not found.")
+                raise Exception("PID file not found.")
 
             with self.sftp.open(pid_file_path, 'r') as pid_file:
                 pid = pid_file.read().decode('utf-8').strip()
-                logger.info(f"Retrieved PID: {pid} for job {job_id}.")
 
             kill_command = f"kill -9 {pid}"
             logger.info(f"Attempting to kill process with PID {pid} for job {job_id}.")
@@ -137,7 +122,7 @@ class SSHService:
 
             if command_error:
                 logger.error(f"Error killing process: {command_error}")
-                raise HTTPException(status_code=500, detail=f"Error killing process: {command_error}")
+                raise Exception(f"Error killing process: {command_error}")
 
             logger.info(f"Process with PID {pid} killed successfully for job {job_id}.")
 
@@ -154,8 +139,7 @@ class SSHService:
                 return False
 
         except Exception as e:
-            logger.error(f"Error killing MPI process for job {job_id}: {e}")
-            raise HTTPException(status_code=500, detail=f"Error killing MPI process: {str(e)}")
+            raise Exception(f"Error killing MPI process: {str(e)}")
 
 
     async def clear_jobs_in_background(self, jobId: str = None):
@@ -170,8 +154,7 @@ class SSHService:
             await asyncio.gather(*tasks)
             return True
         except Exception as e:
-            logger.error(f"Error triggering background job clearing: {str(e)}")
-            return False
+            raise Exception(f"Error triggering background job clearing: {str(e)}")
 
     async def clear_job_folders_on_node(self, fqdn, jobId: str = None):
         try:
@@ -183,21 +166,21 @@ class SSHService:
                 result = await conn.run(f"find {BASE_DIRECTORY}/ -mindepth 1 -maxdepth 1 -type d", check=True)
 
                 directories = result.stdout.splitlines()
-
                 logger.info(f"Found the following directories on {fqdn} to clear: {directories}")
 
                 for directory in directories:
                     await conn.run(f"rm -rf {directory}", check=True)
                     logger.info(f"Successfully cleared directory: {directory}")
 
-
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error sending files to {fqdn}: {str(e)}")
-
+            raise Exception(f"Error sending files to {fqdn}: {str(e)}")
 
     def close(self):
-        if self.sftp:
-            self.sftp.close()
-        if self.client:
-            self.client.close()
-        print("SSH connection closed.")
+        try:
+            if self.sftp:
+                self.sftp.close()
+            if self.client:
+                self.client.close()
+        except Exception as e:
+            raise Exception(f"Service Error in close: {e}")
+

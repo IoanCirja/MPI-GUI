@@ -11,8 +11,9 @@ from AuthService.App.Services.AuthService import UserService
 from JobService.App.Controllers.JobController import router
 from JobService.App.DTOs.JobUploadDTO import JobUploadDTO
 from JobService.App.Services.JobService import JobService
+from pydantic import ValidationError
 
-MONITOR_INTERVAL = 2
+MONITOR_INTERVAL = 3
 NODES = [f"c05-{str(i).zfill(2)}.cs.tuiasi.ro" for i in range(21)]
 status_active_connections = []
 
@@ -23,6 +24,7 @@ ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+
 app = FastAPI()
 
 origins = [
@@ -39,36 +41,15 @@ app.add_middleware(
 
 app.include_router(router, prefix="/api")
 
-
-
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(monitor_pending_jobs())
 
-#per user
-# allowed_keys = {
-#     "max_processes_per_user",
-#     "max_running_jobs_per_user",
-#     "max_pending_jobs_per_user",
-#     "max_allowed_nodes",
-# }
-
-
-#per total
-# allowed_keys = {
-#     "max_processes_per_user",
-#     "max_running_jobs_per_user",
-#     "max_pending_jobs_per_user",
-# }
-
-
-
-from pydantic import ValidationError
 
 async def monitor_pending_jobs():
     job_service = JobService(None)
 
-    MAX_RUNNING_JOBS_PER_CLUSTER = 1
+    MAX_RUNNING_JOBS_PER_CLUSTER = 2
     MAX_NODE_USAGE_PER_CLUSTER = 50
     MAX_PENDING_JOBS_PER_CLUSTER = 15
     MAX_TOTAL_USAGE_PER_CLUSTER = 300
@@ -77,7 +58,7 @@ async def monitor_pending_jobs():
     while True:
         await asyncio.sleep(MONITOR_INTERVAL)
 
-
+        logger.info(f'Monitoring...');
 
         try:
             pending_jobs = await job_service.get_all_pending_jobs()
@@ -88,12 +69,17 @@ async def monitor_pending_jobs():
             request_usage = await job_service.compute_request_usage()
 
             if MAX_RUNNING_JOBS_PER_CLUSTER <= len(running_jobs):
-
+                logger.info(f'MAX_RUNNING_JOBS_PER_CLUSTER reached.');
                 continue
 
             if MAX_PENDING_JOBS_PER_CLUSTER <= len(pending_jobs):
-
+                logger.info(f'MAX_PENDING_JOBS_PER_CLUSTER reached.');
                 continue
+
+            if MAX_TOTAL_USAGE_PER_CLUSTER <= len(pending_jobs) + len(running_jobs):
+                logger.info(f'MAX_TOTAL_USAGE_PER_CLUSTER reached.');
+                continue
+
             job_started = False
 
             for job in pending_jobs:
@@ -146,8 +132,7 @@ async def monitor_pending_jobs():
 
                     # job_author = job.get("user_id")
                     # job_quotas = quotas.get(job_author)
-                    #
-                    # logger.info(f'STARSS {job_quotas['']}');
+
 
                     asyncio.create_task(job_service.execute_job_in_background(str(job["_id"]), job_dto, 700))
                     job_started = True
@@ -155,9 +140,7 @@ async def monitor_pending_jobs():
                     logger.error(f"Error constructing JobUploadDTO for job {job['_id']}: {ve}")
                 except Exception as e:
                     logger.error(f"Unexpected error processing job {job['_id']}: {e}")
-
         except Exception as e:
             logger.error(f"Error in monitoring pending jobs: {str(e)}")
-
 
 

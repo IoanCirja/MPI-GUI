@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, WebSocket, BackgroundTasks, Body
 from pydantic import ValidationError
 from starlette.websockets import WebSocketDisconnect
 
-from AuthService.App.Utils.JWTUtils import *
+from JobService.App.Utils.JWTUtils import *
 from JobService.App.DTOs.JobUploadDTO import JobUploadDTO
 from JobService.App.DTOs.JobDTO import JobDTO
 from JobService.App.DTOs.UserJobDTO import UserJobDTO
