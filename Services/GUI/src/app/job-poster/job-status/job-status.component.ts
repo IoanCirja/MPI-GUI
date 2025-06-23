@@ -57,6 +57,11 @@ throw new Error('Method not implemented.');
     this.listenToWebSocketUpdates();
   }
 
+
+  get hasRunningJobs(): boolean {
+  return this.jobData.some(job => job.status === 'running');
+}
+
   getJobStatus(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.fileUploadService.getJobStatus().subscribe({
@@ -165,6 +170,10 @@ throw new Error('Method not implemented.');
   }
 
   deleteJob(jobId: string): void {
+        const job = this.jobData.find(j => j.id === jobId);
+    if (job?.status === 'running') {
+      return;
+    }
     this.fileUploadService.deleteJob(jobId).subscribe({
       next: (response) => {
         console.log('Job deleted:', response);
@@ -178,6 +187,9 @@ throw new Error('Method not implemented.');
   }
 
   clearHistory(): void {
+        if (this.hasRunningJobs) {
+      return;
+    }
     this.fileUploadService.deleteJobs().subscribe({
       next: (response) => {
         console.log('All jobs deleted:', response);

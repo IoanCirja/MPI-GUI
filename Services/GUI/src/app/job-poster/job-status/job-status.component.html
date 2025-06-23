@@ -6,7 +6,11 @@
 <div class="list-container">
   <span class="loading-message" *ngIf="jobData.length===0 && !loading">No Jobs Found</span>
   <div class="clear-history-container">
-    <button (click)="clearHistory()">Clear History and Delete All Jobs</button>
+    <button (click)="clearHistory()" 
+        [disabled]="hasRunningJobs"
+    [class.disabled]="hasRunningJobs"
+    >
+    Clear History and Delete All Jobs</button>
   </div>
   
   <div
@@ -31,7 +35,7 @@
       <div class="circle button-circle" (click)="killJob(job.id)">
         <img src="assets/stop.svg" alt="Kill Job" />
       </div>
-      <div class="circle button-circle" (click)="deleteJob(job.id)">
+      <div class="circle button-circle" [class.disabled]="job.status === 'running'" (click)="deleteJob(job.id)">
         <img src="assets/trash.svg" alt="Delete Job" />
       </div>
       <div class="circle button-circle expand-button" (click)="toggleExpand(i)">

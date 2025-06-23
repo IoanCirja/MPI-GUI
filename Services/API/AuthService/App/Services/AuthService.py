@@ -42,19 +42,20 @@ class UserService:
 
         token_data = {
             "iss": iss,
-            "sub": userData["id"],
+            "sub": str(userData["id"]),
             "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(hours=1),
+            "exp": datetime.utcnow() + timedelta(minutes=int(env("ACCESS_TOKEN_EXPIRE_MINUTES"))),
             "jti": str(uuid.uuid4()),
-            'username': userData["username"],
-            'email': userData["email"],
-            "max_processes_per_user": userData.get("max_processes_per_user", 5),
-            "max_parallel_jobs_per_user": userData.get("max_parallel_jobs_per_user", 3),
-            "max_jobs_in_queue": userData.get("max_jobs_in_queue", 10),
-            "max_memory_usage_per_user_per_cluster": userData.get("max_memory_usage_per_user_per_cluster", "8GB"),
-            "max_memory_usage_per_process": userData.get("max_memory_usage_per_process", "2GB"),
-            "max_allowed_nodes": userData.get("max_allowed_nodes", 7),
-            "max_job_time": userData.get("max_job_time", "2h"),
+            "username": userData.get("username", ""),
+            "email": userData.get("email", ""),
+            "max_processes_per_user": userData.get("max_processes_per_user", 0),
+            "max_processes_per_node_per_user": userData.get("max_processes_per_node_per_user", 0),
+            "max_running_jobs": userData.get("max_running_jobs", 0),
+            "max_pending_jobs": userData.get("max_pending_jobs", 0),
+            "max_job_time": userData.get("max_job_time", 0),
+            "allowed_nodes": userData.get("allowed_nodes", ""),
+            "max_nodes_per_job": int(userData.get("max_nodes_per_job", 0)),
+            "max_total_jobs": userData.get("max_total_jobs", 0),
             "rights": userData.get("rights", "base")
         }
 

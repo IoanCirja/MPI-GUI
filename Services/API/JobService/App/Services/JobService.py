@@ -168,6 +168,7 @@ class JobService:
         except Exception as e:
             logging.error(f"Failed to clear jobs: {str(e)}")
 
+
     async def update_quota_data(self, quota_data: dict):
         try:
             # Call the repository to insert or update quota data
@@ -368,13 +369,20 @@ class JobService:
 
     async def kill_job_in_background(self, job_id: str):
         try:
+            job_data_db = self.get_job_by_id(job_id)
+            if job_data_db and job_data_db.status == "pending":
+                job_data_db.status = "killed"
+                job_data_db.output = "Job was killed before it started."
+                job_data_db.endDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                self.update_job_status_and_output(job_id, job_data_db)
+                self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+                return
 
             ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
             ssh_service.connect()
 
             success = await ssh_service.request_kill(job_id)
 
-            job_data_db = self.get_job_by_id(job_id)
             if success:
                 job_data_db.status = "killed"
                 job_data_db.output = "Job was successfully killed."
@@ -501,17 +509,14 @@ class JobService:
             return []
 
 
-    def clear_jobs(self):
+    def clear_jobs(self) -> List[str]:
         try:
-            success = self.repository.clear_jobs()
-            if success:
-                logger.info(f"All jobs for user {self.user_id} have been cleared.")
-            else:
-                logger.warning(f"No jobs found to clear for user {self.user_id}.")
-            return success
-        except Exception as e:
-            logger.error(f"Error clearing jobs for user {self.user_id}: {str(e)}")
-            return False
+            job_ids = self.repository.clear_jobs()
+            if not job_ids:
+                return []
+            return job_ids
+        except Exception:
+            return []
     def clear_job(self, job_id):
         try:
             success = self.repository.clear_job(job_id)

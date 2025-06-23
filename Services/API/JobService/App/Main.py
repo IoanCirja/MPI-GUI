@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -9,14 +10,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from AuthService.App.Services.AuthService import UserService
 from JobService.App.Controllers.JobController import router
 from JobService.App.DTOs.JobUploadDTO import JobUploadDTO
-from JobService.App.Repositories.JobRepository import logger
 from JobService.App.Services.JobService import JobService
 
 MONITOR_INTERVAL = 2
 NODES = [f"c05-{str(i).zfill(2)}.cs.tuiasi.ro" for i in range(21)]
 status_active_connections = []
 
-
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 app = FastAPI()
 
 origins = [
@@ -62,7 +68,7 @@ from pydantic import ValidationError
 async def monitor_pending_jobs():
     job_service = JobService(None)
 
-    MAX_RUNNING_JOBS_PER_CLUSTER = 3
+    MAX_RUNNING_JOBS_PER_CLUSTER = 1
     MAX_NODE_USAGE_PER_CLUSTER = 50
     MAX_PENDING_JOBS_PER_CLUSTER = 15
     MAX_TOTAL_USAGE_PER_CLUSTER = 300
@@ -72,7 +78,6 @@ async def monitor_pending_jobs():
         await asyncio.sleep(MONITOR_INTERVAL)
 
 
-        logger.info(f"monitoring")
 
         try:
             pending_jobs = await job_service.get_all_pending_jobs()
@@ -83,12 +88,10 @@ async def monitor_pending_jobs():
             request_usage = await job_service.compute_request_usage()
 
             if MAX_RUNNING_JOBS_PER_CLUSTER <= len(running_jobs):
-                logger.info(f"here")
 
                 continue
 
             if MAX_PENDING_JOBS_PER_CLUSTER <= len(pending_jobs):
-                logger.info(f"here2")
 
                 continue
             job_started = False
