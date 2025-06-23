@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from './User';
 import { Suspension } from './Suspension';
+import { Job } from '../job-poster/models/Job';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ export class AdminService {
   private usersUrl = 'http://127.0.0.1:8001/api/admin/users/';
   private suspendUrl = 'http://127.0.0.1:8001/api/admin/suspend/';
   private suspensionsUrl = 'http://127.0.0.1:8001/api/admin/suspensions/';
+  private adminJobsUrl = 'http://127.0.0.1:8002/api/jobs/admin';    // ← new
 
   constructor(private http: HttpClient) {}
 
@@ -35,6 +37,10 @@ export class AdminService {
   removeSuspension(payload: { user_id: string, suspension_id: string }): Observable<{ message: string }> {
     const url = `${this.suspensionsUrl}`; 
     return this.http.delete<{ message: string }>(url, { body: payload });
+  }
+
+    getAllJobsAdmin(): Observable<Job[]> {
+    return this.http.get<Job[]>(this.adminJobsUrl);
   }
   
   

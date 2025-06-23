@@ -99,3 +99,46 @@
     </tbody>
   </table>
 </div>
+
+
+
+
+
+<div *ngIf="adminJobs?.length" class="all-jobs-container">
+  <h2>All MPI Jobs</h2>
+  <table class="all-jobs-table">
+    <thead>
+      <tr>
+        <th>Job ID</th>
+        <th>Name</th>
+        <th>User</th>
+        <th>Status</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th># Procs</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let job of adminJobs">
+        <td>{{ job.jobName }}</td>
+        <td [ngClass]="{
+             'status-pending': job.status==='pending',
+             'status-running': job.status==='running',
+             'status-completed': job.status==='completed',
+             'status-failed': job.status==='failed',
+             'status-killed': job.status==='killed'
+           }">
+          {{ job.status }}
+        </td>
+        <td>{{ job.beginDate || '–' }}</td>
+        <td>{{ job.endDate  || '–' }}</td>
+        <td>{{ job.numProcesses }}</td>
+        <!-- <td class="job-actions">
+          <button (click)="killJob(job.id)" title="Kill"><mat-icon>stop</mat-icon></button>
+          <button (click)="downloadHostfile(job.hostFile)" title="Hostfile"><mat-icon>file_download</mat-icon></button>
+        </td> -->
+      </tr>
+    </tbody>
+  </table>
+</div>

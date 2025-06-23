@@ -15,16 +15,6 @@ from JobService.App.Services.JobService import JobService, active_connections
 
 router = APIRouter()
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
-
-
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -38,13 +28,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 AUTH_SERVICE_URL = f"http://localhost:8001/api/users/quotas"
 
-logging.basicConfig(level=logging.INFO)
-
-
 async def get_quota_data(token: str) -> dict:
     headers = {"Authorization": f"Bearer {token}"}
-
-
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(AUTH_SERVICE_URL, headers=headers)
@@ -143,10 +128,8 @@ async def upload_file(
         return {"jobId": job_id}
 
     except ValidationError as e:
-        logger.error(f"Validation error: {str(e)}")
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Validation Error: {str(e)}")
     except HTTPException as e:
-        logger.error(f"Failed to upload file and execute command for user {decoded_token['sub']}: {str(e)}")
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
@@ -227,4 +210,21 @@ def kill_job(job_id: str, background_tasks: BackgroundTasks, decoded_token: str 
         raise http_exc
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error initiating job termination: {str(e)}")
+
+
+
+@router.get("/jobs/admin", response_model=List[JobDTO])
+async def get_all_jobs_admin(
+    decoded_token: dict = Depends(get_token_from_header)
+):
+    # Check admin right in the token payload
+    if decoded_token.get("rights") != "admin":
+        # 413 chosen per your spec
+        raise HTTPException(status_code=413, detail="Admin rights required")
+    # Fetch all jobs regardless of user
+    user_id = decoded_token["sub"]
+
+    job_service = JobService(user_id)
+    all_jobs = job_service.get_all_jobs()
+    return all_jobs
 

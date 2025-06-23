@@ -6,36 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Services/AdminService.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Services/UserService.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Utils/FirebaseConnection.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BroadCastService/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BroadCastService/docker-compose.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Repositories/JobRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Repositories/JobRepository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/JobService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/JobService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/SchedulerService.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MonitorService/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MonitorService/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/header/header.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/header/header.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/help-menu/help-menu.component.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/help-menu/help-menu.component.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/help-menu/help-menu.component.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/settings/settings.component.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/settings/settings.component.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/settings/settings.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -187,7 +160,7 @@
       <workItem from="1749812352290" duration="25032000" />
       <workItem from="1750238781065" duration="5481000" />
       <workItem from="1750405763535" duration="10163000" />
-      <workItem from="1750529304118" duration="9440000" />
+      <workItem from="1750529304118" duration="11998000" />
     </task>
     <servers />
   </component>

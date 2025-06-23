@@ -4,6 +4,7 @@ import { User } from './User';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Suspension } from './Suspension';
+import { Job } from '../job-poster/models/Job';
 
 @Component({
   selector: 'app-admin',
@@ -24,15 +25,23 @@ export class AdminComponent implements OnInit {
   suspensions: Suspension[] = [];
   successMessage: string = '';  // This will hold the success message
   showSuccessPopup: boolean = false;  // Flag to show/hide the success popup
+adminJobs: Job[] = [];
 
   ngOnInit(): void {
     this.fetchAllUsers();
     this.fetchSuspensions();
+      this.fetchAllJobsAdmin();
+
   }
 
   
 
-
+fetchAllJobsAdmin() {
+  this.adminService.getAllJobsAdmin().subscribe({
+    next: jobs => this.adminJobs = jobs,
+    error: err => console.error('Could not load all jobs:', err)
+  });
+}
   isAllValid(): boolean {
     return this.users.every(user => 
       this.isValidUsername(user.username) &&
