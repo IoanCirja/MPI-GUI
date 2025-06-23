@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-class JobUploadDTO(BaseModel):
+
+class UserJobDTO(BaseModel):
     jobName: str
     jobDescription: str
 
@@ -26,5 +27,4 @@ class JobUploadDTO(BaseModel):
 
     alertOnFinish: bool
 
-    user_id: str
-    userEmail: str
+

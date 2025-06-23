@@ -3,9 +3,11 @@
     <p>{{ errorMessage }}</p>
   </div>
   <div class="encapsulating-card">
+    <!-- Left Card -->
     <div class="card left-card">
       <h3>Job Details</h3>
 
+      <!-- Job Name -->
       <div class="input-group">
         <label for="jobName">Job Name</label>
         <input
@@ -16,16 +18,26 @@
         />
       </div>
 
-          <div class="input-group">
-        <label for="alertOnFinish">Alert on Finish</label>
-        <input
-          type="checkbox"
-          id="alertOnFinish"
-          [(ngModel)]="alertOnFinish"
-          class="styled-checkbox"
-        />
+      <!-- Alert on Finish -->
+      <div class="input-group checkbox-group">
+        <label for="alertOnFinish" class="checkbox-label">
+          <input
+            type="checkbox"
+            id="alertOnFinish"
+            [(ngModel)]="alertOnFinish"
+            class="styled-checkbox"
+          />
+          <span class="checkbox-text">Alert on Finish</span>
+        </label>
+        <mat-icon
+          class="info-icon"
+          matTooltip="Send an email notification when the job completes."
+          matTooltipPosition="above"
+          >info</mat-icon
+        >
       </div>
 
+      <!-- Job Description -->
       <div class="input-group">
         <label for="jobDescription">Job Description</label>
         <textarea
@@ -35,6 +47,7 @@
         ></textarea>
       </div>
 
+      <!-- File Upload -->
       <div class="input-group">
         <div
           class="upload-dropzone"
@@ -44,7 +57,7 @@
           (drop)="onFileDropped($event)"
         >
           <p *ngIf="!selectedFile">
-            Click to browse or drag & drop your .exe or .cpp file here
+            Click to browse or drag & drop your .exe file here
           </p>
           <p *ngIf="selectedFile">Selected file: {{ selectedFile.name }}</p>
           <button
@@ -52,7 +65,7 @@
             class="clear-file-button"
             (click)="clearSelectedFile($event)"
           >
-            &times;
+            
           </button>
           <input
             type="file"
@@ -71,29 +84,68 @@
       </div>
     </div>
 
+    <!-- Right Card -->
     <div class="card right-card">
       <h3>Process and Host Configuration</h3>
 
-      <div class="input-group">
-        <label for="numProcesses">Number of Processes:</label>
-        <input
-          type="number"
-          id="numProcesses"
-          [value]="numProcesses"
-          readonly
-        />
-      </div>
-
-      <div class="input-group">
-        <label for="allowOverSubscription">Oversubscription</label>
+<div class="input-row">
+  <div class="left-col">
+    <!-- Oversubscription -->
+    <div class="input-group checkbox-group">
+      <label for="allowOverSubscription" class="checkbox-label">
         <input
           type="checkbox"
           id="allowOverSubscription"
           [(ngModel)]="allowOverSubscription"
           class="styled-checkbox"
         />
-      </div>
+        <span class="checkbox-text">Oversubscription</span>
+      </label>
+      <mat-icon
+        class="info-icon"
+        matTooltip="Allow more MPI processes than physical CPU cores."
+        matTooltipPosition="above"
+        >info</mat-icon
+      >
+    </div>
 
+    <!-- Display Map -->
+    <div class="input-group checkbox-group">
+      <label for="displayMap" class="checkbox-label">
+        <input
+          type="checkbox"
+          id="displayMap"
+          [(ngModel)]="displayMap"
+          class="styled-checkbox"
+        />
+        <span class="checkbox-text">Display Map</span>
+      </label>
+      <mat-icon
+        class="info-icon"
+        matTooltip="Show the allocation map of MPI processes."
+        matTooltipPosition="above"
+        >info</mat-icon
+      >
+    </div>
+  </div>
+
+  <div class="right-col">
+    <!-- Number of Processes -->
+    <div class="input-group">
+      <label for="numProcesses">Number of Processes:</label>
+      <input
+        type="number"
+        id="numProcesses"
+        [value]="numProcesses"
+        readonly
+        class="small-number-input"
+      />
+    </div>
+  </div>
+</div>
+
+
+      <!-- Environment Variables -->
       <div class="input-group">
         <label for="environmentVars">Environment Variables:</label>
         <input
@@ -104,131 +156,112 @@
         />
       </div>
 
-      <div class="input-group">
-        <label for="mapBy">Map By:</label>
-        <mat-icon
-          class="info-icon"
-          matTooltip="Map the processes to specific resources like node, socket, or core."
-          matTooltipPosition="above"
-          >info</mat-icon
-        >
-        <select id="mapBy" [(ngModel)]="mapBy" class="styled-select">
-          <option value="node">Node</option>
-          <option value="socket">Socket</option>
-          <option value="core">Core</option>
-        </select>
-      </div>
+      <!-- Map By -->
+<!-- Map By -->
+<div class="input-group select-group">
+  <label for="mapBy" class="select-label">
+    <span class="select-text">Map By:</span>
+  </label>
+  <select id="mapBy" [(ngModel)]="mapBy" class="styled-select small-select">
+    <option value="node">Node</option>
+    <option value="socket">Socket</option>
+    <option value="core">Core</option>
+  </select>
+  <mat-icon
+    class="info-icon"
+    matTooltip="Map the processes to specific resources like node, socket or core."
+    matTooltipPosition="above"
+    >info</mat-icon
+  >
+</div>
 
-      <div class="input-group">
-        <label for="rankBy">Rank By:</label>
-        <mat-icon
-          class="info-icon"
-          matTooltip="Rank the processes based on resources like socket or core."
-          matTooltipPosition="above"
-          >info</mat-icon
-        >
-        <select id="rankBy" [(ngModel)]="rankBy" class="styled-select">
-          <option value="socket">Socket</option>
-          <option value="core">Core</option>
-        </select>
-      </div>
+<!-- Rank By -->
+<div class="input-group select-group">
+  <label for="rankBy" class="select-label">
+    <span class="select-text">Rank By:</span>
+  </label>
+  <select id="rankBy" [(ngModel)]="rankBy" class="styled-select small-select">
+    <option value="socket">Socket</option>
+    <option value="core">Core</option>
+  </select>
+  <mat-icon
+    class="info-icon"
+    matTooltip="Rank the processes based on resources like socket or core."
+    matTooltipPosition="above"
+    >info</mat-icon
+  >
+</div>
 
-      <div class="input-group">
-        <label for="displayMap">Display Map:</label>
-        <mat-icon
-          class="info-icon"
-          matTooltip="Display the allocation map of the processes."
-          matTooltipPosition="above"
-          >info</mat-icon
-        >
-        <input
-          type="checkbox"
-          id="displayMap"
-          [(ngModel)]="displayMap"
-          class="styled-checkbox"
-        />
-      </div>
 
-      <div class="input-group">
-        <label for="displayMap">Fail Safe:</label>
-        <mat-icon
-          class="info-icon"
-          matTooltip="Retry if the job fails"
-          matTooltipPosition="above"
-          >info</mat-icon
-        >
-        <input
-          type="checkbox"
-          id="displayMap"
-          [(ngModel)]="displayMap"
-          class="styled-checkbox"
-        />
-      </div>
-
+      <!-- Select Nodes -->
       <div class="input-group title-container">
         <mat-icon
           class="info-icon"
-          matTooltip="Select nodes to allocate slots for processing. You can select multiple nodes."
+          matTooltip="Select nodes and allocate slots for processing."
           matTooltipPosition="above"
           >info</mat-icon
         >
         <h4>Select Nodes:</h4>
       </div>
-
-      <div class="node-selection-container">
-        <div class="node-grid">
-          <div
-            *ngFor="let node of nodeList; let i = index"
-            class="node-option"
-          >
-            <input
-              type="checkbox"
-              [checked]="selectedNodes[i]"
-              (change)="toggleNodeSelection(i)"
-              [id]="'node-' + i"
-              class="styled-checkbox"
-            />
-            <label [for]="'node-' + i">{{ node }}</label>
-            <input
-              *ngIf="selectedNodes[i]"
-              type="number"
-              [(ngModel)]="slots[i]"
-              min="1"
-              max="10"
-              class="slot-input"
-              [id]="'slots-' + i"
-              placeholder="Slots"
-              (ngModelChange)="updateNumProcesses()" 
-
-            />
-          </div>
-        </div>
-      </div>
+<div class="node-selection-container">
+  <div class="node-grid">
+    <div
+      *ngFor="let node of nodeList; let i = index"
+      class="node-option"
+      [ngClass]="{ 'disabled-node': !availableNodes[i] }"
+    >
+      <input
+        type="checkbox"
+        [checked]="selectedNodes[i]"
+        [disabled]="!availableNodes[i]"
+        (change)="toggleNodeSelection(i)"
+        [id]="'node-' + i"
+        class="styled-checkbox"
+      />
+      <label
+        [for]="'node-' + i"
+        class="checkbox-text"
+        [ngClass]="{ 'text-disabled': !availableNodes[i] }"
+      >
+        {{ node }}
+      </label>
+      <input
+        *ngIf="selectedNodes[i]"
+        type="number"
+        [(ngModel)]="slots[i]"
+        min="1"
+        max="50"
+        class="slot-input"
+        [id]="'slots-' + i"
+        placeholder="Slots"
+        (ngModelChange)="updateNumProcesses()"
+      />
     </div>
   </div>
 </div>
-
-<div class="sticky-footer">
-  <div class="button-group-left">
-    <div class="button cancel" (click)="clearForm()">Clear</div>
+    </div>
   </div>
 
-  <div
-    class="button run"
-    (click)="uploadFile()"
-    [ngClass]="{
-      disabled: !selectedFile || !numProcesses || !hasSelectedNodes()
-    }"
-  >
-    Run Job
+  <!-- Footer Buttons -->
+  <div class="sticky-footer">
+    <div class="button-group-left">
+      <div class="button cancel" (click)="clearForm()">Clear</div>
+    </div>
+    <div
+      class="button run"
+      (click)="uploadFile()"
+      [ngClass]="{ disabled: !selectedFile || !numProcesses || !hasSelectedNodes() }"
+    >
+      Run Job
+    </div>
+    <div class="button-group-right">
+      <div class="button">Load</div>
+      <div class="button" (click)="saveJobData()">Save</div>
+    </div>
   </div>
 
-  <div class="button-group-right">
-    <div class="button">Load</div>
-    <div class="button" (click) = "saveJobData()">Save</div>
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
   </div>
-</div>
-
-<div *ngIf="isLoading" class="loading-overlay">
-  <div class="spinner"></div>
 </div>

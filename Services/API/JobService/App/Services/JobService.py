@@ -106,6 +106,9 @@ class JobService:
             status="pending",
             output="",
             alertOnFinish=job_data.alertOnFinish,
+
+            user_id=job_data.user_id,
+            userEmail=job_data.userEmail,
         )
 
         self.repository.insert_job(job)
@@ -224,7 +227,7 @@ class JobService:
         msg = EmailMessage()
         msg["Subject"] = subject
         msg["From"] = smtp_email
-        msg["To"] = "ioan.cirja.00@gmail.com"
+        msg["To"] = job_data_db.userEmail
         msg.set_content(body)
 
         try:

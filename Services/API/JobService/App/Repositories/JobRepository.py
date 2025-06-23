@@ -57,7 +57,6 @@ class JobRepository:
         try:
             job_data = job.dict()
             job_data["_id"] = job_data.pop("id")
-            job_data["user_id"] = self.user_id
 
             self.jobs_collection.insert_one(job_data)
 

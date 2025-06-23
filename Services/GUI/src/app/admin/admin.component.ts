@@ -64,7 +64,7 @@ export class AdminComponent implements OnInit {
   }
 
   isValidMaxProcessesPerNode(maxProcesses: number): boolean {
-    return maxProcesses >= 1 && maxProcesses <= 10;
+    return maxProcesses >= 1 && maxProcesses <= 50;
   }
 
   isValidMaxRunningJobs(maxRunningJobs: number): boolean {

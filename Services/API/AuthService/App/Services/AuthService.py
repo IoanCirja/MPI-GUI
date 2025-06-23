@@ -77,40 +77,40 @@ class UserService:
         hashedPassword = hashlib.sha256((createUserRequest.password + salt).encode('utf-8')).hexdigest()
 
 ##admin
-        data = {
-            "username": createUserRequest.username,
-            "email": createUserRequest.email,
-            "password": hashedPassword,
-            "salt": salt,
-            "max_processes_per_user": 999,
-            "max_processes_per_node_per_user": 999,
-            "max_running_jobs": 999,
-            "max_pending_jobs": 999,
-            "max_job_time": 999,
-            "allowed_nodes": "C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20",
-            "max_nodes_per_job": 999,
-            "max_total_jobs": 999,
-            "suspensions": [],
-            "rights": 'admin'
-        }
-
-
         # data = {
         #     "username": createUserRequest.username,
         #     "email": createUserRequest.email,
         #     "password": hashedPassword,
         #     "salt": salt,
-        #     "max_processes_per_user": 5,
-        #     "max_processes_per_node_per_user": 3,
-        #     "max_running_jobs": 10,
-        #     "max_pending_jobs": 8,
-        #     "max_job_time": 500,
-        #     "allowed_nodes": "C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15",
-        #     "max_nodes_per_job": 5,
-        #     "max_total_jobs": 50,
+        #     "max_processes_per_user": 999,
+        #     "max_processes_per_node_per_user": 999,
+        #     "max_running_jobs": 999,
+        #     "max_pending_jobs": 999,
+        #     "max_job_time": 999,
+        #     "allowed_nodes": "C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20",
+        #     "max_nodes_per_job": 999,
+        #     "max_total_jobs": 999,
         #     "suspensions": [],
-        #     "rights": 'base'
+        #     "rights": 'admin'
         # }
+
+
+        data = {
+            "username": createUserRequest.username,
+            "email": createUserRequest.email,
+            "password": hashedPassword,
+            "salt": salt,
+            "max_processes_per_user": 5,
+            "max_processes_per_node_per_user": 3,
+            "max_running_jobs": 10,
+            "max_pending_jobs": 8,
+            "max_job_time": 500,
+            "allowed_nodes": "C00, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10, C11, C12, C13, C14, C15",
+            "max_nodes_per_job": 5,
+            "max_total_jobs": 50,
+            "suspensions": [],
+            "rights": 'base'
+        }
 
         UserRepository.addUser(data)
 

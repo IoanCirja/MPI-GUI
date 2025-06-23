@@ -37,9 +37,7 @@
       <div class="circle button-circle expand-button" (click)="toggleExpand(i)">
         <img [src]="expandedJobs.has(i) ? 'assets/collapse.svg' : 'assets/expand.svg'" alt="Expand/Collapse" />
       </div>
-      <div class="circle button-circle" (click)="failSafeJob(job.id)">
-        <img src="assets/error.svg" alt="Fail Safe Job" />
-      </div>
+
       <div class="circle button-circle" (click)="replayJob(job.id)">
         <img src="assets/play.svg" alt="Replay Job" />
       </div>
@@ -107,15 +105,19 @@
           <td><strong>Map By:</strong></td>
           <td>{{ job.mapBy || "Not available" }}</td>
         </tr>
-        <tr>
-          <td><strong>Hostfile:</strong></td>
-          <td>
-            <button *ngIf="job.hostFile" (click)="downloadHostfile(job.hostFile)">
-              Download Hostfile
-            </button>
-            <pre>{{ decodeBase64(job.hostFile) || "No hostfile available" }}</pre>
-          </td>
-        </tr>
+<tr>
+  <td><strong>Hostfile:</strong></td>
+  <td>
+    <button 
+      *ngIf="job.hostFile" 
+      class="btn-download-hostfile" 
+      (click)="downloadHostfile(job.hostFile)">
+      Download Hostfile
+    </button>
+    <pre>{{ decodeBase64(job.hostFile) || "No hostfile available" }}</pre>
+  </td>
+</tr>
+
         <tr>
           <td><strong>Output:</strong></td>
           <td>

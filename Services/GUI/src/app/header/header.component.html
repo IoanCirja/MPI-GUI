@@ -9,13 +9,11 @@
     <a class="button" id="dashboard" routerLink="/dashboard">Dashboard</a>
     <a class="button" id="upload" routerLink="/jobs/upload-job">Create a Job</a>
     <a class="button" id="status" routerLink="/jobs/status">Job Status</a>
-    <a class="button" id="settings" routerLink="/settings">Settings</a>
-    <a class="button" id="help" routerLink="/help">Help</a>
+
   </nav>
 
   <nav class="nav-menu" *ngIf="user.rights === 'admin'">
     <a class="button" id="dashboard" routerLink="/dashboard">User Access</a>
-    <a class="button" id="upload" routerLink="/jobs/upload-job">Cluster Status</a>
   </nav>
 
   <span class="spacer"></span>

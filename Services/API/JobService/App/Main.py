@@ -63,7 +63,7 @@ async def monitor_pending_jobs():
     job_service = JobService(None)
 
     MAX_RUNNING_JOBS_PER_CLUSTER = 3
-    MAX_NODE_USAGE_PER_CLUSTER = 20
+    MAX_NODE_USAGE_PER_CLUSTER = 50
     MAX_PENDING_JOBS_PER_CLUSTER = 15
     MAX_TOTAL_USAGE_PER_CLUSTER = 300
 
@@ -115,6 +115,8 @@ async def monitor_pending_jobs():
                         status=job.get("status"),
                         output=job.get("output"),
                         alertOnFinish=job.get("alertOnFinish"),
+                        user_id=job.get("user_id"),
+                        userEmail=job.get("userEmail"),
                     )
                     node_request = {}
                     encoded_hostfile = job["hostFile"]

@@ -28,5 +28,8 @@ class JobDTO(BaseModel):
     output: str
     alertOnFinish: bool
 
+    user_id: str
+    userEmail: str
+
     # scheduled: bool
     # scheduledDate: str

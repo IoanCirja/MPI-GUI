@@ -2,8 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { SettingsComponent } from './settings/settings.component';
-import { HelpMenuComponent } from './help-menu/help-menu.component';
+
 import { AuthGuard } from './auth.guard';
 import { AdminComponent } from './admin/admin.component';
 import { NonAuthGuard } from './non-auth.guard';
@@ -26,8 +25,6 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
   },
-  { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
-  { path: 'help', component: HelpMenuComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
 
   { path: '**', redirectTo: '/auth/login' },

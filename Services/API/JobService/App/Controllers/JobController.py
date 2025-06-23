@@ -10,6 +10,7 @@ from starlette.websockets import WebSocketDisconnect
 from AuthService.App.Utils.JWTUtils import *
 from JobService.App.DTOs.JobUploadDTO import JobUploadDTO
 from JobService.App.DTOs.JobDTO import JobDTO
+from JobService.App.DTOs.UserJobDTO import UserJobDTO
 from JobService.App.Services.JobService import JobService, active_connections
 
 router = APIRouter()
@@ -35,19 +36,18 @@ async def websocket_endpoint(websocket: WebSocket):
         active_connections.remove(websocket)
 
 
-AUTH_SERVICE_URL = "http://localhost:8001/api"
+AUTH_SERVICE_URL = f"http://localhost:8001/api/users/quotas"
 
 logging.basicConfig(level=logging.INFO)
 
 
 async def get_quota_data(token: str) -> dict:
     headers = {"Authorization": f"Bearer {token}"}
-    logging.info(f"Sending request to http://localhost:8001/api/users/quotas")
-    logging.info(f"Headers: {headers}")
+
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(f"http://localhost:8001/api/users/quotas", headers=headers)
+            response = await client.get(AUTH_SERVICE_URL, headers=headers)
 
         if response.status_code == 200:
             return response.json()
@@ -64,43 +64,26 @@ async def get_quota_data(token: str) -> dict:
         logging.error(f"Error occurred: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-async def get_user_data(token: str) -> dict:
-    headers = {"Authorization": f"Bearer {token}"}
-    logging.info(f"Sending request to http://localhost:8001/api/users/quotas")
-    logging.info(f"Headers: {headers}")
-
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(f"http://localhost:8001/api/users/quotas", headers=headers)
-
-        if response.status_code == 200:
-            return response.json()
-        elif response.status_code == 404:
-            raise HTTPException(status_code=404, detail="User not found")
-        elif response.status_code == 403:
-            raise HTTPException(status_code=403, detail="Access denied")
-        elif response.status_code == 401:
-            raise HTTPException(status_code=401, detail="Unauthorized")
-        else:
-            raise HTTPException(status_code=500, detail="Failed to retrieve user data")
-
-    except Exception as e:
-        logging.error(f"Error occurred: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/upload/")
 async def upload_file(
-        job_data: JobUploadDTO = Body(...),
+        upload_dto: UserJobDTO = Body(...),
         decoded_token: str = Depends(get_token_from_header),
         authorization: str = Header(...)
 ):
     try:
-        if not job_data.fileName.endswith(".exe"):
+        if not upload_dto.fileName.endswith(".exe"):
             raise HTTPException(status_code=415, detail="Only .exe files are allowed!")
 
         userId = decoded_token["sub"]
+        user_email = decoded_token["email"]
         job_service = JobService(userId)
+
+        job_data = JobUploadDTO(
+            **upload_dto.dict(),
+            user_id=userId,
+            userEmail=user_email
+        )
 
         token = authorization[7:]
         quotas = await get_quota_data(token)

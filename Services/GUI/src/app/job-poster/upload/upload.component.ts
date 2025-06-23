@@ -149,7 +149,7 @@ export class UploadComponent implements OnInit, OnDestroy {
       } else {
         this.selectedFile = null;
         this.isValidFile = false;
-        this.uploadMessage = 'Only .exe or .cpp files are allowed!';
+        this.uploadMessage = 'Only .exe files are allowed!';
       }
     }
   }
@@ -232,11 +232,11 @@ export class UploadComponent implements OnInit, OnDestroy {
           hostFile: (hostFileReader.result as string).split(',')[1],
           hostNumber: this.selectedNodesList.length,
           numProcesses: this.numProcesses!,
-          allowOverSubscription: this.allowOverSubscription,
-          environmentVars: this.environmentVars,
-          displayMap: this.displayMap,
-          rankBy: this.rankBy,
-          mapBy: this.mapBy,
+          allowOverSubscription: this.allowOverSubscription ?? false,
+          environmentVars: this.environmentVars ?? '',
+          displayMap: this.displayMap ?? '',
+          rankBy: this.rankBy ?? '',
+          mapBy: this.mapBy ?? '',
           status: 'pending',
           output: '',
           alertOnFinish: this.alertOnFinish,

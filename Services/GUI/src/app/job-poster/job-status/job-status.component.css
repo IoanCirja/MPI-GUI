@@ -111,7 +111,7 @@
 }
 
 .job-details-table td strong {
-  color: #007bff;
+  color: rgba(39, 74, 173, 1);
 }
 
 .output-text {
@@ -237,4 +237,45 @@
 .expand-button img {
   width: 14px;
   height: 14px;
+}
+/* Container for the button, pinned to top-right */
+.clear-history-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+/* Style the Clear History button */
+.clear-history-container button {
+  background-color: #d9534f;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clear-history-container button:hover {
+  background-color: #c9302c;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Download Hostfile button */
+.btn-download-hostfile {
+  background-color: #007bff;
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.btn-download-hostfile:hover {
+  background-color: #0056b3;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
