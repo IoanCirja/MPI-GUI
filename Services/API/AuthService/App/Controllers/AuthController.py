@@ -44,7 +44,8 @@ async def get_user_profile(
         user_data = {
             "token": token,
             "username": decoded_token["username"],
-            "email": decoded_token["email"]
+            "email": decoded_token["email"],
+            "rights": decoded_token["rights"]
         }
         return user_data
 

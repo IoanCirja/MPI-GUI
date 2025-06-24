@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FileUploadService } from '../services/upload.service';
-import { DashboardService, UserQuota } from './dashboard.service'; // import service & interface
+import { DashboardService } from '../services/dashboard.service';
 import { CommonModule } from '@angular/common';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
+import { UserQuota } from '../models/UserQuota';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,7 +24,7 @@ export class DashboardComponent implements OnInit {
 
   durationChartData!: ChartConfiguration<'line'>['data'];
   durationChartType: ChartType = 'line';
-objectKeys = Object.keys;
+  objectKeys = Object.keys;
 
   chartOptions: ChartOptions = {
     responsive: true,
@@ -59,7 +60,6 @@ objectKeys = Object.keys;
           resolve();
         },
         error: (error) => {
-          console.error('Error fetching job data:', error);
           reject(error);
         },
       });
@@ -73,10 +73,8 @@ objectKeys = Object.keys;
           this.userQuota = quota;
           this.cdRef.detectChanges();
           resolve();
-          console.log('TEST', quota);
         },
         error: (error) => {
-          console.error('Error fetching user quota:', error);
           reject(error);
         },
       });
@@ -128,7 +126,7 @@ objectKeys = Object.keys;
           data: this.jobData.map((job) => {
             const start = new Date(job.beginDate).getTime();
             const end = new Date(job.endDate).getTime();
-            return (end - start) / 1000; // duration in seconds
+            return (end - start) / 1000;
           }),
           label: 'Job Duration (s)',
           fill: false,

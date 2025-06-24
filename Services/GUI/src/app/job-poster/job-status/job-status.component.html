@@ -4,58 +4,87 @@
 </div>
 
 <div class="list-container">
-  <span class="loading-message" *ngIf="jobData.length===0 && !loading">No Jobs Found</span>
+  <span class="loading-message" *ngIf="jobData.length === 0 && !loading"
+    >No Jobs Found</span
+  >
   <div class="clear-history-container">
-    <button (click)="clearHistory()" 
-        [disabled]="hasRunningJobs"
-    [class.disabled]="hasRunningJobs"
+    <button
+      (click)="clearHistory()"
+      [class.disabled]="hasRunningJobs || (jobData.length === 0 && !loading)"
     >
-    Clear History and Delete All Jobs</button>
+      Clear History and Delete All Jobs
+    </button>
   </div>
-  
+
   <div
     class="job-status-container"
     *ngFor="let job of jobData; let i = index"
     [@fadeIn]
   >
-  <div class="job-bar">
-    <div class="circle " [ngClass]="{
-      'completed': job.status === 'completed',
-      'failed': job.status === 'failed',
-      'killed': job.status === 'killed'
-    }">
-      <div *ngIf="job.status === 'pending'" class="loading-spinner-pending"></div>
-      <div *ngIf="job.status === 'running'" class="loading-spinner-running"></div>
+    <div class="job-bar">
+      <div
+        class="circle"
+        [ngClass]="{
+          completed: job.status === 'completed',
+          failed: job.status === 'failed',
+          killed: job.status === 'killed'
+        }"
+      >
+        <div
+          *ngIf="job.status === 'pending'"
+          class="loading-spinner-pending"
+        ></div>
+        <div
+          *ngIf="job.status === 'running'"
+          class="loading-spinner-running"
+        ></div>
+      </div>
+
+      <span class="job-name">{{ job.jobName || "Loading..." }}</span>
+
+      <div class="right-end-container">
+        <div
+          class="circle button-circle"
+          [class.disabled]="job.status !== 'running'"
+          (click)="killJob(job.id)"
+        >
+          <img src="assets/stop.svg" alt="Kill Job" />
+        </div>
+        <div
+          class="circle button-circle"
+          [class.disabled]="job.status === 'running'"
+          (click)="deleteJob(job.id)"
+        >
+          <img src="assets/trash.svg" alt="Delete Job" />
+        </div>
+        <div
+          class="circle button-circle expand-button"
+          (click)="toggleExpand(i)"
+        >
+          <img
+            [src]="
+              expandedJobs.has(i) ? 'assets/collapse.svg' : 'assets/expand.svg'
+            "
+            alt="Expand/Collapse"
+          />
+        </div>
+        <div class="circle button-circle" (click)="exportJob(job.id)">
+          <img src="assets/export.svg" alt="Export Job" />
+        </div>
+        <div
+          class="circle button-circle"
+          (click)="downloadExecutable(job.fileName, job.fileContent)"
+        >
+          <img src="assets/exe.svg" alt="Download Executable" />
+        </div>
+        <div
+          class="circle button-circle"
+          (click)="downloadHostfile(job.hostFile)"
+        >
+          <img src="assets/hostfile.svg" alt="Download Hostfile" />
+        </div>
+      </div>
     </div>
-
-    <span class="job-name">{{ job.jobName || "Loading..." }}</span>
-
-    <div class="right-end-container">
-
-      <div class="circle button-circle" (click)="killJob(job.id)">
-        <img src="assets/stop.svg" alt="Kill Job" />
-      </div>
-      <div class="circle button-circle" [class.disabled]="job.status === 'running'" (click)="deleteJob(job.id)">
-        <img src="assets/trash.svg" alt="Delete Job" />
-      </div>
-      <div class="circle button-circle expand-button" (click)="toggleExpand(i)">
-        <img [src]="expandedJobs.has(i) ? 'assets/collapse.svg' : 'assets/expand.svg'" alt="Expand/Collapse" />
-      </div>
-
-      <div class="circle button-circle" (click)="replayJob(job.id)">
-        <img src="assets/play.svg" alt="Replay Job" />
-      </div>
-      <div class="circle button-circle" (click)="exportJob(job.id)">
-        <img src="assets/export.svg" alt="Export Job" />
-      </div>
-      <div class="circle button-circle" (click)="downloadExecutable(job.fileName, job.fileContent)">
-        <img src="assets/exe.svg" alt="Download Executable" />
-      </div>
-      <div class="circle button-circle" (click)="downloadHostfile(job.hostFile)">
-        <img src="assets/hostfile.svg" alt="Download Hostfile" />
-      </div>
-    </div>
-  </div>
     <div class="job-details" [class.expanded]="expandedJobs.has(i)">
       <table class="job-details-table">
         <tr>
@@ -109,18 +138,21 @@
           <td><strong>Map By:</strong></td>
           <td>{{ job.mapBy || "Not available" }}</td>
         </tr>
-<tr>
-  <td><strong>Hostfile:</strong></td>
-  <td>
-    <button 
-      *ngIf="job.hostFile" 
-      class="btn-download-hostfile" 
-      (click)="downloadHostfile(job.hostFile)">
-      Download Hostfile
-    </button>
-    <pre>{{ decodeBase64(job.hostFile) || "No hostfile available" }}</pre>
-  </td>
-</tr>
+        <tr>
+          <td><strong>Hostfile:</strong></td>
+          <td>
+            <button
+              *ngIf="job.hostFile"
+              class="btn-download-hostfile"
+              (click)="downloadHostfile(job.hostFile)"
+            >
+              Download Hostfile
+            </button>
+            <pre>{{
+              decodeBase64(job.hostFile) || "No hostfile available"
+            }}</pre>
+          </td>
+        </tr>
 
         <tr>
           <td><strong>Output:</strong></td>

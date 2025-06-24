@@ -25,15 +25,12 @@ export class HeaderComponent implements OnInit {
     private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
+  
   ngOnInit() {
     this.userService.getUser().subscribe((user) => {
       this.user = user;
       this.cdr.detectChanges();
-
-      console.log("User", this.user);
     });
-
-    
   }
 
   logout() {

@@ -5,19 +5,20 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AuthGuard } from './auth.guard';
 import { AdminComponent } from './admin/admin.component';
-import { NonAuthGuard } from './non-auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
-
+    canActivate: [AuthGuard],
   },
+
   {
     path: 'jobs',
     loadChildren: () =>
       import('./job-poster/job-poster.module').then((m) => m.JobPosterModule),
+    canActivate: [AuthGuard],
   },
 
   {
@@ -25,8 +26,11 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
   },
-  { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] },
-
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: '/auth/login' },
 ];
 

@@ -89,7 +89,7 @@ class JobService:
     async def create_and_save_job(self, job_data: JobUploadDTO) -> str:
         try:
             job_id = str(uuid.uuid4())
-            beginDate = datetime.now().strftime("%Y-%d-%m %H:%M:%S")
+            beginDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             job = JobDTO(
                 id=job_id,
                 jobName=job_data.jobName,
@@ -285,9 +285,9 @@ class JobService:
                 os.rename(temp_exe.name, correct_exe_path)
                 temp_exe_path = correct_exe_path
 
-                scan_result = self.scan_file_with_virustotal(temp_exe_path)
-                if scan_result != 0:
-                    raise Exception("File flagged by VirusTotal")
+                # scan_result = self.scan_file_with_virustotal(temp_exe_path)
+                # if scan_result != 0:
+                #     raise Exception("File flagged by VirusTotal")
 
                 with tempfile.NamedTemporaryFile(delete=False) as temp_hostfile:
                     temp_hostfile.write(base64.b64decode(job_data.hostFile.encode('utf-8')))

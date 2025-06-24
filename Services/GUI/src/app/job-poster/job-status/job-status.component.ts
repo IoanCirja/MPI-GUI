@@ -7,7 +7,7 @@ import {
   query,
 } from '@angular/animations';
 import { FileUploadService } from '../../services/upload.service';
-import { WebSocketService } from './websocket.service';
+import { WebSocketService } from '../../services/websocketstatus.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -25,25 +25,17 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class JobStatusComponent implements OnInit {
-failSafeJob(arg0: any) {
-throw new Error('Method not implemented.');
-}
-replayJob(arg0: any) {
-throw new Error('Method not implemented.');
-}
-exportJob(arg0: any) {
-throw new Error('Method not implemented.');
-}
-downloadExe(arg0: any) {
-throw new Error('Method not implemented.');
-}
-downloadHostfileForJob(arg0: any) {
-throw new Error('Method not implemented.');
-}
-
   jobData: any[] = [];
   expandedJobs: Set<number> = new Set();
   loading: boolean = true;
+  nodeList: string[] = Array.from(
+    { length: 21 },
+    (_, i) => `C05-${i.toString().padStart(2, '0')}`
+  );
+
+  get hasRunningJobs(): boolean {
+    return this.jobData.some((job) => job.status === 'running');
+  }
 
   constructor(
     private fileUploadService: FileUploadService,
@@ -57,23 +49,16 @@ throw new Error('Method not implemented.');
     this.listenToWebSocketUpdates();
   }
 
-
-  get hasRunningJobs(): boolean {
-  return this.jobData.some(job => job.status === 'running');
-}
-
   getJobStatus(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.fileUploadService.getJobStatus().subscribe({
         next: (response: any) => {
           this.jobData = [...response];
-          console.log('Fetched job data:', this.jobData);
           this.loading = false;
           this.cdRef.detectChanges();
           resolve();
         },
         error: (error) => {
-          console.error('Error fetching job data:', error);
           reject(error);
         },
       });
@@ -92,20 +77,24 @@ throw new Error('Method not implemented.');
     try {
       return atob(encodedString);
     } catch (e) {
-      console.error('Failed to decode Base64:', e);
       return encodedString;
     }
   }
+
   downloadExecutable(name: string, content: string): void {
     const decodedContent = this.decodeBase64(content);
 
-    const blob = new Blob([new Uint8Array(decodedContent.split('').map(c => c.charCodeAt(0)))], { type: 'application/x-msdownload' });
+    const blob = new Blob(
+      [new Uint8Array(decodedContent.split('').map((c) => c.charCodeAt(0)))],
+      { type: 'application/x-msdownload' }
+    );
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = name;
     link.click();
   }
+
   downloadHostfile(encodedHostfile: string): void {
     const decodedHostfile = this.decodeBase64(encodedHostfile);
     const blob = new Blob([decodedHostfile], { type: 'text/plain' });
@@ -114,31 +103,15 @@ throw new Error('Method not implemented.');
     link.download = 'hostfile.txt';
     link.click();
   }
+
   listenToWebSocketUpdates(): void {
     this.webSocketService.connect().subscribe((update: any) => {
-      console.log('Wbby update received:', update);
+      console.log('Wb update received:', update);
 
       this.ngZone.run(() => {
         const index = this.jobData.findIndex(
           (job) => String(job.id) === String(update.jobId)
         );
-
-        if(update.status === 'killed') {
-          console.log('Job killed:', update.jobId);
-        }
-
-        if(update.status === 'running') {
-          console.log('Job running:', update.jobId);
-        }
-
-        if(update.status === 'completed') {
-          console.log('Job running running:', update.jobId);
-        }
-
-        if(update.status === 'pending') {
-          console.log('Job running pending:', update.jobId);
-        }
-
 
         if (index !== -1) {
           this.jobData[index] = {
@@ -149,8 +122,6 @@ throw new Error('Method not implemented.');
           };
         }
 
-        console.log('Updated job data:', this.jobData);
-
         this.jobData = [...this.jobData];
         this.cdRef.detectChanges();
       });
@@ -158,48 +129,81 @@ throw new Error('Method not implemented.');
   }
 
   killJob(jobId: string): void {
-
     this.fileUploadService.killJob(jobId).subscribe({
-      next: (response) => {
-        console.log('Job kill request sent:', response);
-      },
-      error: (error) => {
-        console.error('Error killing job:', error);
-      },
+      next: (response) => {},
+      error: (error) => {},
     });
   }
 
   deleteJob(jobId: string): void {
-        const job = this.jobData.find(j => j.id === jobId);
+    const job = this.jobData.find((j) => j.id === jobId);
     if (job?.status === 'running') {
       return;
     }
     this.fileUploadService.deleteJob(jobId).subscribe({
       next: (response) => {
-        console.log('Job deleted:', response);
-        
-        this.jobData = this.jobData.filter(job => job.id !== jobId);
-      },
-      error: (error) => {
-        console.error('Error deleting job:', error);
+        this.jobData = this.jobData.filter((job) => job.id !== jobId);
       },
     });
   }
 
   clearHistory(): void {
-        if (this.hasRunningJobs) {
+    if (this.hasRunningJobs) {
       return;
     }
     this.fileUploadService.deleteJobs().subscribe({
       next: (response) => {
-        console.log('All jobs deleted:', response);
-        this.jobData = [];  
-      },
-      error: (error) => {
-        console.error('Error clearing jobs:', error);
+        this.jobData = [];
       },
     });
   }
 
-  
+  exportJob(jobId: string): void {
+    const job = this.jobData.find((j) => j.id === jobId);
+    if (!job) {
+      return;
+    }
+
+    const decoded = this.decodeBase64(job.hostFile || '')
+      .trim()
+      .split('\n')
+      .filter((l) => l);
+
+    const selectedNodes = new Array(this.nodeList.length).fill(false);
+    const slots = new Array(this.nodeList.length).fill(0);
+
+    for (const line of decoded) {
+      const [node, slotPart] = line.split(/\s+/);
+      const idx = this.nodeList.indexOf(node);
+      if (idx !== -1) {
+        selectedNodes[idx] = true;
+        const [, s] = slotPart.split('=');
+        slots[idx] = parseInt(s, 10) || 0;
+      }
+    }
+
+    const cfg = {
+      jobName: job.jobName,
+      jobDescription: job.jobDescription,
+      startDate: job.beginDate,
+      endDate: job.endDate,
+      allowOverSubscription: job.allowOverSubscription,
+      environmentVars: job.environmentVars,
+      displayMap: job.displayMap,
+      rankBy: job.rankBy,
+      mapBy: job.mapBy,
+      alertOnFinish: job.alertOnFinish,
+      selectedNodes,
+      slots,
+      numProcesses: job.numProcesses,
+    };
+
+    const blob = new Blob([JSON.stringify(cfg, null, 2)], {
+      type: 'application/json',
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${job.jobName || 'job'}_config.json`;
+    a.click();
+  }
 }

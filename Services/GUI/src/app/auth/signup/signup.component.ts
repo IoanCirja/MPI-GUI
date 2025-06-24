@@ -73,7 +73,6 @@ export class SignupComponent {
           this.router.navigate(['/auth/login']);
         },
         (error) => {
-          console.log('Signup failed, processing error:', error);
           this.processErrorDetails(error.error.detail);
         }
       );
@@ -83,7 +82,6 @@ export class SignupComponent {
   }
 
   processErrorDetails(errorDetails: any) {
-    console.log('Processing error details:', errorDetails);
     this.errorMessages = [];
 
     if (Array.isArray(errorDetails)) {
@@ -130,7 +128,7 @@ export class SignupComponent {
   autoDismissErrors() {
     setTimeout(() => {
       this.errorMessages = [];
-    }, 5000);
+    }, 3000);
   }
 
   closeErrorPopup() {

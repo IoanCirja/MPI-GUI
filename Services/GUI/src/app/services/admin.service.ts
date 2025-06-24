@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from './User';
-import { Suspension } from './Suspension';
-import { Job } from '../job-poster/models/Job';
+import { Job, UserJob } from '../models/Job';
+import { User } from '../models/User';
+import { Suspension } from '../models/Suspension';
 
 @Injectable({
   providedIn: 'root',
@@ -20,8 +20,9 @@ export class AdminService {
     return this.http.get<{ users: User[] }>(this.usersUrl);
   }
 
-
-  updateUsers(payload: { users: Partial<User>[] }): Observable<{ message: string }> {
+  updateUsers(payload: {
+    users: Partial<User>[];
+  }): Observable<{ message: string }> {
     const url = `${this.usersUrl}`;
     return this.http.patch<{ message: string }>(url, payload);
   }
@@ -30,18 +31,25 @@ export class AdminService {
     return this.http.get<{ suspensions: Suspension[] }>(this.suspensionsUrl);
   }
 
-  suspendUser(payload: { user_id: string; suspend_time: number }): Observable<{ message: string; user: User }> {
-    return this.http.post<{ message: string; user: User }>(this.suspendUrl, payload);
+  suspendUser(payload: {
+    user_id: string;
+    suspend_time: number;
+  }): Observable<{ message: string; user: User }> {
+    return this.http.post<{ message: string; user: User }>(
+      this.suspendUrl,
+      payload
+    );
   }
 
-  removeSuspension(payload: { user_id: string, suspension_id: string }): Observable<{ message: string }> {
-    const url = `${this.suspensionsUrl}`; 
+  removeSuspension(payload: {
+    user_id: string;
+    suspension_id: string;
+  }): Observable<{ message: string }> {
+    const url = `${this.suspensionsUrl}`;
     return this.http.delete<{ message: string }>(url, { body: payload });
   }
 
-    getAllJobsAdmin(): Observable<Job[]> {
-    return this.http.get<Job[]>(this.adminJobsUrl);
+  getAllJobsAdmin(): Observable<UserJob[]> {
+    return this.http.get<UserJob[]>(this.adminJobsUrl);
   }
-  
-  
 }

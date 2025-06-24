@@ -1,7 +1,6 @@
 <div class="admin-container">
   <h1>User Quotas</h1>
 
-
   <div *ngIf="showSuccessPopup" class="success-popup">
     {{ successMessage }}
   </div>
@@ -10,7 +9,6 @@
     {{ errorMessage }}
   </div>
 
-  
   <table *ngIf="users.length > 0" class="users-table">
     <thead>
       <tr>
@@ -29,36 +27,113 @@
     </thead>
     <tbody>
       <tr *ngFor="let user of users">
-        <td><input [(ngModel)]="user.username" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidUsername(user.username)}" /></td>
-        <td><input [(ngModel)]="user.email" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidEmail(user.email)}" /></td>
-        <td><input type="number" [(ngModel)]="user.max_processes_per_user" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxProcesses(user.max_processes_per_user)}" /></td>
-        <td><input type="number" [(ngModel)]="user.max_processes_per_node_per_user" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxProcessesPerNode(user.max_processes_per_node_per_user)}" /></td>
-        <td><input type="number" [(ngModel)]="user.max_running_jobs" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxRunningJobs(user.max_running_jobs)}" /></td>
-        <td><input type="number" [(ngModel)]="user.max_pending_jobs" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxPendingJobs(user.max_pending_jobs)}" /></td>
-        <td><input [(ngModel)]="user.max_job_time" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxJobTime(user.max_job_time)}" /></td>
-        <td><input [(ngModel)]="user.allowed_nodes" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidAllowedNodes(user.allowed_nodes)}" /></td>
-        <td><input [(ngModel)]="user.max_nodes_per_job" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxNodesPerJob(user.max_nodes_per_job)}" /></td>
-        <td><input [(ngModel)]="user.max_total_jobs" (ngModelChange)="markAsModified(user.id)" [ngClass]="{'invalid': !isValidMaxTotalJobs(user.max_total_jobs)}" /></td>
         <td>
-          <button class="suspend-btn" (click)="openSuspendModal(user)">Suspend</button>
+          <input
+            [(ngModel)]="user.username"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{ invalid: !isValidUsername(user.username) }"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.email"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{ invalid: !isValidEmail(user.email) }"
+          />
+        </td>
+        <td>
+          <input
+            type="number"
+            [(ngModel)]="user.max_processes_per_user"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{
+              invalid: !isValidMaxProcesses(user.max_processes_per_user)
+            }"
+          />
+        </td>
+        <td>
+          <input
+            type="number"
+            [(ngModel)]="user.max_processes_per_node_per_user"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{
+              invalid: !isValidMaxProcessesPerNode(
+                user.max_processes_per_node_per_user
+              )
+            }"
+          />
+        </td>
+        <td>
+          <input
+            type="number"
+            [(ngModel)]="user.max_running_jobs"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{
+              invalid: !isValidMaxRunningJobs(user.max_running_jobs)
+            }"
+          />
+        </td>
+        <td>
+          <input
+            type="number"
+            [(ngModel)]="user.max_pending_jobs"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{
+              invalid: !isValidMaxPendingJobs(user.max_pending_jobs)
+            }"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_job_time"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{ invalid: !isValidMaxJobTime(user.max_job_time) }"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.allowed_nodes"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{ invalid: !isValidAllowedNodes(user.allowed_nodes) }"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_nodes_per_job"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{
+              invalid: !isValidMaxNodesPerJob(user.max_nodes_per_job)
+            }"
+          />
+        </td>
+        <td>
+          <input
+            [(ngModel)]="user.max_total_jobs"
+            (ngModelChange)="markAsModified(user.id)"
+            [ngClass]="{ invalid: !isValidMaxTotalJobs(user.max_total_jobs) }"
+          />
+        </td>
+        <td>
+          <button class="suspend-btn" (click)="openSuspendModal(user)">
+            Suspend
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
 
+  <div>
+    <button
+      class="push-changes-btn"
+      *ngIf="modifiedUsers.size > 0"
+      [ngClass]="{ invalid: !isAllValid() }"
+      [disabled]="!isAllValid()"
+      (click)="pushChanges()"
+    >
+      Push Changes
+    </button>
+  </div>
 
-<div>
-  <button class="push-changes-btn"
-          *ngIf="modifiedUsers.size > 0"
-          [ngClass]="{'invalid': !isAllValid()}"
-          [disabled]="!isAllValid()"
-          (click)="pushChanges()">
-    Push Changes
-  </button>
-</div>
-
-
-  
   <div class="suspension-modal-overlay" *ngIf="showSuspendModal">
     <div class="suspension-modal">
       <h2 class="modal-header">Suspend User: {{ selectedUser?.username }}</h2>
@@ -72,13 +147,10 @@
     </div>
   </div>
 
-
-  
   <h1>User Suspensions</h1>
   <table *ngIf="suspensions.length > 0" class="suspensions-table">
     <thead>
       <tr>
-
         <th>Username</th>
         <th>Email</th>
         <th>Suspend Date</th>
@@ -90,55 +162,89 @@
       <tr *ngFor="let suspension of suspensions">
         <td>{{ suspension.username }}</td>
         <td>{{ suspension.email }}</td>
-        <td>{{ suspension.start_date | date: 'short' }}</td>
+        <td>{{ suspension.start_date | date : "short" }}</td>
         <td>{{ suspension.suspend_time }}</td>
         <td>
-          <button class="remove-btn" (click)="removeSuspension(suspension)">Remove</button>
+          <button class="remove-btn" (click)="removeSuspension(suspension)">
+            Remove
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
-</div>
 
+  <div *ngIf="adminJobs?.length" class="all-jobs-container">
+    <h1>All MPI Jobs</h1>
+    <div class="table-responsive">
+      <table class="all-jobs-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>User Email</th>
+            <th>Status</th>
+            <th>Begin Time</th>
+            <th>End Time</th>
+            <th>File Name</th>
+            <th>Hostfile</th>
+            <th>Procs</th>
+            <th>Oversub?</th>
+            <th>Env Vars</th>
+            <th>Display Map</th>
+            <th>Map By</th>
+            <th>Rank By</th>
+            <th>Alert On Finish</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let job of adminJobs">
+            <td>{{ job.jobName }}</td>
+            <td>{{ job.userEmail }}</td>
+            <td
+              [ngClass]="{
+                'status-pending': job.status === 'pending',
+                'status-running': job.status === 'running',
+                'status-completed': job.status === 'completed',
+                'status-failed': job.status === 'failed',
+                'status-killed': job.status === 'killed'
+              }"
+            >
+              {{ job.status }}
+            </td>
+            <td>{{ job.beginDate || "-" }}</td>
+            <td>{{ job.endDate || "-" }}</td>
 
+            <td>
+              <a
+                *ngIf="job.fileContent"
+                href="javascript:void(0)"
+                (click)="downloadExecutable(job.fileName, job.fileContent)"
+              >
+                {{ job.fileName }}
+              </a>
+              <span *ngIf="!job.fileContent">-</span>
+            </td>
 
+            <td>
+              <a
+                *ngIf="job.hostFile"
+                href="javascript:void(0)"
+                (click)="downloadHostfile(job.hostFile)"
+              >
+                Download
+              </a>
+              <span *ngIf="!job.hostFile">-</span>
+            </td>
 
-
-<div *ngIf="adminJobs?.length" class="all-jobs-container">
-  <h2>All MPI Jobs</h2>
-  <table class="all-jobs-table">
-    <thead>
-      <tr>
-        <th>Job ID</th>
-        <th>Name</th>
-        <th>User</th>
-        <th>Status</th>
-        <th>Start Time</th>
-        <th>End Time</th>
-        <th># Procs</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let job of adminJobs">
-        <td>{{ job.jobName }}</td>
-        <td [ngClass]="{
-             'status-pending': job.status==='pending',
-             'status-running': job.status==='running',
-             'status-completed': job.status==='completed',
-             'status-failed': job.status==='failed',
-             'status-killed': job.status==='killed'
-           }">
-          {{ job.status }}
-        </td>
-        <td>{{ job.beginDate || '–' }}</td>
-        <td>{{ job.endDate  || '–' }}</td>
-        <td>{{ job.numProcesses }}</td>
-        <!-- <td class="job-actions">
-          <button (click)="killJob(job.id)" title="Kill"><mat-icon>stop</mat-icon></button>
-          <button (click)="downloadHostfile(job.hostFile)" title="Hostfile"><mat-icon>file_download</mat-icon></button>
-        </td> -->
-      </tr>
-    </tbody>
-  </table>
+            <td>{{ job.numProcesses }}</td>
+            <td>{{ job.allowOverSubscription ? "Yes" : "No" }}</td>
+            <td class="env-vars">{{ job.environmentVars }}</td>
+            <td>{{ job.displayMap ? "Yes" : "No" }}</td>
+            <td>{{ job.mapBy || "-" }}</td>
+            <td>{{ job.rankBy || "-" }}</td>
+            <td>{{ job.alertOnFinish ? "Yes" : "No" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

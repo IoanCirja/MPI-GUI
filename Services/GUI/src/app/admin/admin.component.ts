@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AdminService } from './admin.service';
-import { User } from './User';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Suspension } from './Suspension';
-import { Job } from '../job-poster/models/Job';
+import { Suspension } from '../models/Suspension';
+import { Job, UserJob } from '../models/Job';
+import { AdminService } from '../services/admin.service';
+import { User } from '../models/User';
 
 @Component({
   selector: 'app-admin',
@@ -16,48 +16,78 @@ export class AdminComponent implements OnInit {
 
   users: User[] = [];
   errorMessage: string = '';
-  modifiedUsers: Set<string> = new Set();  
+  modifiedUsers: Set<string> = new Set();
   showSuspendModal: boolean = false;
   selectedUser: User | null = null;
-  suspendTime: number = 10;  
-  currentDate: string = new Date().toISOString(); 
-  constructor(private adminService: AdminService) {}
+  suspendTime: number = 10;
+  currentDate: string = new Date().toISOString();
   suspensions: Suspension[] = [];
-  successMessage: string = '';  // This will hold the success message
-  showSuccessPopup: boolean = false;  // Flag to show/hide the success popup
-adminJobs: Job[] = [];
+  successMessage: string = '';
+  showSuccessPopup: boolean = false;
+  adminJobs: UserJob[] = [];
+
+  constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
     this.fetchAllUsers();
     this.fetchSuspensions();
-      this.fetchAllJobsAdmin();
-
+    this.fetchAllJobsAdmin();
   }
 
-  
 
-fetchAllJobsAdmin() {
-  this.adminService.getAllJobsAdmin().subscribe({
-    next: jobs => this.adminJobs = jobs,
-    error: err => console.error('Could not load all jobs:', err)
-  });
-}
+    decodeBase64(encodedString: string): string {
+    try {
+      return atob(encodedString);
+    } catch (e) {
+      return encodedString;
+    }
+  }
+
+  downloadExecutable(name: string, content: string): void {
+    const decodedContent = this.decodeBase64(content);
+
+    const blob = new Blob(
+      [new Uint8Array(decodedContent.split('').map((c) => c.charCodeAt(0)))],
+      { type: 'application/x-msdownload' }
+    );
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
+    link.click();
+  }
+
+  downloadHostfile(encodedHostfile: string): void {
+    const decodedHostfile = this.decodeBase64(encodedHostfile);
+    const blob = new Blob([decodedHostfile], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'hostfile.txt';
+    link.click();
+  }
+
+  fetchAllJobsAdmin() {
+    this.adminService.getAllJobsAdmin().subscribe({
+      next: (jobs) => (this.adminJobs = jobs),
+      error: (err) => console.error('Could not load all jobs:', err),
+    });
+  }
   isAllValid(): boolean {
-    return this.users.every(user => 
-      this.isValidUsername(user.username) &&
-      this.isValidEmail(user.email) &&
-      this.isValidMaxProcesses(user.max_processes_per_user) &&
-      this.isValidMaxProcessesPerNode(user.max_processes_per_node_per_user) &&
-      this.isValidMaxRunningJobs(user.max_running_jobs) &&
-      this.isValidMaxPendingJobs(user.max_pending_jobs) &&
-      this.isValidMaxJobTime(user.max_job_time) &&
-      this.isValidAllowedNodes(user.allowed_nodes) &&
-      this.isValidMaxNodesPerJob(user.max_nodes_per_job) &&
-      this.isValidMaxTotalJobs(user.max_total_jobs)
+    return this.users.every(
+      (user) =>
+        this.isValidUsername(user.username) &&
+        this.isValidEmail(user.email) &&
+        this.isValidMaxProcesses(user.max_processes_per_user) &&
+        this.isValidMaxProcessesPerNode(user.max_processes_per_node_per_user) &&
+        this.isValidMaxRunningJobs(user.max_running_jobs) &&
+        this.isValidMaxPendingJobs(user.max_pending_jobs) &&
+        this.isValidMaxJobTime(user.max_job_time) &&
+        this.isValidAllowedNodes(user.allowed_nodes) &&
+        this.isValidMaxNodesPerJob(user.max_nodes_per_job) &&
+        this.isValidMaxTotalJobs(user.max_total_jobs)
     );
   }
 
-  
   isValidUsername(username: string): boolean {
     return Boolean(username && username.length > 0);
   }
@@ -68,7 +98,6 @@ fetchAllJobsAdmin() {
   }
 
   isValidMaxProcesses(maxProcesses: number): boolean {
-    console.log('TEST',maxProcesses >= 1 && maxProcesses <= 70 );
     return maxProcesses >= 1 && maxProcesses <= 70;
   }
 
@@ -90,7 +119,9 @@ fetchAllJobsAdmin() {
 
   isValidAllowedNodes(allowedNodes: string): boolean {
     const nodesPattern = /^C[0-9]{2}$/;
-    return allowedNodes.split(',').every(node => nodesPattern.test(node.trim()));
+    return allowedNodes
+      .split(',')
+      .every((node) => nodesPattern.test(node.trim()));
   }
 
   isValidMaxNodesPerJob(maxNodes: number): boolean {
@@ -105,62 +136,53 @@ fetchAllJobsAdmin() {
     this.adminService.getAllUsers().subscribe(
       (response) => {
         this.users = response.users;
-        console.log('Fetched users:', this.users); 
       },
       (error) => {
-        this.errorMessage = 'Failed to load users. Make sure you are logged in as an admin.';
-        console.error('Error fetching users:', error); 
+        this.errorMessage =
+          'Failed to load users. Make sure you are logged in as an admin.';
       }
     );
   }
 
-  
   markAsModified(userId: string): void {
-    console.log(`User ${userId} marked as modified`); 
     this.modifiedUsers.add(userId);
   }
 
-  
   isModified(userId: string): boolean {
     return this.modifiedUsers.has(userId);
   }
   getRequestKeys(request: any): string[] {
     return Object.keys(request);
   }
-  
+
   prettifyKey(key: string): string {
-    return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   }
-  
-  
+
   removeSuspension(suspension: Suspension): void {
     if (!confirm('Are you sure you want to remove this suspension?')) {
       return;
     }
-  
+
     const payload = {
       user_id: suspension.user_id,
-      suspension_id: suspension.id
+      suspension_id: suspension.id,
     };
-  
+
     this.adminService.removeSuspension(payload).subscribe(
       () => {
-        console.log('Suspension removed successfully');
-        this.fetchSuspensions(); // Refresh the suspensions list
+        this.fetchSuspensions();
       },
       (error) => {
-        console.error('Error removing suspension:', error);
         this.errorMessage = 'Failed to remove suspension.';
       }
     );
   }
-  
-  
-  
+
   pushChanges(): void {
     const modifiedUsersData = this.users
-      .filter(user => this.isModified(user.id))
-      .map(user => ({
+      .filter((user) => this.isModified(user.id))
+      .map((user) => ({
         id: user.id,
         username: user.username,
         email: user.email,
@@ -173,64 +195,51 @@ fetchAllJobsAdmin() {
         max_nodes_per_job: user.max_nodes_per_job,
         max_total_jobs: user.max_total_jobs,
       }));
-  
+
     const payload = { users: modifiedUsersData };
-  
+
     this.adminService.updateUsers(payload).subscribe(
       () => {
-        console.log('Users updated successfully');
         this.modifiedUsers.clear();
-        this.successMessage = 'Changes successfully applied!';  // Set the success message
+        this.successMessage = 'Changes successfully applied!';
         this.showSuccessPopup = true;
         setTimeout(() => {
-          this.showSuccessPopup = false;  // Hide the popup after 3 seconds
+          this.showSuccessPopup = false;
         }, 3000);
-      },
-      (error) => {
-        console.error('Error updating users:', error);
-        this.errorMessage = 'Failed to update users. Please try again.';
       }
     );
   }
-  
 
-fetchSuspensions(): void {
-  this.adminService.getAllSuspensions().subscribe(
-    (response) => {
-      this.suspensions = response.suspensions;
-      console.log('TEST', this.suspensions);
-    },
-    (error) => {
-      this.errorMessage = 'Failed to load suspensions.';
-    }
-  );
-}
+  fetchSuspensions(): void {
+    this.adminService.getAllSuspensions().subscribe(
+      (response) => {
+        this.suspensions = response.suspensions;
+      }
+    );
+  }
 
-openSuspendModal(user: User): void {
-  this.selectedUser = user;
-  this.showSuspendModal = true;
-}
+  openSuspendModal(user: User): void {
+    this.selectedUser = user;
+    this.showSuspendModal = true;
+  }
 
-closeSuspendModal(): void {
-  this.showSuspendModal = false;
-}
+  closeSuspendModal(): void {
+    this.showSuspendModal = false;
+  }
 
-confirmSuspend(): void {
-  if (!this.selectedUser) return;
-  
-  const payload = {
-    user_id: this.selectedUser.id,
-    suspend_time: this.suspendTime,
-  };
+  confirmSuspend(): void {
+    if (!this.selectedUser) return;
 
-  this.adminService.suspendUser(payload).subscribe(
-    () => {
-      this.fetchSuspensions();  
-      this.closeSuspendModal();
-    },
-    (error) => {
-      this.errorMessage = 'Failed to suspend user.';
-    }
-  );
-}
+    const payload = {
+      user_id: this.selectedUser.id,
+      suspend_time: this.suspendTime,
+    };
+
+    this.adminService.suspendUser(payload).subscribe(
+      () => {
+        this.fetchSuspensions();
+        this.closeSuspendModal();
+      }
+    );
+  }
 }
