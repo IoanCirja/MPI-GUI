@@ -30,8 +30,6 @@ class UserService:
             if datetime.utcnow() < suspend_end:
                 raise ValueError(f"User is currently suspended until {suspend_end}. Try again later.")
 
-
-
         stored_hash = userData["password"]
         salt = userData["salt"]
 
@@ -69,15 +67,13 @@ class UserService:
             raise ValueError("Username already exists")
         if UserRepository.getUserByEmail(createUserRequest.email):
             raise ValueError("Email already exists")
-
         if createUserRequest.password != createUserRequest.retypePassword:
             raise ValueError("Passwords do not match")
 
         salt = os.urandom(16).hex()
-
         hashedPassword = hashlib.sha256((createUserRequest.password + salt).encode('utf-8')).hexdigest()
 
-##admin
+        ##admin
         # data = {
         #     "username": createUserRequest.username,
         #     "email": createUserRequest.email,
@@ -94,7 +90,6 @@ class UserService:
         #     "suspensions": [],
         #     "rights": 'admin'
         # }
-
 
         data = {
             "username": createUserRequest.username,
@@ -118,14 +113,13 @@ class UserService:
     @staticmethod
     def getAllNonAdminUsers():
         all_users = UserRepository.getAllUsers()
-
         non_admin_users = [user for user in all_users if user.get("rights") != "admin"]
-
         return non_admin_users
 
     @staticmethod
     def getUserByIdforQuota(user_id: str) -> dict:
         return UserRepository.getUserByIdforQuota(user_id)
+
     @staticmethod
     def getQuotas() -> dict:
         return UserRepository.getQuotas()
@@ -135,12 +129,9 @@ class UserService:
         existing_user = UserRepository.getUserByIdforQuota(user_id)
 
         if not existing_user:
-            return None  # User does not exist
+            return None
 
-        # Apply updates to existing user
         updated_user_data = {**existing_user, **user_data}
-
-        # Filter the allowed fields to prevent unauthorized changes
         allowed_fields = {
             "max_processes_per_user",
             "max_processes_per_node_per_user",
@@ -153,27 +144,20 @@ class UserService:
         }
 
         filtered_update = {key: value for key, value in updated_user_data.items() if key in allowed_fields}
-
-        # Update the user in the repository
         UserRepository.updateUser(user_id, filtered_update)
 
         return filtered_update
 
     @staticmethod
     def suspendUser(user_id: str, suspend_time: int) -> dict:
-        """Suspend a user by delegating to the repository."""
         updated_user = UserRepository.suspendUser(user_id, suspend_time)
-
         if not updated_user:
             raise ValueError("User not found")
 
         return updated_user
 
-
     def removeSuspension(user_id: str, suspension_id: str) -> dict:
-        """Remove a suspension by suspension_id for the given user."""
         updated_user = UserRepository.removeSuspension(user_id, suspension_id)
-
         if not updated_user:
             raise ValueError("Suspension not found or user not found")
 

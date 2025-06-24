@@ -7,12 +7,10 @@ from bson.objectid import ObjectId
 
 
 class UserRepository:
-    # shared Mongo client & collection
     _client = MongoClient("mongodb://localhost:27019/")
     _db = _client["auth_service_db"]
     _users = _db["users"]
 
-    # fields to include in quota-only views
     _quota_fields = {
         "max_processes_per_user",
         "max_processes_per_node_per_user",
@@ -26,7 +24,6 @@ class UserRepository:
 
     @staticmethod
     def addUser(data: dict):
-        """Insert a new user document (no return, to match original)."""
         UserRepository._users.insert_one(data)
 
     @staticmethod
@@ -95,7 +92,6 @@ class UserRepository:
 
     @staticmethod
     def updateUser(user_id: str, data: dict):
-        """Partial update; no return to match original signature."""
         try:
             oid = ObjectId(user_id)
         except Exception:
@@ -140,7 +136,7 @@ class UserRepository:
         suspensions = user.get("suspensions", [])
         updated = [s for s in suspensions if s.get("id") != suspension_id]
         if len(updated) == len(suspensions):
-            return None  # no change
+            return None
 
         UserRepository._users.update_one({"_id": oid}, {"$set": {"suspensions": updated}})
         return {"id": user_id, "suspensions": updated}

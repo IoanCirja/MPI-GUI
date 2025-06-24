@@ -1,9 +1,12 @@
 from datetime import datetime
 import jwt
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
+from starlette import status
 
+from AuthService.App.DTOs.RemoveSuspensionRequest import RemoveSuspensionRequest
 from AuthService.App.Services.AuthService import UserService, env
+from AuthService.App.Utils.JWTUtils import get_token_from_header
 
 admin_router = APIRouter()
 class SuspendUserRequest(BaseModel):
@@ -11,122 +14,79 @@ class SuspendUserRequest(BaseModel):
     suspend_time: int
 
 @admin_router.get("/admin/users/")
-async def get_all_users(request: Request):
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-
-    token = auth_header.split(" ")[1] if "Bearer " in auth_header else None
-
-    if not token:
-        raise HTTPException(status_code=400, detail="Invalid token format")
-
+async def get_all_users(
+        request: Request,
+        decoded_token: dict = Depends(get_token_from_header),
+):
     try:
-        decoded_token = jwt.decode(token, key=env("SECRET_KEY"), algorithms=[env("ALGORITHM")])
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(decoded_token["exp"]):
-            raise HTTPException(status_code=401, detail="Token has expired")
-
         if decoded_token.get("rights") != "admin":
             raise HTTPException(status_code=403, detail="Access denied. Admin rights required.")
 
         non_admin_users = UserService.getAllNonAdminUsers()
-
         return {"users": non_admin_users}
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve users: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")
 
 @admin_router.post("/admin/suspend/")
-async def suspend_user(request: Request, suspend_request: SuspendUserRequest):
-
-    auth_header = request.headers.get("Authorization")
-    if not auth_header:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-
-    token = auth_header.split(" ")[1] if "Bearer " in auth_header else None
-    if not token:
-        raise HTTPException(status_code=400, detail="Invalid token format")
+async def suspend_user(
+        request: Request,
+        suspend_request: SuspendUserRequest,
+        decoded_token: dict = Depends(get_token_from_header),
+):
 
     try:
-        decoded_token = jwt.decode(token, key=env("SECRET_KEY"), algorithms=[env("ALGORITHM")])
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(decoded_token["exp"]):
-            raise HTTPException(status_code=401, detail="Token has expired")
-
         if decoded_token.get("rights") != "admin":
             raise HTTPException(status_code=403, detail="Access denied. Admin rights required.")
 
         updated_user = UserService.suspendUser(suspend_request.user_id, suspend_request.suspend_time)
 
         return {"message": "User suspended successfully", "user": updated_user}
-
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to suspend user: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")
 
 
 @admin_router.patch("/admin/users/")
-async def bulk_update_users(request: Request):
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-
-    token = auth_header.split(" ")[1] if "Bearer " in auth_header else None
-
-    if not token:
-        raise HTTPException(status_code=400, detail="Invalid token format")
-
+async def bulk_update_users(
+        request: Request,
+        decoded_token: dict = Depends(get_token_from_header),
+):
     try:
-        decoded_token = jwt.decode(token, key=env("SECRET_KEY"), algorithms=[env("ALGORITHM")])
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(decoded_token["exp"]):
-            raise HTTPException(status_code=401, detail="Token has expired")
+        if decoded_token.get("rights") != "admin":
+            raise HTTPException(status_code=403, detail="Access denied. Admin rights required.")
 
         payload = await request.json()
         updated_users = payload.get('users', [])
 
         if not updated_users:
-            raise HTTPException(status_code=400, detail="No users to update")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users to update")
 
         for user in updated_users:
             user_id = user.get("id")
             if user_id:
                 updated_user = UserService.updateUser(user_id, user)
                 if not updated_user:
-                    raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User {user_id} not found")
 
         return {"message": "Users updated successfully"}
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to update users: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")
 
 
 @admin_router.get("/admin/suspensions/")
-async def get_all_suspensions(request: Request):
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-
-    token = auth_header.split(" ")[1] if "Bearer " in auth_header else None
-
-    if not token:
-        raise HTTPException(status_code=400, detail="Invalid token format")
+async def get_all_suspensions(
+        request: Request,
+        decoded_token: dict = Depends(get_token_from_header),
+):
 
     try:
-        decoded_token = jwt.decode(token, key=env("SECRET_KEY"), algorithms=[env("ALGORITHM")])
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(decoded_token["exp"]):
-            raise HTTPException(status_code=401, detail="Token has expired")
-
         if decoded_token.get("rights") != "admin":
             raise HTTPException(status_code=403, detail="Access denied. Admin rights required.")
 
@@ -147,38 +107,21 @@ async def get_all_suspensions(request: Request):
 
         return {"suspensions": suspensions}
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve suspensions: {str(e)}")
-
-
-
-class RemoveSuspensionRequest(BaseModel):
-    user_id: str
-    suspension_id: str
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")
 
 @admin_router.delete("/admin/suspensions/")
-async def remove_suspension(suspension: RemoveSuspensionRequest, request: Request):
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
-        raise HTTPException(status_code=400, detail="Authorization header missing")
-
-    token = auth_header.split(" ")[1] if "Bearer " in auth_header else None
-    if not token:
-        raise HTTPException(status_code=400, detail="Invalid token format")
-
+async def remove_suspension(
+        suspension: RemoveSuspensionRequest,
+        request: Request,
+        decoded_token: dict = Depends(get_token_from_header),
+):
     try:
-        decoded_token = jwt.decode(token, key=env("SECRET_KEY"), algorithms=[env("ALGORITHM")])
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(decoded_token["exp"]):
-            raise HTTPException(status_code=401, detail="Token has expired")
-
         if decoded_token.get("rights") != "admin":
             raise HTTPException(status_code=403, detail="Access denied. Admin rights required.")
 
-        # Pass user_id and suspension_id to the service layer
         success = UserService.removeSuspension(suspension.user_id, suspension.suspension_id)
 
         if not success:
@@ -186,7 +129,7 @@ async def remove_suspension(suspension: RemoveSuspensionRequest, request: Reques
 
         return {"message": "Suspension removed successfully"}
 
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to remove suspension: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")

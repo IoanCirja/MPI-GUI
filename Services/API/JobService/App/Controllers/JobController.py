@@ -49,7 +49,7 @@ async def get_quota_data(token: str) -> dict:
 @router.post("/upload/", response_model=dict)
 async def upload_file(
         upload_dto: UserJobDTO = Body(...),
-        decoded_token: str = Depends(get_token_from_header),
+        decoded_token: dict = Depends(get_token_from_header),
         authorization: str = Header(...),
         content_type: str = Header(..., alias="Content-Type"),
 ):
@@ -141,7 +141,7 @@ async def upload_file(
 
 @router.get('/jobs/', response_model=List[JobDTO])
 async def get_job_details(
-        decoded_token: str = Depends(get_token_from_header)
+        decoded_token: dict = Depends(get_token_from_header)
 ):
     try:
         userId = decoded_token["sub"]
@@ -150,13 +150,16 @@ async def get_job_details(
 
         return job_data
 
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")
+
 
 @router.delete('/jobs/', response_model=dict)
 async def clear_jobs(
         background_tasks: BackgroundTasks,
-        decoded_token: str = Depends(get_token_from_header),
+        decoded_token: dict = Depends(get_token_from_header),
 ):
     try:
         user_id = decoded_token["sub"]
@@ -185,7 +188,7 @@ async def clear_jobs(
 async def clear_jobs(
         job_id: str,
         background_tasks: BackgroundTasks,
-        decoded_token: str = Depends(get_token_from_header)
+        decoded_token: dict = Depends(get_token_from_header)
 ):
     try:
         user_id = decoded_token["sub"]
@@ -209,7 +212,7 @@ async def clear_jobs(
 def kill_job(
         job_id: str,
         background_tasks: BackgroundTasks,
-        decoded_token: str = Depends(get_token_from_header)
+        decoded_token: dict = Depends(get_token_from_header)
 ):
     try:
         user_id = decoded_token["sub"]
