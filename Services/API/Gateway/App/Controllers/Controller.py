@@ -52,6 +52,10 @@ async def login(request: Request):
 async def profile(request: Request):
     return await forward_request(request, f"{AUTH_SERVICE_URL}/profile/")
 
+
+
+
+
 @router.post("/upload/")
 async def upload(request: Request):
     return await forward_request(request, f"{JOB_SERVICE_URL}/upload/")
@@ -60,10 +64,18 @@ async def upload(request: Request):
 async def jobs(request: Request):
     return await forward_request(request, f"{JOB_SERVICE_URL}/jobs/")
 
-@router.get("/jobs/{job_id}")
-async def job_details(request: Request, job_id: str):
-    return await forward_request(request, f"{JOB_SERVICE_URL}/jobs/{job_id}")
-
 @router.post("/jobs/{job_id}/kill")
 async def kill_job(request: Request, job_id: str):
     return await forward_request(request, f"{JOB_SERVICE_URL}/jobs/{job_id}/kill")
+
+@router.delete("/jobs/")
+async def clear_all_jobs(request: Request):
+    return await forward_request(request, f"{JOB_SERVICE_URL}/jobs/")
+
+@router.delete("/jobs/{job_id}")
+async def clear_job(request: Request, job_id: str):
+    return await forward_request(request, f"{JOB_SERVICE_URL}/jobs/{job_id}")
+
+@router.get("/jobs/admin")
+async def get_all_jobs_admin(request: Request):
+    return await forward_request(request, f"{JOB_SERVICE_URL}/jobs/admin")

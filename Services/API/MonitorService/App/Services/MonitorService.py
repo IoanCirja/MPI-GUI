@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 logger = logging.getLogger(__name__)
 
 node_statuses = {node: None for node in MPI_HOSTS}
-
+MONITOR_INTERVAL = 5
 class MonitorService:
     def __init__(self, host: str, port: int, username: str, password: str):
         self.host = host
@@ -85,6 +85,6 @@ async def run_ssh_cycle_and_notify():
     try:
         while True:
             ssh_service.update_node_statuses_in_db()
-            await asyncio.sleep(5)
+            await asyncio.sleep(MONITOR_INTERVAL)
     finally:
         await loop.run_in_executor(None, ssh_service.close)

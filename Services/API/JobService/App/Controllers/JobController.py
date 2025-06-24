@@ -120,9 +120,7 @@ async def upload_file(
         for node in allowed_nodes:
             allowed_nodes_with_prefix.append(node.replace("C", "C05-", 1).strip())
 
-
         for node, slots in node_request.items():
-
             if slots > int(quotas_for_user['max_processes_per_node_per_user']):
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Node {node} exceeds the max process count per node!")
 
@@ -237,10 +235,14 @@ def kill_job(
 async def get_all_jobs_admin(
     decoded_token: dict = Depends(get_token_from_header)
 ):
-    if decoded_token.get("rights") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin rights required")
-    user_id = decoded_token["sub"]
-    job_service = JobService(user_id)
-    all_jobs = job_service.get_all_jobs()
-    return all_jobs
-
+    try:
+        if decoded_token.get("rights") != "admin":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin rights required")
+        user_id = decoded_token["sub"]
+        job_service = JobService(user_id)
+        all_jobs = job_service.get_all_jobs()
+        return all_jobs
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Action Failed: {str(e)}")

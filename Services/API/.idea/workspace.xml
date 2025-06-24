@@ -6,13 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BroadCastService/App/DTOs/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BroadCastService/App/Repositories/BroadCastRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/BroadCastService/App/Repositories/BroadCastRepository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BroadCastService/App/Services/BroadCastService.py" beforeDir="false" afterPath="$PROJECT_DIR$/BroadCastService/App/Services/BroadCastService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gateway/App/Controllers/Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/App/Controllers/Controller.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Repositories/JobRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Repositories/JobRepository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/JobService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/JobService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/SSHService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Utils/FirebaseConnection.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonitorService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/MonitorService/App/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonitorService/App/Services/MonitorService.py" beforeDir="false" afterPath="$PROJECT_DIR$/MonitorService/App/Services/MonitorService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +165,7 @@
       <workItem from="1749812352290" duration="25032000" />
       <workItem from="1750238781065" duration="5481000" />
       <workItem from="1750405763535" duration="10163000" />
-      <workItem from="1750529304118" duration="28765000" />
+      <workItem from="1750529304118" duration="36549000" />
     </task>
     <servers />
   </component>

@@ -8,7 +8,7 @@ import { Job } from '../job-poster/models/Job';
 })
 export class FileUploadService {
   private apiUrl = 'http://127.0.0.1:8000/api/upload/';
-  private jobUrl = 'http://localhost:8002/api/jobs/';
+  private jobUrl = 'http://localhost:8000/api/jobs/';
 
   constructor(private http: HttpClient) {}
 

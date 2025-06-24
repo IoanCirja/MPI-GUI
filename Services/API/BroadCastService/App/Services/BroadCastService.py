@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 node_statuses = {node: None for node in MPI_HOSTS}
 
+MONITOR_INTERVAL = 5
 
 
 async def broadcast_node_statuses():
@@ -36,7 +37,7 @@ async def broadcast_node_statuses():
 
             if not node_statuses:
                 logging.warning("No node statuses available to broadcast.")
-                await asyncio.sleep(60)
+                await asyncio.sleep(10)
                 continue
 
             node_status_data = json.dumps(node_statuses)
@@ -48,7 +49,7 @@ async def broadcast_node_statuses():
                     status_active_connections.remove(websocket)
 
             logging.info(f"Broadcasted node statuses to {len(status_active_connections)} clients.")
-            await asyncio.sleep(5)
+            await asyncio.sleep(MONITOR_INTERVAL)
 
         except Exception as e:
             logging.error(f"Error while broadcasting node statuses: {e}")

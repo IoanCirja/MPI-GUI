@@ -12,7 +12,7 @@ export class AdminService {
   private usersUrl = 'http://127.0.0.1:8001/api/admin/users/';
   private suspendUrl = 'http://127.0.0.1:8001/api/admin/suspend/';
   private suspensionsUrl = 'http://127.0.0.1:8001/api/admin/suspensions/';
-  private adminJobsUrl = 'http://127.0.0.1:8002/api/jobs/admin';    // ← new
+  private adminJobsUrl = 'http://127.0.0.1:8000/api/jobs/admin';    // ← new
 
   constructor(private http: HttpClient) {}
 
