@@ -6,23 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AdminController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AdminController.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Services/JobService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/JobService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/dashboard/dashboard.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/job-status/job-status.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/models/Job.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/services/upload.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/services/upload.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BroadCastService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/BroadCastService/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonitorService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MonitorService/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +47,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/FACULTATE/LICENTA/MPI-GUI/Services/API/JobService/App/Utils",
+    "last_opened_file_path": "C:/FACULTATE/LICENTA/MPI-GUI/Services/API/Gateway",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -70,11 +58,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\FACULTATE\LICENTA\MPI-GUI\Services\API\Gateway" />
       <recent name="C:\FACULTATE\LICENTA\MPI-GUI\Services\API\JobService\App\Utils" />
       <recent name="C:\FACULTATE\LICENTA\MPI-GUI\Services\API\BroadCastService\App" />
       <recent name="C:\FACULTATE\LICENTA\MPI-GUI\Services\API" />
       <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\JobService\App\Utils" />
-      <recent name="C:\FACULTATE\Licenta\MPI-GUI\Services\API\AuthService" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\FACULTATE\LICENTA\MPI-GUI\Services\API\AuthService\App\DTOs" />
@@ -174,7 +162,7 @@
       <workItem from="1749812352290" duration="25032000" />
       <workItem from="1750238781065" duration="5481000" />
       <workItem from="1750405763535" duration="10163000" />
-      <workItem from="1750529304118" duration="50097000" />
+      <workItem from="1750529304118" duration="61914000" />
     </task>
     <servers />
   </component>
