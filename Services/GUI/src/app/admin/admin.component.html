@@ -32,6 +32,7 @@
             [(ngModel)]="user.username"
             (ngModelChange)="markAsModified(user.id)"
             [ngClass]="{ invalid: !isValidUsername(user.username) }"
+            readonly
           />
         </td>
         <td>
@@ -39,6 +40,7 @@
             [(ngModel)]="user.email"
             (ngModelChange)="markAsModified(user.id)"
             [ngClass]="{ invalid: !isValidEmail(user.email) }"
+            readonly
           />
         </td>
         <td>
@@ -137,9 +139,9 @@
   <div class="suspension-modal-overlay" *ngIf="showSuspendModal">
     <div class="suspension-modal">
       <h2 class="modal-header">Suspend User: {{ selectedUser?.username }}</h2>
-      <p>Start Time: {{ currentDate }}</p>
+      <p>Start Time: {{ currentDate }} (UTC)</p>
       <label for="suspendTime">Suspend Time (mins):</label>
-      <input type="number" id="suspendTime" [(ngModel)]="suspendTime" />
+      <input type="number" id="suspendTime" [(ngModel)]="suspendTime" min="1"/>
       <div class="modal-buttons">
         <button class="ok-btn" (click)="confirmSuspend()">OK</button>
         <button class="cancel-btn" (click)="closeSuspendModal()">Cancel</button>
@@ -153,7 +155,7 @@
       <tr>
         <th>Username</th>
         <th>Email</th>
-        <th>Suspend Date</th>
+        <th>Suspend Date (UTC)</th>
         <th>Suspend Time (mins)</th>
         <th>Actions</th>
       </tr>

@@ -67,11 +67,7 @@ async def upload_file(
         user_email = decoded_token["email"]
         job_service = JobService(user_id)
 
-        job_data = JobUploadDTO(
-            **upload_dto.dict(),
-            user_id=user_id,
-            userEmail=user_email
-        )
+
 
         token = authorization[7:]
         quotas = await get_quota_data(token)
@@ -82,6 +78,13 @@ async def upload_file(
                 detail=f"No quota record found for this user!"
             )
         await job_service.update_quota_data(quotas)
+
+        job_data = JobUploadDTO(
+            **upload_dto.dict(),
+            user_id=user_id,
+            userEmail=user_email,
+            timeout=int(quotas_for_user['max_job_time'])
+        )
 
         job_history_for_user = job_service.get_all_jobs_for_user()
         running_jobs_for_user = await job_service.get_running_jobs_for_user()
@@ -168,12 +171,13 @@ async def clear_jobs(
         all_jobs: List[JobDTO] = job_service.get_all_jobs_for_user()
         job_ids = [job.id for job in all_jobs]
 
-        for job in all_jobs:
-            if job.status == "running":
-                background_tasks.add_task(job_service.kill_job_in_background, job.id)
-
+        # for job in all_jobs:
+        #     if job.status == "running":
+        #         background_tasks.add_task(job_service.kill_job_in_background, job.id)
+        #
+        job_service.clear_jobs()
         background_tasks.add_task(job_service.clear_jobs_on_cluster)
-        background_tasks.add_task(job_service.clear_jobs)
+
 
 
         return {"jobIds": job_ids}
@@ -196,11 +200,11 @@ async def clear_jobs(
 
         job = job_service.get_job_by_id(job_id)
 
-        if job and job.status == "running" and job_id:
-            background_tasks.add_task(job_service.kill_job_in_background, job_id)
+        # if job and job.status == "running" and job_id:
+        #     background_tasks.add_task(job_service.kill_job_in_background, job_id)
 
         background_tasks.add_task(job_service.clear_jobs_on_cluster, job_id)
-        background_tasks.add_task(job_service.clear_job, job_id)
+        job_service.clear_job(job_id)
         return {"jobId": job_id}
 
     except HTTPException as e:

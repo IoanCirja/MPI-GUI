@@ -305,6 +305,9 @@ export class UploadComponent implements OnInit, OnDestroy {
     this.slots = [];
     this.executionOutput = '';
     this.uploadMessage = '';
+    this.displayMap = false;
+    this.alertOnFinish = false;
+    this.environmentVars = '';
   }
 
 saveJobData(): void {

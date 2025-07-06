@@ -20,3 +20,4 @@ class JobUploadDTO(BaseModel):
     alertOnFinish: bool
     user_id: str
     userEmail: str
+    timeout: int

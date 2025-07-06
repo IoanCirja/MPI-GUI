@@ -98,23 +98,23 @@ export class AdminComponent implements OnInit {
   }
 
   isValidMaxProcesses(maxProcesses: number): boolean {
-    return maxProcesses >= 1 && maxProcesses <= 70;
+    return maxProcesses >= 1 && maxProcesses <= 1000;
   }
 
   isValidMaxProcessesPerNode(maxProcesses: number): boolean {
-    return maxProcesses >= 1 && maxProcesses <= 50;
+    return maxProcesses >= 1 && maxProcesses <= 1000;
   }
 
   isValidMaxRunningJobs(maxRunningJobs: number): boolean {
-    return maxRunningJobs >= 1 && maxRunningJobs <= 30;
+    return maxRunningJobs >= 1 && maxRunningJobs <= 1000;
   }
 
   isValidMaxPendingJobs(maxPendingJobs: number): boolean {
-    return maxPendingJobs >= 1 && maxPendingJobs <= 30;
+    return maxPendingJobs >= 1 && maxPendingJobs <= 1000;
   }
 
   isValidMaxJobTime(maxJobTime: number): boolean {
-    return maxJobTime >= 100 && maxJobTime <= 100000;
+    return maxJobTime >= 1 && maxJobTime <= 10000000;
   }
 
   isValidAllowedNodes(allowedNodes: string): boolean {
@@ -125,11 +125,11 @@ export class AdminComponent implements OnInit {
   }
 
   isValidMaxNodesPerJob(maxNodes: number): boolean {
-    return maxNodes >= 1 && maxNodes <= 20;
+    return maxNodes >= 1 && maxNodes <= 21;
   }
 
   isValidMaxTotalJobs(maxTotalJobs: number): boolean {
-    return maxTotalJobs >= 1 && maxTotalJobs <= 100;
+    return maxTotalJobs >= 1 && maxTotalJobs <= 1000;
   }
 
   fetchAllUsers(): void {
@@ -151,13 +151,7 @@ export class AdminComponent implements OnInit {
   isModified(userId: string): boolean {
     return this.modifiedUsers.has(userId);
   }
-  getRequestKeys(request: any): string[] {
-    return Object.keys(request);
-  }
 
-  prettifyKey(key: string): string {
-    return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  }
 
   removeSuspension(suspension: Suspension): void {
     if (!confirm('Are you sure you want to remove this suspension?')) {

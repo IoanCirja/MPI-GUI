@@ -111,6 +111,7 @@ class JobService:
                 alertOnFinish=job_data.alertOnFinish,
                 user_id=job_data.user_id,
                 userEmail=job_data.userEmail,
+                timeout=job_data.timeout
             )
 
             self.repository.insert_job(job)
@@ -248,7 +249,7 @@ class JobService:
         except Exception as e:
             raise Exception(f"Service Error: {e}")
 
-    async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO, timeout: int):
+    async def execute_job_in_background(self, job_id: str, job_data: JobUploadDTO):
         temp_exe_path = None
         temp_hostfile_path = None
         try:
@@ -314,10 +315,12 @@ class JobService:
 
                 mpirun_command += f" {remote_path_exe}"
 
+                logger.info(f'RUNNIG : {mpirun_command}')
+
                 try:
                     output = await asyncio.wait_for(
                         asyncio.to_thread(ssh_service.execute_command, mpirun_command, remote_path_exe, remote_path_host),
-                        timeout=timeout
+                        timeout=job_data.timeout
                     )
                 except asyncio.TimeoutError:
                     job_data_db = self.get_job_by_id(job_id)
@@ -370,6 +373,8 @@ class JobService:
                 job_data_db.endDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self.update_job_status_and_output(job_id, job_data_db)
                 self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+                if job_data_db.alertOnFinish:
+                    self.send_job_status_email(job_id, job_data_db)
                 return
 
             ssh_service = SSHService(SSH_HOST, SSH_PORT, SSH_USERNAME, SSH_PASSWORD)
@@ -383,8 +388,12 @@ class JobService:
                 job_data_db.endDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+
                 self.update_job_status_and_output(job_id, job_data_db)
                 self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+
+                if job_data_db.alertOnFinish:
+                    self.send_job_status_email(job_id, job_data_db)
 
         except Exception as e:
             job_data_db = self.get_job_by_id(job_id)
@@ -394,6 +403,9 @@ class JobService:
             self.update_job_status_and_output(job_id, job_data_db)
 
             self.notify_frontend(job_id, job_data_db.status, job_data_db.output, job_data_db.endDate)
+            if job_data_db.alertOnFinish:
+                self.send_job_status_email(job_id, job_data_db)
+            return
 
         finally:
             if ssh_service:

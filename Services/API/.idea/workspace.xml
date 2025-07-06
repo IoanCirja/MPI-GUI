@@ -6,11 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AdminController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AdminController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Controllers/AuthController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BroadCastService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/BroadCastService/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MonitorService/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MonitorService/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JobService/App/Services/JobService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/JobService.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,23 +44,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.AuthController.executor": "Run",
-    "Python.Main.executor": "Run",
-    "Python.main.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/FACULTATE/LICENTA/MPI-GUI/Services/API/Gateway",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.AuthController.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/FACULTATE/LICENTA/MPI-GUI/Services/API/Gateway&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\FACULTATE\LICENTA\MPI-GUI\Services\API\Gateway" />
@@ -162,7 +167,11 @@
       <workItem from="1749812352290" duration="25032000" />
       <workItem from="1750238781065" duration="5481000" />
       <workItem from="1750405763535" duration="10163000" />
-      <workItem from="1750529304118" duration="61914000" />
+      <workItem from="1750529304118" duration="63250000" />
+      <workItem from="1751265739657" duration="3434000" />
+      <workItem from="1751463360900" duration="320000" />
+      <workItem from="1751559540924" duration="891000" />
+      <workItem from="1751736140464" duration="13040000" />
     </task>
     <servers />
   </component>

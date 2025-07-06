@@ -51,8 +51,8 @@ async def monitor_pending_jobs():
 
     MAX_RUNNING_JOBS_PER_CLUSTER = 2
     MAX_NODE_USAGE_PER_CLUSTER = 50
-    MAX_PENDING_JOBS_PER_CLUSTER = 15
-    MAX_TOTAL_USAGE_PER_CLUSTER = 300
+    MAX_PENDING_JOBS_PER_CLUSTER = 50
+    MAX_TOTAL_USAGE_PER_CLUSTER = 500
 
 
     while True:
@@ -106,6 +106,7 @@ async def monitor_pending_jobs():
                         alertOnFinish=job.get("alertOnFinish"),
                         user_id=job.get("user_id"),
                         userEmail=job.get("userEmail"),
+                        timeout=job.get("timeout"),
                     )
                     node_request = {}
                     encoded_hostfile = job["hostFile"]
@@ -134,7 +135,7 @@ async def monitor_pending_jobs():
                     # job_quotas = quotas.get(job_author)
 
 
-                    asyncio.create_task(job_service.execute_job_in_background(str(job["_id"]), job_dto, 700))
+                    asyncio.create_task(job_service.execute_job_in_background(str(job["_id"]), job_dto))
                     job_started = True
                 except ValidationError as ve:
                     logger.error(f"Error constructing JobUploadDTO for job {job['_id']}: {ve}")
