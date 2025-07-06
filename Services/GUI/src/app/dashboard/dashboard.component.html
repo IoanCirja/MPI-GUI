@@ -1,6 +1,24 @@
 <div class="charts-container">
   <div class="quota-panel" *ngIf="userQuota">
-    <h3>User Quota</h3>
+    <h3>
+      User Quota
+      <div class="info-container">
+        <span class="info-icon">&#9432;</span>
+        <div class="info-popup">
+          These are the maximum limits configured for creating MPI jobs on the
+          cluster.<br />
+          Please note: if you exceed these quotas, you won't be able to submit
+          jobs that do not comply with them.
+          <br /><br />
+          The limitations mainly refer to the number of jobs, their distribution
+          across nodes, and maximum runtime.
+          <br /><br />
+          Additionally, the cluster itself has its own global constraints: In
+          periods of high load, your jobs may remain pending even if your
+          personal quotas are respected.
+        </div>
+      </div>
+    </h3>
     <table class="quota-table">
       <tbody>
         <tr>

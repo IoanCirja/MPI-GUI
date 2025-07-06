@@ -49,3 +49,43 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+
+.info-container {
+  position: relative;
+  display: inline-block;
+}
+
+.info-icon {
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1d25a0;
+
+  width: 16px;
+  height: 16px;
+
+}
+
+.info-popup {
+  visibility: hidden;
+  opacity: 0;
+  width: 370px;
+  background-color: #fff;
+  color: #333333;
+  text-align: left;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  position: absolute;
+  z-index: 10;
+  top: 24px;
+  left: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: opacity 0.2s;
+}
+
+.info-container:hover .info-popup {
+  visibility: visible;
+  opacity: 1;
+}
