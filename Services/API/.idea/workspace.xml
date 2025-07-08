@@ -6,16 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7803d145-2d97-4595-9250-b21cde827754" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/App/Services/AuthService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Controllers/JobController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobDTO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/DTOs/JobUploadDTO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JobService/App/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/JobService/App/Services/JobService.py" beforeDir="false" afterPath="$PROJECT_DIR$/JobService/App/Services/JobService.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/admin/admin.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../GUI/src/app/job-poster/upload/upload.component.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,7 +162,9 @@
       <workItem from="1751265739657" duration="3434000" />
       <workItem from="1751463360900" duration="320000" />
       <workItem from="1751559540924" duration="891000" />
-      <workItem from="1751736140464" duration="13040000" />
+      <workItem from="1751736140464" duration="14632000" />
+      <workItem from="1751804232391" duration="672000" />
+      <workItem from="1751817153941" duration="21487000" />
     </task>
     <servers />
   </component>
